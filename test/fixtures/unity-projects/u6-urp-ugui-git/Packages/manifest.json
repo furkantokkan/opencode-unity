@@ -1,0 +1,12 @@
+{
+  "dependencies": {
+    "com.cysharp.unitask": "https://github.com/example/unitask.git?path=src/UniTask#2.5.10",
+    "com.unity.addressables": "2.3.1",
+    "com.unity.ide.visualstudio": "2.0.22",
+    "com.unity.inputsystem": "1.11.2",
+    "com.unity.render-pipelines.universal": "17.3.0",
+    "com.unity.test-framework": "1.4.5",
+    "com.unity.ugui": "2.0.0",
+    "jp.hadashikick.vcontainer": "1.16.9"
+  }
+}

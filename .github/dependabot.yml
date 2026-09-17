@@ -1,0 +1,44 @@
+# Spec 16 P8 and 21.4: weekly updates for pinned GitHub Actions and dev dependencies. Runtime
+# dependencies are forbidden, and `lint` fails if one appears, so npm updates are development only.
+version: 2
+
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "05:00"
+      timezone: Etc/UTC
+    commit-message:
+      prefix: ci
+    open-pull-requests-limit: 5
+    groups:
+      github-actions:
+        patterns: ["*"]
+
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "05:00"
+      timezone: Etc/UTC
+    commit-message:
+      prefix: chore
+      include: scope
+    # Dev dependencies are pinned to exact versions; keep the pin and raise it.
+    versioning-strategy: increase
+    open-pull-requests-limit: 5
+    allow:
+      - dependency-type: development
+    ignore:
+      # Types for the tested OpenCode release. Bumping it is a minor release with its own checklist
+      # (spec section 22), driven by the contract-latest drift issue.
+      - dependency-name: "@opencode-ai/plugin"
+      # Pinned to the minimum supported Node major so type checking runs against it.
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
+    groups:
+      dev-dependencies:
+        patterns: ["*"]

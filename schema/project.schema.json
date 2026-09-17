@@ -1,0 +1,318 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "opencode-unity project.json",
+  "description": "Machine-readable Unity project facts written by `init` (spec 6.4). It never holds absolute paths, user names or machine data; those live in local.json.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "generator",
+    "unity",
+    "projectFiles",
+    "assemblies",
+    "compileMap",
+    "tests",
+    "ui",
+    "input",
+    "packagesNotable",
+    "librariesInUse",
+    "vcs",
+    "mcpForUnity",
+    "naming",
+    "largeFiles",
+    "instructionFiles",
+    "opencodeDir",
+    "sources",
+    "inputsHash"
+  ],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "generator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "version", "factsVersion"],
+      "properties": {
+        "name": { "const": "opencode-unity" },
+        "version": { "type": "string", "minLength": 1 },
+        "factsVersion": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "unity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version", "stream", "support", "pipeline"],
+      "properties": {
+        "version": { "$ref": "#/$defs/nullableString" },
+        "stream": { "$ref": "#/$defs/nullableString" },
+        "support": { "enum": ["reference-tested", "experimental", "unsupported", "unknown"] },
+        "pipeline": { "enum": ["URP", "HDRP", "Built-in"] }
+      }
+    },
+    "projectFiles": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["idePackage", "csprojCount", "solutionCount", "stale", "staleCount", "staleExamples"],
+      "properties": {
+        "idePackage": { "$ref": "#/$defs/nullableString" },
+        "csprojCount": { "type": "integer", "minimum": 0 },
+        "solutionCount": { "type": "integer", "minimum": 0 },
+        "stale": { "type": "boolean" },
+        "staleCount": { "type": "integer", "minimum": 0 },
+        "staleExamples": { "type": "array", "maxItems": 5, "items": { "$ref": "#/$defs/relativePath" } }
+      }
+    },
+    "assemblies": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "folder", "csproj", "platforms", "isTest", "testMode"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1 },
+          "folder": { "$ref": "#/$defs/relativePath" },
+          "csproj": { "type": "string", "pattern": "\\.csproj$" },
+          "platforms": { "type": "array", "items": { "type": "string" } },
+          "isTest": { "type": "boolean" },
+          "testMode": { "anyOf": [{ "enum": ["EditMode", "PlayMode"] }, { "type": "null" }] }
+        }
+      }
+    },
+    "compileMap": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["prefix", "assembly", "csproj", "command", "source", "generated"],
+        "properties": {
+          "prefix": { "type": "string", "pattern": "/$" },
+          "assembly": { "type": "string", "minLength": 1 },
+          "csproj": { "type": "string", "pattern": "\\.csproj$" },
+          "command": { "type": "string", "pattern": "^dotnet build " },
+          "source": { "enum": ["asmdef", "asmref", "special-folder", "default"] },
+          "generated": { "type": "boolean" }
+        }
+      }
+    },
+    "tests": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["assemblies", "testFramework"],
+      "properties": {
+        "assemblies": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "folder", "mode"],
+            "properties": {
+              "name": { "type": "string", "minLength": 1 },
+              "folder": { "$ref": "#/$defs/relativePath" },
+              "mode": { "enum": ["EditMode", "PlayMode"] }
+            }
+          }
+        },
+        "testFramework": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["present", "version"],
+          "properties": { "present": { "type": "boolean" }, "version": { "$ref": "#/$defs/nullableString" } }
+        }
+      }
+    },
+    "ui": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["verdict", "uguiScripts", "uiToolkitScripts", "uxml", "uss"],
+      "properties": {
+        "verdict": { "enum": ["uGUI", "UI Toolkit", "mixed", "none"] },
+        "uguiScripts": { "type": "integer", "minimum": 0 },
+        "uiToolkitScripts": { "type": "integer", "minimum": 0 },
+        "uxml": { "type": "integer", "minimum": 0 },
+        "uss": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["activeInputHandler", "verdict", "package", "inputActions", "legacyCalls", "legacyFiles"],
+      "properties": {
+        "activeInputHandler": { "anyOf": [{ "type": "integer", "minimum": 0 }, { "type": "null" }] },
+        "verdict": { "enum": ["legacy", "input-system", "both", "unknown"] },
+        "package": { "type": "boolean" },
+        "inputActions": { "type": "integer", "minimum": 0 },
+        "legacyCalls": { "type": "integer", "minimum": 0 },
+        "legacyFiles": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "packagesNotable": {
+      "type": "array",
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "name", "version"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "name": { "type": "string", "minLength": 1 },
+          "version": { "$ref": "#/$defs/nullableString" }
+        }
+      }
+    },
+    "librariesInUse": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "package", "files"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1 },
+          "package": { "type": "boolean" },
+          "files": { "type": "integer", "minimum": 0 }
+        }
+      }
+    },
+    "vcs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "readOnlyAllow", "writeDeny", "experimental"],
+      "properties": {
+        "kind": { "enum": ["git", "plastic", "perforce", "svn", "hg", "none"] },
+        "readOnlyAllow": { "type": "array", "items": { "type": "string" } },
+        "writeDeny": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+        "experimental": { "type": "boolean" }
+      }
+    },
+    "mcpForUnity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["present", "version", "testedVersion", "hubUrlSource"],
+      "properties": {
+        "present": { "type": "boolean" },
+        "version": { "$ref": "#/$defs/nullableString" },
+        "testedVersion": { "type": "boolean" },
+        "hubUrlSource": { "enum": ["opencode-config", "package-default"] }
+      }
+    },
+    "naming": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["files", "categories", "braces", "namespaces", "serializeField", "folders"],
+      "properties": {
+        "files": { "type": "integer", "minimum": 0 },
+        "categories": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["privateInstance", "privateStatic", "constants"],
+          "properties": {
+            "privateInstance": { "$ref": "#/$defs/namingCategory" },
+            "privateStatic": { "$ref": "#/$defs/namingCategory" },
+            "constants": { "$ref": "#/$defs/namingCategory" }
+          }
+        },
+        "braces": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["allman", "knr", "dominant"],
+          "properties": {
+            "allman": { "type": "integer", "minimum": 0 },
+            "knr": { "type": "integer", "minimum": 0 },
+            "dominant": { "enum": ["Allman", "K&R", "mixed"] }
+          }
+        },
+        "namespaces": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["files", "share"],
+          "properties": { "files": { "type": "integer", "minimum": 0 }, "share": { "$ref": "#/$defs/share" } }
+        },
+        "serializeField": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["serialized", "publicFields", "share"],
+          "properties": {
+            "serialized": { "type": "integer", "minimum": 0 },
+            "publicFields": { "type": "integer", "minimum": 0 },
+            "share": { "anyOf": [{ "$ref": "#/$defs/share" }, { "type": "null" }] }
+          }
+        },
+        "folders": {
+          "type": "array",
+          "maxItems": 5,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["folder", "files", "dominant", "label", "share", "sampleSize"],
+            "properties": {
+              "folder": { "$ref": "#/$defs/relativePath" },
+              "files": { "type": "integer", "minimum": 0 },
+              "dominant": { "type": "string", "minLength": 1 },
+              "label": { "type": "string", "minLength": 1 },
+              "share": { "$ref": "#/$defs/share" },
+              "sampleSize": { "type": "integer", "minimum": 0 }
+            }
+          }
+        }
+      }
+    },
+    "largeFiles": {
+      "type": "array",
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "lines"],
+        "properties": { "path": { "$ref": "#/$defs/relativePath" }, "lines": { "type": "integer", "minimum": 0 } }
+      }
+    },
+    "instructionFiles": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "scope", "chars", "tokens"],
+        "properties": {
+          "path": { "type": "string", "minLength": 1, "pattern": "^(\\.\\./)*[^:*?\"<>|]+$" },
+          "scope": { "enum": ["upward", "nested"] },
+          "chars": { "type": "integer", "minimum": 0 },
+          "tokens": { "type": "integer", "minimum": 0 }
+        }
+      }
+    },
+    "opencodeDir": { "type": "boolean" },
+    "sources": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["files", "firstParty", "namingSample"],
+      "properties": {
+        "files": { "type": "integer", "minimum": 0 },
+        "firstParty": { "type": "integer", "minimum": 0 },
+        "namingSample": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "inputsHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+  },
+  "$defs": {
+    "nullableString": { "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }] },
+    "relativePath": {
+      "description": "A path inside the project, with `/` separators and no drive letter.",
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[^:\\\\]*$"
+    },
+    "share": { "type": "number", "minimum": 0, "maximum": 1 },
+    "namingCategory": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["dominant", "label", "topStyle", "share", "sampleSize", "source"],
+      "properties": {
+        "dominant": { "type": "string", "minLength": 1 },
+        "label": { "type": "string", "minLength": 1 },
+        "topStyle": { "$ref": "#/$defs/nullableString" },
+        "share": { "$ref": "#/$defs/share" },
+        "sampleSize": { "type": "integer", "minimum": 0 },
+        "source": { "enum": ["sample", "editorconfig"] }
+      }
+    }
+  }
+}

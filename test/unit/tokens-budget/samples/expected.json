@@ -1,0 +1,25 @@
+{
+  "note": "Real Qwen2/Qwen3 BPE token counts for the estimator calibration test. Counted offline with the Qwen tokenizer merges; regenerate only with a real tokenizer.",
+  "samples": {
+    "agent-prompt.md.txt": {
+      "chars": 1219,
+      "qwenTokens": 288
+    },
+    "build-log.txt": {
+      "chars": 1073,
+      "qwenTokens": 414
+    },
+    "localization-cjk.txt": {
+      "chars": 457,
+      "qwenTokens": 224
+    },
+    "tools.json.txt": {
+      "chars": 1763,
+      "qwenTokens": 427
+    },
+    "unity-script.cs.txt": {
+      "chars": 1886,
+      "qwenTokens": 391
+    }
+  }
+}

@@ -1,0 +1,137 @@
+{
+  "spike": "M",
+  "id": "M",
+  "title": "MCP for Unity HTTP endpoint path",
+  "question": "What is the MCP for Unity HTTP endpoint path when no configurator entry exists?",
+  "contractTest": "Manual",
+  "fallback": "Require the user to paste the URL from the MCP for Unity window",
+  "opencodeVersion": "1.18.31",
+  "platform": "win32 x64",
+  "node": "v24.13.0",
+  "ranAt": "2026-09-17T18:42:17.170Z",
+  "durationMs": 10407,
+  "outcome": "partial",
+  "decision": "Build the hub URL as <base>/mcp, default base http://127.0.0.1:8080, and take the spec fallback for discovery: the user pastes the HTTP base URL from the MCP for Unity window (doctor pre-fills the documented default and the URL of an existing configurator entry when one is there). Nothing outside the Editor's own preferences reveals a changed port.",
+  "checks": [
+    {
+      "name": "M1 a remote MCP URL ending in /mcp connects and lists tools",
+      "pass": true,
+      "detail": [
+        "initialize",
+        "notifications/initialized",
+        "tools/list"
+      ]
+    },
+    {
+      "name": "M2 every hub request goes to the /mcp path",
+      "pass": true,
+      "detail": [
+        "/mcp"
+      ]
+    },
+    {
+      "name": "M3 the allowed tool and the hub instructions reach the session",
+      "pass": true,
+      "detail": {
+        "tools": [
+          "unityMCP_read_console"
+        ],
+        "instructions": true
+      }
+    },
+    {
+      "name": "M4 the base URL without /mcp reaches no MCP method",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "M5 a wrong URL costs the session its MCP tools but not the session itself",
+      "pass": true,
+      "detail": {
+        "tools": [],
+        "exitCode": 0
+      }
+    }
+  ],
+  "findings": [
+    "MCP for Unity stores an HTTP BASE url in EditorPrefs (default http://127.0.0.1:8080) and appends \"/mcp\" for the JSON-RPC endpoint; its OpenCode configurator writes { \"type\": \"remote\", \"url\": \"<base>/mcp\" } into the user's global opencode.json, and it strips a trailing \"/mcp\" from whatever the user types.",
+    "OpenCode 1.18.31 talks to such a URL over the streamable HTTP transport: initialize, notifications/initialized, tools/list and tools/call all POST to /mcp, and a GET answered with 405 is accepted.",
+    "Pointing the same configuration at the base URL without the path yields no MCP method at all: the session still runs, but with no MCP tools, which is the failure mode doctor must name.",
+    "The port is only in the Editor's preferences, so when no configurator entry exists the user has to paste the URL from the MCP for Unity window; the live confirmation against a real hub stays a manual check."
+  ],
+  "evidence": {
+    "withRpcPath": {
+      "exitCode": 0,
+      "durationMs": 5146,
+      "timedOut": false,
+      "attempts": 1,
+      "chatRequests": 1,
+      "hookCounts": {
+        "server": 1,
+        "config": 1,
+        "event": 9,
+        "messages.transform": 1,
+        "system.transform": 1,
+        "chat.params": 1,
+        "text.complete": 1
+      },
+      "chatParamsAgents": [
+        "unity-editor"
+      ],
+      "runErrorEvents": [],
+      "stdoutEventTypes": [
+        "step_start",
+        "text",
+        "step_finish"
+      ],
+      "stderrTail": "",
+      "url": "http://127.0.0.1:<port>/mcp",
+      "hubPaths": [
+        "/mcp"
+      ],
+      "hubMethods": [
+        "initialize",
+        "notifications/initialized",
+        "tools/list"
+      ],
+      "mcpTools": [
+        "unityMCP_read_console"
+      ],
+      "hasHubInstructions": true
+    },
+    "baseUrlOnly": {
+      "exitCode": 0,
+      "durationMs": 4778,
+      "timedOut": false,
+      "attempts": 1,
+      "chatRequests": 1,
+      "hookCounts": {
+        "server": 1,
+        "config": 1,
+        "event": 9,
+        "messages.transform": 1,
+        "system.transform": 1,
+        "chat.params": 1,
+        "text.complete": 1
+      },
+      "chatParamsAgents": [
+        "unity-editor"
+      ],
+      "runErrorEvents": [],
+      "stdoutEventTypes": [
+        "step_start",
+        "text",
+        "step_finish"
+      ],
+      "stderrTail": "",
+      "url": "http://127.0.0.1:<port>",
+      "hubPaths": [
+        "/"
+      ],
+      "hubMethods": [],
+      "mcpTools": [],
+      "hasHubInstructions": false
+    }
+  },
+  "crash": null
+}

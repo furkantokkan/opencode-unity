@@ -1,0 +1,33 @@
+root = true
+
+[*]
+end_of_line = lf
+
+[*.cs]
+indent_size = 4
+
+dotnet_naming_rule.private_fields.severity = suggestion
+dotnet_naming_rule.private_fields.symbols = private_field_symbols
+dotnet_naming_rule.private_fields.style = m_prefix_pascal
+dotnet_naming_symbols.private_field_symbols.applicable_kinds = field
+dotnet_naming_symbols.private_field_symbols.applicable_accessibilities = private
+dotnet_naming_style.m_prefix_pascal.required_prefix = m_
+dotnet_naming_style.m_prefix_pascal.capitalization = pascal_case
+
+dotnet_naming_rule.static_fields.severity = suggestion
+dotnet_naming_rule.static_fields.symbols = static_field_symbols
+dotnet_naming_rule.static_fields.style = s_prefix_pascal
+dotnet_naming_symbols.static_field_symbols.applicable_kinds = field
+dotnet_naming_symbols.static_field_symbols.applicable_accessibilities = private
+dotnet_naming_symbols.static_field_symbols.required_modifiers = static
+dotnet_naming_style.s_prefix_pascal.required_prefix = s_
+dotnet_naming_style.s_prefix_pascal.capitalization = pascal_case
+
+dotnet_naming_rule.constants.severity = suggestion
+dotnet_naming_rule.constants.symbols = constant_symbols
+dotnet_naming_rule.constants.style = k_prefix_pascal
+dotnet_naming_symbols.constant_symbols.applicable_kinds = field
+dotnet_naming_symbols.constant_symbols.applicable_accessibilities = *
+dotnet_naming_symbols.constant_symbols.required_modifiers = const
+dotnet_naming_style.k_prefix_pascal.required_prefix = k_
+dotnet_naming_style.k_prefix_pascal.capitalization = pascal_case

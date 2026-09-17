@@ -1,0 +1,26 @@
+{
+  "parameters": "stop                           \"<|im_start|>\"\nstop                           \"<|im_end|>\"",
+  "template": "{{- range $index, $_ := .Messages }}...",
+  "system": "You are a coding assistant baked into the model file.",
+  "renderer": "qwen3-coder",
+  "parser": "qwen3-coder",
+  "details": {
+    "parent_model": "",
+    "format": "gguf",
+    "family": "qwen3moe",
+    "families": [
+      "qwen3moe"
+    ],
+    "parameter_size": "30.5B",
+    "quantization_level": "Q4_K_M"
+  },
+  "model_info": {
+    "general.architecture": "qwen3moe",
+    "qwen3moe.block_count": 48
+  },
+  "capabilities": [
+    "completion",
+    "tools"
+  ],
+  "modified_at": "2026-09-15T09:02:44.000000+03:00"
+}

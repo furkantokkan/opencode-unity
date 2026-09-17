@@ -1,0 +1,37 @@
+# Template for the local personal-data denylist used by scripts/check-no-personal-data.mjs.
+#
+# Copy this file to `.personal-data-denylist` in the repository root and replace the placeholder
+# lines with your own values. That file is git-ignored and must never be committed: the check
+# refuses to run when git would commit it. Never put real values in this template.
+#
+# In CI, store the same content in a repository secret and expose it as OPENCODE_UNITY_DENYLIST.
+# You can also keep the file elsewhere and pass --denylist <file> or OPENCODE_UNITY_DENYLIST_FILE.
+#
+# Format:
+# - one term per line, at least 3 characters;
+# - lines starting with '#' are comments;
+# - terms match file contents and file paths as substrings, ignoring case and diacritics;
+#   '\' and '/' are treated as the same separator, so a path matches in every spelling;
+# - 'allow: <exact string>' removes that public string before matching, for example the public
+#   repository URL when your account name is also a denylist term.
+#
+# Findings print the entry number, never the value.
+
+# Your real name and any spelling of it
+Jane Placeholder
+
+# Your OS user name, machine name and account handles
+placeholder-user
+PLACEHOLDER-PC
+
+# Your e-mail addresses (addresses outside example domains are already caught by a built-in rule)
+jane.placeholder@example.invalid
+
+# Local paths that identify you or your machine
+D:/Work/placeholder-projects
+
+# Game, studio, company or client names that must not appear in this generic project
+Placeholder Game Title
+Placeholder Studio
+
+# allow: github.com/placeholder-user/opencode-unity

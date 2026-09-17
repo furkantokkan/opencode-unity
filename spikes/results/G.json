@@ -1,0 +1,142 @@
+{
+  "spike": "G",
+  "id": "G",
+  "title": "Models catalogue fetch disabled",
+  "question": "Does OPENCODE_DISABLE_MODELS_FETCH keep the injected provider working?",
+  "contractTest": "C12",
+  "fallback": "Do not set it; document the models.dev fetch",
+  "opencodeVersion": "1.18.31",
+  "platform": "win32 x64",
+  "node": "v24.13.0",
+  "ranAt": "2026-09-17T18:39:35.152Z",
+  "durationMs": 8344,
+  "outcome": "pass",
+  "decision": "Keep OPENCODE_DISABLE_MODELS_FETCH=1 in the clean-room launch environment (spec 8.1).",
+  "checks": [
+    {
+      "name": "G1 the catalogue stand-in records requests (liveness)",
+      "pass": true,
+      "detail": [
+        {
+          "method": "GET",
+          "url": "/api.json"
+        }
+      ]
+    },
+    {
+      "name": "G2 the run works with the flag set",
+      "pass": true,
+      "detail": {
+        "exitCode": 0,
+        "requests": 1
+      }
+    },
+    {
+      "name": "G3 no request reaches the catalogue URL",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "G4 no models catalogue file is cached",
+      "pass": true,
+      "detail": [
+        "bin"
+      ]
+    },
+    {
+      "name": "G5 the injected model keeps its tool-call capability",
+      "pass": true,
+      "detail": {
+        "model": "ocu-spike-model-16k",
+        "hasTools": true,
+        "toolNames": [
+          "bash",
+          "edit",
+          "glob",
+          "grep",
+          "read",
+          "skill",
+          "task",
+          "todowrite",
+          "webfetch",
+          "write"
+        ],
+        "temperature": 0.7,
+        "topP": 0.8,
+        "maxTokens": 4096,
+        "streamOptions": {
+          "include_usage": true
+        }
+      }
+    },
+    {
+      "name": "G6 `models <provider>` lists the injected model offline",
+      "pass": true,
+      "detail": {
+        "exitCode": 0,
+        "stdout": "opencode-unity/ocu-spike-model-16k"
+      }
+    }
+  ],
+  "findings": [
+    "With the flag set, OpenCode fetches no model catalogue (the OPENCODE_MODELS_URL stand-in stays untouched and no models cache file is written) and the plugin-injected provider still resolves, keeps its tool-call capability and sends tools.",
+    "OPENCODE_MODELS_URL is the override the fetch would use (`<url>/api.json`), so pointing it at a loopback recorder is how contract test C12 proves the flag works."
+  ],
+  "evidence": {
+    "run": {
+      "exitCode": 0,
+      "durationMs": 5329,
+      "timedOut": false,
+      "attempts": 1,
+      "chatRequests": 1,
+      "hookCounts": {
+        "server": 2,
+        "config": 2,
+        "event": 9,
+        "messages.transform": 1,
+        "system.transform": 1,
+        "chat.params": 1,
+        "text.complete": 1
+      },
+      "chatParamsAgents": [
+        "unity-code"
+      ],
+      "runErrorEvents": [],
+      "stdoutEventTypes": [
+        "step_start",
+        "text",
+        "step_finish"
+      ],
+      "stderrTail": ""
+    },
+    "catalogueRequests": [],
+    "modelsCommand": {
+      "exitCode": 0,
+      "stdout": "opencode-unity/ocu-spike-model-16k"
+    },
+    "cacheFiles": [],
+    "requestShape": {
+      "model": "ocu-spike-model-16k",
+      "hasTools": true,
+      "toolNames": [
+        "bash",
+        "edit",
+        "glob",
+        "grep",
+        "read",
+        "skill",
+        "task",
+        "todowrite",
+        "webfetch",
+        "write"
+      ],
+      "temperature": 0.7,
+      "topP": 0.8,
+      "maxTokens": 4096,
+      "streamOptions": {
+        "include_usage": true
+      }
+    }
+  },
+  "crash": null
+}

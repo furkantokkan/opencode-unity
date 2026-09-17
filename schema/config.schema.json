@@ -1,0 +1,358 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "opencode-unity config.json",
+  "description": "User settings in <home>/config.json. Keys left out take their defaults; unknown keys are rejected. The schema describes the file after defaults are applied.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "preset", "overrides", "ollama", "guard", "budget", "safety", "start", "delegate", "projects", "experimental"],
+  "properties": {
+    "schemaVersion": {
+      "description": "Config format version. Older files are migrated forward automatically.",
+      "const": 1,
+      "default": 1
+    },
+    "preset": {
+      "description": "Model preset id from presets/. Experimental presets need --experimental.",
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]{0,63}$",
+      "default": "nvidia-24gb-qwen3-coder-30b-16k"
+    },
+    "overrides": {
+      "description": "Preset fields to replace, for example {\"model\": {\"numCtx\": 8192}}. Any override marks the profile custom (experimental).",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "hardware": { "type": "object" },
+        "model": { "type": "object" },
+        "ollamaServerEnv": { "type": "object" },
+        "opencode": { "type": "object" },
+        "guard": { "type": "object" }
+      },
+      "default": {}
+    },
+    "ollama": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["baseUrl", "startAppIfDown", "appPath", "serverLogPath"],
+      "properties": {
+        "baseUrl": {
+          "description": "Ollama server URL. A non-loopback host is blocked by the guard unless guard.remote is unguarded.",
+          "type": "string",
+          "pattern": "^https?://[^\\s/?#]+/?$",
+          "default": "http://127.0.0.1:11434"
+        },
+        "startAppIfDown": {
+          "description": "Start the installed Ollama app when the server is down.",
+          "enum": ["ask", "always", "never"],
+          "default": "ask"
+        },
+        "appPath": {
+          "description": "Path of the Ollama app; null means the default install location.",
+          "type": ["string", "null"],
+          "minLength": 1,
+          "default": null
+        },
+        "serverLogPath": {
+          "description": "Path of the Ollama server log; null means the default location.",
+          "type": ["string", "null"],
+          "minLength": 1,
+          "default": null
+        }
+      }
+    },
+    "guard": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "minFreeVramAfterLoadMiB",
+        "maxGpuUtilPercent",
+        "gpuUtilSampleIntervalMs",
+        "assetImportCpuPercent",
+        "assetImportSampleMs",
+        "assetImportProcessPatterns",
+        "maxUnityEditors",
+        "importWhileLoaded",
+        "keepAliveMarginSec",
+        "coldPassCacheSec",
+        "loadedPassCacheSec",
+        "probeTimeoutSec",
+        "onColdBlock",
+        "onLoadedBusy",
+        "remote",
+        "adapter",
+        "nvidiaSmiCommand"
+      ],
+      "properties": {
+        "minFreeVramAfterLoadMiB": { "$ref": "#/$defs/minFreeVramAfterLoadMiB", "default": 1500 },
+        "maxGpuUtilPercent": { "$ref": "#/$defs/maxGpuUtilPercent", "default": 60 },
+        "gpuUtilSampleIntervalMs": {
+          "description": "Delay between the two GPU utilization samples.",
+          "type": "integer",
+          "minimum": 100,
+          "maximum": 10000,
+          "default": 1000
+        },
+        "assetImportCpuPercent": { "$ref": "#/$defs/assetImportCpuPercent", "default": 20 },
+        "assetImportSampleMs": {
+          "description": "CPU sampling window for import workers.",
+          "type": "integer",
+          "minimum": 100,
+          "maximum": 60000,
+          "default": 1500
+        },
+        "assetImportProcessPatterns": {
+          "description": "Command-line substrings that identify Unity asset import workers.",
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 },
+          "default": ["AssetImportWorker", "-importWorker"]
+        },
+        "editorImportCpuPercent": { "$ref": "#/$defs/editorImportCpuPercent", "default": 60 },
+        "maxUnityEditors": { "$ref": "#/$defs/maxUnityEditors", "default": 3 },
+        "importWhileLoaded": { "$ref": "#/$defs/importWhileLoaded", "default": "wait" },
+        "keepAliveMarginSec": {
+          "description": "A loaded model counts as loaded only when it stays loaded at least this long.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3600,
+          "default": 60
+        },
+        "coldPassCacheSec": {
+          "description": "How long a pass on the cold path is reused.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 60,
+          "default": 3
+        },
+        "loadedPassCacheSec": {
+          "description": "How long a pass on the loaded path is reused.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 300,
+          "default": 15
+        },
+        "probeTimeoutSec": {
+          "description": "Timeout for nvidia-smi and process probes.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 120,
+          "default": 10
+        },
+        "onColdBlock": { "$ref": "#/$defs/onColdBlock", "default": "stop" },
+        "onLoadedBusy": { "$ref": "#/$defs/onLoadedBusy", "default": "retry" },
+        "remote": {
+          "description": "What to do when the Ollama host is not loopback: block, or run without the guard.",
+          "enum": ["block", "unguarded"],
+          "default": "block"
+        },
+        "adapter": {
+          "description": "GPU probe adapter. none needs --experimental and an acknowledgment.",
+          "enum": ["auto", "none"],
+          "default": "auto"
+        },
+        "nvidiaSmiCommand": {
+          "description": "nvidia-smi command. Meant for tests; any other value prints a warning.",
+          "type": "string",
+          "minLength": 1,
+          "default": "nvidia-smi"
+        }
+      }
+    },
+    "budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["reserveTokens", "charsPerToken", "safetyMargin", "calibrationClamp", "prefixTargetTokens", "prefixFailTokens"],
+      "properties": {
+        "reserveTokens": {
+          "description": "Tokens kept free besides the output limit.",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 65536,
+          "default": 512
+        },
+        "charsPerToken": {
+          "description": "Estimator calibration; lower values make budgets more conservative.",
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 10,
+          "default": 3.5
+        },
+        "safetyMargin": {
+          "description": "Extra fraction added to every token estimate.",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.1
+        },
+        "calibrationClamp": {
+          "description": "Lowest and highest session calibration factor.",
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": { "type": "number", "exclusiveMinimum": 0, "maximum": 10 },
+          "default": [0.7, 1.4]
+        },
+        "prefixTargetTokens": { "$ref": "#/$defs/agentTokens", "default": { "unity-code": 5000, "unity-editor": 7000 } },
+        "prefixFailTokens": { "$ref": "#/$defs/agentTokens", "default": { "unity-code": 6000, "unity-editor": 8000 } }
+      }
+    },
+    "safety": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["bashMode", "readLimitLines", "extraProtectedEditGlobs", "extraProtectedReadGlobs"],
+      "properties": {
+        "bashMode": { "$ref": "#/$defs/bashMode", "default": "allowlist" },
+        "readLimitLines": {
+          "description": "Most lines one read call returns.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2000,
+          "default": 200
+        },
+        "extraProtectedEditGlobs": {
+          "description": "More globs the agent may never edit.",
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "default": []
+        },
+        "extraProtectedReadGlobs": {
+          "description": "More globs the agent may never read.",
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "default": []
+        }
+      }
+    },
+    "start": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["warm", "pane", "agent", "projectConfig"],
+      "properties": {
+        "warm": { "description": "Load the model (through the guard) before the TUI opens.", "type": "boolean", "default": false },
+        "pane": { "description": "Open the status pane in Windows Terminal.", "enum": ["auto", "never"], "default": "auto" },
+        "agent": { "description": "Agent the TUI opens with.", "enum": ["unity-code", "unity-editor"], "default": "unity-code" },
+        "projectConfig": { "description": "Load project OpenCode config files, or disable them.", "enum": ["load", "disable"], "default": "load" }
+      }
+    },
+    "delegate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["temperature", "maxOutputTokens", "lockTimeoutSec", "requestTimeoutSec", "checkTimeoutSec", "checkCommandPrefixes", "extraSensitivePatterns"],
+      "properties": {
+        "temperature": { "type": "number", "minimum": 0, "maximum": 2, "default": 0.2 },
+        "maxOutputTokens": { "type": "integer", "minimum": 1, "maximum": 32000, "default": 2048 },
+        "lockTimeoutSec": { "type": "integer", "minimum": 0, "maximum": 86400, "default": 900 },
+        "requestTimeoutSec": { "type": "integer", "minimum": 1, "maximum": 86400, "default": 600 },
+        "checkTimeoutSec": { "type": "integer", "minimum": 1, "maximum": 86400, "default": 1800 },
+        "checkCommandPrefixes": {
+          "description": "A custom check command must start with one of these.",
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "default": ["dotnet build ", "dotnet test "]
+        },
+        "extraSensitivePatterns": {
+          "description": "More file patterns delegate refuses without --allow-sensitive.",
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "default": []
+        }
+      }
+    },
+    "projects": {
+      "description": "Per-project settings keyed by project id (<name>-<sha8>).",
+      "type": "object",
+      "propertyNames": { "pattern": "^[A-Za-z0-9._-]{1,64}-[0-9a-f]{8}$" },
+      "additionalProperties": { "$ref": "#/$defs/projectSettings" },
+      "default": {}
+    },
+    "experimental": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["platforms", "presets", "untestedVersions"],
+      "properties": {
+        "platforms": { "type": "boolean", "default": false },
+        "presets": { "type": "boolean", "default": false },
+        "untestedVersions": { "type": "boolean", "default": false }
+      }
+    }
+  },
+  "$defs": {
+    "minFreeVramAfterLoadMiB": {
+      "description": "Free video memory that must remain after the model loads.",
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 1048576
+    },
+    "maxGpuUtilPercent": {
+      "description": "Block a cold load when GPU utilization is at or above this in both samples.",
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 100
+    },
+    "assetImportCpuPercent": {
+      "description": "Import workers at or above this CPU percent (100 = one core) count as importing.",
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 102400
+    },
+    "editorImportCpuPercent": {
+      "description": "A Unity editor at or above this CPU percent (100 = one core) counts as importing in-process, compiling or in Play Mode; 0 disables the check. Projects that import in-process (the Unity default) show no import worker at all.",
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 102400
+    },
+    "maxUnityEditors": {
+      "description": "Most Unity editors with a window; 0 disables the check.",
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 64
+    },
+    "importWhileLoaded": {
+      "description": "wait keeps the import check on while the model is loaded; allow skips it.",
+      "enum": ["wait", "allow"]
+    },
+    "onColdBlock": {
+      "description": "How OpenCode sees a cold-path block: stop the request, or retry it.",
+      "enum": ["stop", "retry"]
+    },
+    "onLoadedBusy": {
+      "description": "How OpenCode sees an import block while the model is loaded.",
+      "enum": ["retry", "stop"]
+    },
+    "bashMode": {
+      "description": "allowlist runs only allowed shell commands; ask prompts for others.",
+      "enum": ["allowlist", "ask"]
+    },
+    "agentTokens": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["unity-code", "unity-editor"],
+      "properties": {
+        "unity-code": { "type": "integer", "minimum": 1, "maximum": 1048576 },
+        "unity-editor": { "type": "integer", "minimum": 1, "maximum": 1048576 }
+      }
+    },
+    "projectSettings": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["editor", "bashMode"],
+      "properties": {
+        "editor": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["enabled", "trust", "allowPlayMode"],
+          "properties": {
+            "enabled": { "type": "boolean", "default": false },
+            "trust": { "type": "boolean", "default": false },
+            "allowPlayMode": { "type": "boolean", "default": false }
+          }
+        },
+        "bashMode": {
+          "description": "Overrides safety.bashMode for this project; null uses the global value.",
+          "anyOf": [{ "type": "null" }, { "$ref": "#/$defs/bashMode" }],
+          "default": null
+        }
+      }
+    }
+  }
+}

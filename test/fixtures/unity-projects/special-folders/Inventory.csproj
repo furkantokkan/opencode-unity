@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="Current" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <EnableDefaultItems>false</EnableDefaultItems>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Assets\Modules\Inventory\Item.cs" />
+    <Compile Include="Assets\Modules\Inventory\Editor\ItemEditor.cs" />
+    <Compile Include="Assets\Extensions\ItemExtras.cs" />
+    <Compile Include="Assets\Extras\MoreItems.cs" />
+  </ItemGroup>
+</Project>

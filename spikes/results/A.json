@@ -1,0 +1,356 @@
+{
+  "spike": "A",
+  "id": "A",
+  "title": "Guard throw semantics in system.transform and chat.params",
+  "question": "Does a throw in system.transform/chat.params abort with 0 requests and a readable error in both TUI and run, and does retry wording retry?",
+  "contractTest": "C5, C6",
+  "fallback": "Build the loopback gate (spec 8.10)",
+  "opencodeVersion": "1.18.31",
+  "platform": "win32 x64",
+  "node": "v24.13.0",
+  "ranAt": "2026-09-17T18:44:42.069Z",
+  "durationMs": 134331,
+  "outcome": "pass",
+  "decision": "Run the guard in the plugin hooks (D1, D8): a stop Error for blocking verdicts and a \"temporarily at capacity\" Error for retryable ones. No loopback gate.",
+  "checks": [
+    {
+      "name": "A1 stop in system.transform: 0 requests reach the mock LLM",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "A1 stop in system.transform: guard evaluated once (not retried)",
+      "pass": true,
+      "detail": 1
+    },
+    {
+      "name": "A1 async loopback probe inside the hook works",
+      "pass": true,
+      "detail": 1
+    },
+    {
+      "name": "A1 stop message is readable in run output",
+      "pass": true,
+      "detail": [
+        {
+          "name": "UnknownError",
+          "data": {
+            "message": "opencode-unity GPU guard: the model was not loaded because free video memory would drop to 0.7 GiB (minimum 1.5 GiB). Close GPU-heavy apps, then send the prompt again."
+          }
+        }
+      ]
+    },
+    {
+      "name": "A2 stop in chat.params: 0 requests",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "A2 stop in chat.params: guard evaluated once",
+      "pass": true,
+      "detail": 1
+    },
+    {
+      "name": "A2 stop message is readable in run output",
+      "pass": true,
+      "detail": [
+        {
+          "name": "UnknownError",
+          "data": {
+            "message": "opencode-unity GPU guard: the model was not loaded because free video memory would drop to 0.7 GiB (minimum 1.5 GiB). Close GPU-heavy apps, then send the prompt again."
+          }
+        }
+      ]
+    },
+    {
+      "name": "A3 retry wording: exactly one request arrives after the retries",
+      "pass": true,
+      "detail": 1
+    },
+    {
+      "name": "A3 retry wording: guard re-evaluated on each retry (3 calls)",
+      "pass": true,
+      "detail": 3
+    },
+    {
+      "name": "A3 retry status events observed (2)",
+      "pass": true,
+      "detail": [
+        {
+          "attempt": 1,
+          "message": "opencode-unity GPU guard: the local model is temporarily at capacity because Unity is importing assets. The request will be tried again.",
+          "waitMs": 2368
+        },
+        {
+          "attempt": 2,
+          "message": "opencode-unity GPU guard: the local model is temporarily at capacity because Unity is importing assets. The request will be tried again.",
+          "waitMs": 4227
+        }
+      ]
+    },
+    {
+      "name": "A3 run exits 0 after the retries",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "A4 retry exhaustion: 0 requests",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "A4 retry exhaustion: 1 attempt + 5 retries = 6 guard calls",
+      "pass": true,
+      "detail": 6
+    },
+    {
+      "name": "A4 retry exhaustion: final error stored and readable",
+      "pass": true,
+      "detail": [
+        {
+          "name": "UnknownError",
+          "data": {
+            "message": "opencode-unity GPU guard: the local model is temporarily at capacity because Unity is importing assets. The request will be tried again."
+          }
+        }
+      ]
+    },
+    {
+      "name": "A5 server/TUI session path: 0 requests",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "A5 server/TUI session path: error stored on the assistant message",
+      "pass": true,
+      "detail": [
+        {
+          "name": "UnknownError",
+          "data": {
+            "message": "opencode-unity GPU guard: the model was not loaded because free video memory would drop to 0.7 GiB (minimum 1.5 GiB). Close GPU-heavy apps, then send the prompt again."
+          }
+        }
+      ]
+    }
+  ],
+  "findings": [
+    "A thrown Error in experimental.chat.system.transform or chat.params is caught by the session processor; no HTTP request is sent because prepare() runs before streamText.",
+    "Retry wording containing \"temporarily at capacity\" re-runs prepare() (and so the guard) on each retry; after 5 retries the error is stored on the assistant message.",
+    "TUI rendering of the stored error is a manual check; the TUI uses the same server session path verified through `opencode serve`."
+  ],
+  "evidence": {
+    "stopInSystemTransform": {
+      "exitCode": 1,
+      "durationMs": 5012,
+      "timedOut": false,
+      "chatRequests": 0,
+      "ollamaProbeCalls": 1,
+      "guardCalls": [
+        {
+          "via": "system",
+          "verdict": "stop",
+          "at": 0
+        }
+      ],
+      "retryStatuses": [],
+      "sessionErrors": [
+        {
+          "name": "UnknownError",
+          "data": {
+            "message": "opencode-unity GPU guard: the model was not loaded because free video memory would drop to 0.7 GiB (minimum 1.5 GiB). Close GPU-heavy apps, then send the prompt again."
+          }
+        }
+      ],
+      "runErrorEvents": [
+        {
+          "name": "UnknownError",
+          "data": {
+            "message": "opencode-unity GPU guard: the model was not loaded because free video memory would drop to 0.7 GiB (minimum 1.5 GiB). Close GPU-heavy apps, then send the prompt again."
+          }
+        }
+      ],
+      "stdoutEventTypes": [
+        "error"
+      ],
+      "stderrTail": ""
+    },
+    "stopInChatParams": {
+      "exitCode": 1,
+      "durationMs": 15330,
+      "timedOut": false,
+      "chatRequests": 0,
+      "ollamaProbeCalls": 1,
+      "guardCalls": [
+        {
+          "via": "params",
+          "verdict": "stop",
+          "at": 0
+        }
+      ],
+      "retryStatuses": [],
+      "sessionErrors": [
+        {
+          "name": "UnknownError",
+          "data": {
+            "message": "opencode-unity GPU guard: the model was not loaded because free video memory would drop to 0.7 GiB (minimum 1.5 GiB). Close GPU-heavy apps, then send the prompt again."
+          }
+        }
+      ],
+      "runErrorEvents": [
+        {
+          "name": "UnknownError",
+          "data": {
+            "message": "opencode-unity GPU guard: the model was not loaded because free video memory would drop to 0.7 GiB (minimum 1.5 GiB). Close GPU-heavy apps, then send the prompt again."
+          }
+        }
+      ],
+      "stdoutEventTypes": [
+        "error"
+      ],
+      "stderrTail": ""
+    },
+    "retryTwiceThenPass": {
+      "exitCode": 0,
+      "durationMs": 19705,
+      "timedOut": false,
+      "chatRequests": 1,
+      "ollamaProbeCalls": 3,
+      "guardCalls": [
+        {
+          "via": "system",
+          "verdict": "retry",
+          "at": 0
+        },
+        {
+          "via": "system",
+          "verdict": "retry",
+          "at": 2491
+        },
+        {
+          "via": "system",
+          "verdict": "pass",
+          "at": 6830
+        }
+      ],
+      "retryStatuses": [
+        {
+          "attempt": 1,
+          "message": "opencode-unity GPU guard: the local model is temporarily at capacity because Unity is importing assets. The request will be tried again.",
+          "waitMs": 2368
+        },
+        {
+          "attempt": 2,
+          "message": "opencode-unity GPU guard: the local model is temporarily at capacity because Unity is importing assets. The request will be tried again.",
+          "waitMs": 4227
+        }
+      ],
+      "sessionErrors": [],
+      "runErrorEvents": [],
+      "stdoutEventTypes": [
+        "step_start",
+        "text",
+        "step_finish"
+      ],
+      "stderrTail": ""
+    },
+    "retryExhausted": {
+      "exitCode": 1,
+      "durationMs": 79879,
+      "timedOut": false,
+      "chatRequests": 0,
+      "ollamaProbeCalls": 6,
+      "guardCalls": [
+        {
+          "via": "system",
+          "verdict": "retry",
+          "at": 0
+        },
+        {
+          "via": "system",
+          "verdict": "retry",
+          "at": 2318
+        },
+        {
+          "via": "system",
+          "verdict": "retry",
+          "at": 7005
+        },
+        {
+          "via": "system",
+          "verdict": "retry",
+          "at": 16646
+        },
+        {
+          "via": "system",
+          "verdict": "retry",
+          "at": 34524
+        },
+        {
+          "via": "system",
+          "verdict": "retry",
+          "at": 64782
+        }
+      ],
+      "retryStatuses": [
+        {
+          "attempt": 1,
+          "message": "opencode-unity GPU guard: the local model is temporarily at capacity because Unity is importing assets. The request will be tried again.",
+          "waitMs": 2292
+        },
+        {
+          "attempt": 2,
+          "message": "opencode-unity GPU guard: the local model is temporarily at capacity because Unity is importing assets. The request will be tried again.",
+          "waitMs": 4306
+        },
+        {
+          "attempt": 3,
+          "message": "opencode-unity GPU guard: the local model is temporarily at capacity because Unity is importing assets. The request will be tried again.",
+          "waitMs": 9591
+        },
+        {
+          "attempt": 4,
+          "message": "opencode-unity GPU guard: the local model is temporarily at capacity because Unity is importing assets. The request will be tried again.",
+          "waitMs": 17852
+        },
+        {
+          "attempt": 5,
+          "message": "opencode-unity GPU guard: the local model is temporarily at capacity because Unity is importing assets. The request will be tried again.",
+          "waitMs": 29999
+        }
+      ],
+      "sessionErrors": [
+        {
+          "name": "UnknownError",
+          "data": {
+            "message": "opencode-unity GPU guard: the local model is temporarily at capacity because Unity is importing assets. The request will be tried again."
+          }
+        }
+      ],
+      "runErrorEvents": [
+        {
+          "name": "UnknownError",
+          "data": {
+            "message": "opencode-unity GPU guard: the local model is temporarily at capacity because Unity is importing assets. The request will be tried again."
+          }
+        }
+      ],
+      "stdoutEventTypes": [
+        "error"
+      ],
+      "stderrTail": ""
+    },
+    "serverPath": {
+      "promptStatus": 200,
+      "chatRequests": 0,
+      "assistantErrors": [
+        {
+          "name": "UnknownError",
+          "data": {
+            "message": "opencode-unity GPU guard: the model was not loaded because free video memory would drop to 0.7 GiB (minimum 1.5 GiB). Close GPU-heavy apps, then send the prompt again."
+          }
+        }
+      ]
+    }
+  },
+  "crash": null
+}

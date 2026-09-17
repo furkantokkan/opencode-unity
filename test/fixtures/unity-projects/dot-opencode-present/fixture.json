@@ -1,0 +1,29 @@
+{
+  "description": "A project where OpenCode has already run, so .opencode exists with the files OpenCode generates there.",
+  "createAtTestTime": [
+    {
+      "path": ".git",
+      "type": "dir"
+    },
+    {
+      "path": ".opencode/agent/review.md",
+      "type": "file",
+      "content": "---\ndescription: Fixture agent\n---\nReview the diff.\n"
+    },
+    {
+      "path": ".opencode/package.json",
+      "type": "file",
+      "content": "{\"dependencies\":{\"@opencode-ai/plugin\":\"1.18.31\"}}\n"
+    },
+    {
+      "path": ".opencode/node_modules/.keep",
+      "type": "file",
+      "content": ""
+    },
+    {
+      "path": ".opencode/.gitignore",
+      "type": "file",
+      "content": "node_modules\npackage.json\npackage-lock.json\nbun.lock\n.gitignore\n"
+    }
+  ]
+}

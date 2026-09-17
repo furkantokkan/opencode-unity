@@ -1,0 +1,55 @@
+{
+  "tools": [
+    {
+      "type": "function",
+      "function": {
+        "name": "read",
+        "description": "Read a file from the project. Prefer a range over a whole file for large files.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "filePath": { "type": "string", "description": "Absolute or project-relative path" },
+            "offset": { "type": "number", "description": "First line to read, 1 based" },
+            "limit": { "type": "number", "description": "How many lines to read, at most 200" }
+          },
+          "required": ["filePath"],
+          "additionalProperties": false
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "edit",
+        "description": "Replace an exact string in a file. The old string must appear exactly once.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "filePath": { "type": "string" },
+            "oldString": { "type": "string" },
+            "newString": { "type": "string" },
+            "replaceAll": { "type": "boolean", "default": false }
+          },
+          "required": ["filePath", "oldString", "newString"],
+          "additionalProperties": false
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "bash",
+        "description": "Run one allowed command, for example a compile check.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "command": { "type": "string" },
+            "timeout": { "type": "number", "description": "Milliseconds, at most 300000" }
+          },
+          "required": ["command"],
+          "additionalProperties": false
+        }
+      }
+    }
+  ]
+}

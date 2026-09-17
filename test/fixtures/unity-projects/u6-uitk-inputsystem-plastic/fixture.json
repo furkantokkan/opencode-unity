@@ -1,0 +1,9 @@
+{
+  "description": "Unity 6000.0 with UI Toolkit screens, the Input System, Unity Version Control and .editorconfig naming rules.",
+  "createAtTestTime": [
+    {
+      "path": ".plastic",
+      "type": "dir"
+    }
+  ]
+}

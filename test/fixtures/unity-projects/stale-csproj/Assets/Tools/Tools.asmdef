@@ -1,0 +1,6 @@
+{
+  "name": "Game.Tools",
+  "references": [
+    "Game.Core"
+  ]
+}

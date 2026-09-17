@@ -1,0 +1,9 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!129 &1
+PlayerSettings:
+  m_ObjectHideFlags: 0
+  productName: Fixture Project
+  defaultScreenWidth: 1920
+  activeInputHandler: 2
+  gcIncremental: 1

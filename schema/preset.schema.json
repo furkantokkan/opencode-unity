@@ -1,0 +1,181 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "opencode-unity model preset",
+  "description": "One model preset in presets/. Fields a user must supply (the custom preset) are null; a resolved profile never contains null model fields.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "id", "status", "evidence", "hardware", "model", "ollamaServerEnv", "opencode", "guard", "reliability"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{0,63}$" },
+    "status": {
+      "description": "Support label (spec section 3.1).",
+      "enum": ["verified", "reference-tested", "experimental", "planned", "unsupported"]
+    },
+    "evidence": {
+      "description": "Repository path of the evidence document, or null when nothing was measured.",
+      "type": ["string", "null"],
+      "pattern": "^docs/evidence/[A-Za-z0-9._/-]+\\.md$"
+    },
+    "warning": {
+      "description": "Shown before this preset is used.",
+      "type": "string",
+      "minLength": 1
+    },
+    "hardware": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["os", "gpuVendor", "minTotalVramMiB"],
+      "properties": {
+        "os": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "enum": ["win32", "linux", "darwin"] }
+        },
+        "gpuVendor": { "enum": ["nvidia", "amd", "intel", "apple"] },
+        "minTotalVramMiB": { "type": "integer", "minimum": 0, "maximum": 1048576 }
+      }
+    },
+    "model": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["base", "downloadGiB", "tag", "renderer", "parser", "numCtx", "numKeep", "numBatch", "sampling", "vram"],
+      "properties": {
+        "base": {
+          "description": "Model pulled from the Ollama library, for example qwen3-coder:30b.",
+          "type": ["string", "null"],
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,199}$"
+        },
+        "downloadGiB": { "type": ["number", "null"], "minimum": 0, "maximum": 4096 },
+        "tag": {
+          "description": "Tag created by setup: ocu-<model-slug>-<ctx>k, with -r<n> after a Modelfile change.",
+          "type": ["string", "null"],
+          "pattern": "^ocu-[a-z0-9][a-z0-9._-]{0,79}$"
+        },
+        "renderer": { "type": ["string", "null"], "pattern": "^[a-z0-9][a-z0-9._-]{0,63}$" },
+        "parser": { "type": ["string", "null"], "pattern": "^[a-z0-9][a-z0-9._-]{0,63}$" },
+        "numCtx": { "type": ["integer", "null"], "minimum": 2048, "maximum": 1048576 },
+        "numKeep": { "type": "integer", "minimum": 0, "maximum": 1048576 },
+        "numBatch": { "type": "integer", "minimum": 1, "maximum": 65536 },
+        "sampling": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["temperature", "topP", "topK", "repeatPenalty"],
+          "properties": {
+            "temperature": { "type": ["number", "null"], "minimum": 0, "maximum": 2 },
+            "topP": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+            "topK": { "type": ["integer", "null"], "minimum": 0, "maximum": 1000 },
+            "repeatPenalty": { "type": ["number", "null"], "exclusiveMinimum": 0, "maximum": 10 }
+          }
+        },
+        "vram": {
+          "description": "Inputs of the VRAM estimate (spec section 7.4).",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["weightsMiB", "computeMiB", "kvMiBPerTokenF16", "marginMiB"],
+          "properties": {
+            "weightsMiB": { "type": ["number", "null"], "minimum": 0, "maximum": 1048576 },
+            "computeMiB": { "type": ["number", "null"], "minimum": 0, "maximum": 1048576 },
+            "kvMiBPerTokenF16": { "type": ["number", "null"], "exclusiveMinimum": 0, "maximum": 100 },
+            "marginMiB": { "type": "integer", "minimum": 0, "maximum": 65536 }
+          }
+        }
+      }
+    },
+    "ollamaServerEnv": {
+      "description": "Recommended Ollama server environment; applied only with consent.",
+      "type": "object",
+      "propertyNames": { "pattern": "^OLLAMA_[A-Z0-9_]+$" },
+      "additionalProperties": { "type": "string", "pattern": "^[A-Za-z0-9._:-]{1,64}$" }
+    },
+    "opencode": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["limit"],
+      "properties": {
+        "limit": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["context", "output"],
+          "properties": {
+            "context": { "type": ["integer", "null"], "minimum": 2048, "maximum": 1048576 },
+            "output": { "type": ["integer", "null"], "minimum": 256, "maximum": 32000 }
+          }
+        }
+      }
+    },
+    "guard": {
+      "description": "Guard settings this preset needs. They replace the matching config.json guard values, so a stricter preset stays strict; overrides.guard changes them and marks the profile custom (experimental).",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "minFreeVramAfterLoadMiB": { "$ref": "#/$defs/minFreeVramAfterLoadMiB" },
+        "maxGpuUtilPercent": { "$ref": "#/$defs/maxGpuUtilPercent" },
+        "assetImportCpuPercent": { "$ref": "#/$defs/assetImportCpuPercent" },
+        "maxUnityEditors": { "$ref": "#/$defs/maxUnityEditors" },
+        "importWhileLoaded": { "$ref": "#/$defs/importWhileLoaded" },
+        "onColdBlock": { "$ref": "#/$defs/onColdBlock" },
+        "onLoadedBusy": { "$ref": "#/$defs/onLoadedBusy" }
+      }
+    },
+    "reliability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["toolCalls", "edits", "note"],
+      "properties": {
+        "toolCalls": { "anyOf": [{ "type": "null" }, { "$ref": "#/$defs/benchResult" }] },
+        "edits": { "anyOf": [{ "type": "null" }, { "$ref": "#/$defs/benchResult" }] },
+        "note": { "type": "string", "minLength": 1 }
+      }
+    }
+  },
+  "$defs": {
+    "minFreeVramAfterLoadMiB": {
+      "description": "Free video memory that must remain after the model loads.",
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 1048576
+    },
+    "maxGpuUtilPercent": {
+      "description": "Block a cold load when GPU utilization is at or above this in both samples.",
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 100
+    },
+    "assetImportCpuPercent": {
+      "description": "Import workers at or above this CPU percent (100 = one core) count as importing.",
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 102400
+    },
+    "maxUnityEditors": {
+      "description": "Most Unity editors with a window; 0 disables the check.",
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 64
+    },
+    "importWhileLoaded": {
+      "description": "wait keeps the import check on while the model is loaded; allow skips it.",
+      "enum": ["wait", "allow"]
+    },
+    "onColdBlock": {
+      "description": "How OpenCode sees a cold-path block: stop the request, or retry it.",
+      "enum": ["stop", "retry"]
+    },
+    "onLoadedBusy": {
+      "description": "How OpenCode sees an import block while the model is loaded.",
+      "enum": ["retry", "stop"]
+    },
+    "benchResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["passed", "runs", "evidence"],
+      "properties": {
+        "passed": { "type": "integer", "minimum": 0 },
+        "runs": { "type": "integer", "minimum": 1 },
+        "evidence": { "type": "string", "pattern": "^docs/evidence/[A-Za-z0-9._/-]+\\.md$" }
+      }
+    }
+  }
+}

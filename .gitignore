@@ -1,0 +1,8 @@
+node_modules/
+coverage/
+*.tgz
+*.log
+.test-tmp/
+.DS_Store
+Thumbs.db
+.personal-data-denylist

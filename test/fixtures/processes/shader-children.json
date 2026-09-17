@@ -1,0 +1,88 @@
+{
+  "schema": 1,
+  "probePid": 1000,
+  "ancestors": [
+    900,
+    800
+  ],
+  "sampleMs": 1500,
+  "elapsedMs": 1512.4,
+  "processes": [
+    {
+      "pid": 4100,
+      "parentPid": 700,
+      "name": "Unity.exe",
+      "commandLine": "\"C:\\Program Files\\Unity\\Hub\\Editor\\6000.0.58f1\\Editor\\Unity.exe\" -projectPath D:\\Projects\\SampleGame",
+      "hasWindow": true,
+      "first": {
+        "state": "ok",
+        "seconds": 120.5,
+        "startMs": 1758000000000,
+        "error": null
+      },
+      "second": {
+        "state": "ok",
+        "seconds": 121.7,
+        "startMs": 1758000000000,
+        "error": null
+      }
+    },
+    {
+      "pid": 4210,
+      "parentPid": 4100,
+      "name": "UnityShaderCompiler.exe",
+      "commandLine": "\"C:\\Program Files\\Unity\\Hub\\Editor\\6000.0.58f1\\Editor\\Data\\Tools\\UnityShaderCompiler.exe\" -parent 4100",
+      "hasWindow": false,
+      "first": {
+        "state": "ok",
+        "seconds": 5,
+        "startMs": 1758000000000,
+        "error": null
+      },
+      "second": {
+        "state": "ok",
+        "seconds": 5.6,
+        "startMs": 1758000000000,
+        "error": null
+      }
+    },
+    {
+      "pid": 4211,
+      "parentPid": 4310,
+      "name": "UnityShaderCompiler.exe",
+      "commandLine": "\"C:\\Program Files\\Unity\\Hub\\Editor\\6000.0.58f1\\Editor\\Data\\Tools\\UnityShaderCompiler.exe\" -parent 4310",
+      "hasWindow": false,
+      "first": {
+        "state": "ok",
+        "seconds": 4,
+        "startMs": 1758000000000,
+        "error": null
+      },
+      "second": {
+        "state": "ok",
+        "seconds": 4.6,
+        "startMs": 1758000000000,
+        "error": null
+      }
+    },
+    {
+      "pid": 4212,
+      "parentPid": 4100,
+      "name": "UnityShaderCompiler.exe",
+      "commandLine": "\"C:\\Program Files\\Unity\\Hub\\Editor\\6000.0.58f1\\Editor\\Data\\Tools\\UnityShaderCompiler.exe\" -parent 4100",
+      "hasWindow": false,
+      "first": {
+        "state": "ok",
+        "seconds": 9,
+        "startMs": 1758000000000,
+        "error": null
+      },
+      "second": {
+        "state": "ok",
+        "seconds": 9,
+        "startMs": 1758000000000,
+        "error": null
+      }
+    }
+  ]
+}

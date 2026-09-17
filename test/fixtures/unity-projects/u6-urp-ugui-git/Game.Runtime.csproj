@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="Current" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <EnableDefaultItems>false</EnableDefaultItems>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Assets\Game\Player.cs" />
+    <Compile Include="Assets\Game\Combat\Weapon.cs" />
+    <Compile Include="Assets\Game\Combat\Hitbox.cs" />
+    <Compile Include="Assets\Game\Ui\HudView.cs" />
+    <Compile Include="Assets\Game\GameConstants.cs" />
+  </ItemGroup>
+</Project>

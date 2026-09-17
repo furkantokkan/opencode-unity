@@ -1,0 +1,13 @@
+time=2026-09-17T12:21:46.886+03:00 level=INFO source=llama_server.go:434 msg="starting llama-server" cmd="<home>\\AppData\\Local\\Programs\\Ollama\\lib\\ollama\\llama-server.exe --model <home>\\.ollama\\models\\blobs\\sha256-0000000000000000000000000000000000000000000000000000000000000000 --port 49663 --host 127.0.0.1 --no-webui --offline -c 32768 -np 1 --log-verbosity 4 --no-log-prefix --no-log-timestamps --no-jinja --chat-template chatml --load-mode none --cache-type-k q8_0 --cache-type-v q8_0 --flash-attn on -b 512 -ub 512 --context-shift --keep 4"
+llama_kv_cache:      CUDA0 KV buffer size =  1632.00 MiB
+llama_kv_cache: size = 1632.00 MiB ( 32768 cells,  48 layers,  1/1 seqs), K (q8_0):  816.00 MiB, V (q8_0):  816.00 MiB
+srv    load_model: initializing, n_slots = 1, n_ctx_slot = 32768, kv_unified = 'false'
+time=2026-09-17T12:22:04.100+03:00 level=INFO source=llama_server.go:1372 msg="llama-server started in 17.21 seconds"
+slot launch_slot_: id  0 | task -1 | sampler params:
+	repeat_last_n = 64, repeat_penalty = 1.050, frequency_penalty = 0.000, presence_penalty = 0.000
+	top_k = 20, top_p = 0.800, min_p = 0.000, xtc_probability = 0.000, xtc_threshold = 0.100, typical_p = 1.000, top_n_sigma = -1.000, temp = 0.700
+[GIN] 2026/09/17 - 12:45:18 | 200 |    41.2231s |       127.0.0.1 | POST     "/v1/chat/completions"
+CUDA error: the function failed to launch on the GPU
+  current device: 0, in function ggml_cuda_compute_forward at ggml/src/ggml-cuda/ggml-cuda.cu:2361
+time=2026-09-17T12:57:36.441+03:00 level=ERROR source=llama_server.go:1206 msg="llama-server process no longer running" sys=3221225477 string="exit status 3221225477"
+[GIN] 2026/09/17 - 12:57:36 | 500 |    12.0041s |       127.0.0.1 | POST     "/v1/chat/completions"

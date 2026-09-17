@@ -1,0 +1,26 @@
+{
+  "parameters": "num_ctx                        16384\nnum_batch                      256\ntemperature                    0.7\ntop_p                          0.8\ntop_k                          20\nrepeat_penalty                 1.05\nstop                           \"<|im_start|>\"\nstop                           \"<|im_end|>\"",
+  "template": "{{- range $index, $_ := .Messages }}...",
+  "renderer": "qwen3-coder",
+  "parser": "qwen3-coder",
+  "details": {
+    "parent_model": "qwen3-coder:30b",
+    "format": "gguf",
+    "family": "qwen3moe",
+    "families": [
+      "qwen3moe"
+    ],
+    "parameter_size": "30.5B",
+    "quantization_level": "Q4_K_M"
+  },
+  "model_info": {
+    "general.architecture": "qwen3moe",
+    "qwen3moe.block_count": 48,
+    "qwen3moe.context_length": 262144
+  },
+  "capabilities": [
+    "completion",
+    "tools"
+  ],
+  "modified_at": "2026-09-17T11:40:12.123456+03:00"
+}

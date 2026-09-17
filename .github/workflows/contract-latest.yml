@@ -1,0 +1,103 @@
+# Spec 21.2: weekly drift signal against the newest OpenCode release. It never gates a pull request;
+# it files or updates one issue so a version bump is a decision, not a surprise (spec 22, risk R1).
+name: contract-latest
+
+on:
+  schedule:
+    - cron: "0 4 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: contract-latest
+  cancel-in-progress: false
+
+env:
+  OLLAMA_HOST: http://127.0.0.1:9
+  OPENCODE_DISABLE_AUTOUPDATE: "1"
+  OPENCODE_DISABLE_MODELS_FETCH: "1"
+  OPENCODE_DISABLE_CLAUDE_CODE: "1"
+
+jobs:
+  drift:
+    name: drift
+    runs-on: windows-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24"
+          cache: npm
+      - run: npm ci
+      - name: Resolve the latest OpenCode version
+        id: version
+        run: |
+          $version = (npm view opencode-ai version).Trim()
+          if (-not $version) { throw "npm view returned no version" }
+          "version=$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+      - name: Install opencode-ai@${{ steps.version.outputs.version }} into a temp prefix
+        run: npm install --prefix "$env:RUNNER_TEMP/opencode" --no-audit --no-fund "opencode-ai@${{ steps.version.outputs.version }}"
+      - name: Contract tests against the latest version
+        id: contract
+        continue-on-error: true
+        run: node --test "test/contract/**/*.test.mjs"
+        env:
+          OPENCODE_UNITY_TEST_OPENCODE: ${{ runner.temp }}\opencode\node_modules\opencode-ai\bin\opencode.exe
+          OPENCODE_UNITY_TEST_ARTIFACTS: ${{ runner.temp }}\contract-artifacts
+      - name: Refresh the generated OpenCode fixtures and diff them
+        id: fixtures
+        continue-on-error: true
+        run: |
+          node scripts/refresh-opencode-fixtures.mjs
+          $changes = git status --porcelain -- src/opencode
+          if ($changes) {
+            Write-Output "Generated OpenCode fixtures changed:"
+            Write-Output $changes
+            git --no-pager diff -- src/opencode
+            exit 1
+          }
+      - name: Upload contract artifacts and fixture candidates
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: contract-latest-${{ steps.version.outputs.version }}
+          path: |
+            ${{ runner.temp }}/contract-artifacts
+            src/opencode
+          if-no-files-found: ignore
+          include-hidden-files: true
+      - name: Open or update the drift issue
+        if: steps.contract.outcome == 'failure' || steps.fixtures.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.version }}
+          CONTRACT_OUTCOME: ${{ steps.contract.outcome }}
+          FIXTURES_OUTCOME: ${{ steps.fixtures.outcome }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          $title = "OpenCode drift: $env:VERSION"
+          $body = @"
+          The weekly drift job ran against ``opencode-ai@$env:VERSION`` (tested version: 1.18.31).
+
+          - contract suite: $env:CONTRACT_OUTCOME
+          - generated fixtures (schema keys, retry patterns, expected tools): $env:FIXTURES_OUTCOME
+
+          Run and artifacts: $env:RUN_URL
+
+          Bumping the tested version is a minor release and needs the checklist in spec section 22:
+          contract green, fixtures regenerated and reviewed, gates G1, G2 and G5 re-run on reference
+          hardware, and a changelog entry.
+          "@
+          $existing = (gh issue list --state open --search "$title in:title" --json number,title --jq "[.[] | select(.title == `"$title`")] | .[0].number // empty" | Out-String).Trim()
+          if ($existing) {
+            gh issue comment $existing --body $body
+          } else {
+            gh issue create --title $title --body $body
+          }

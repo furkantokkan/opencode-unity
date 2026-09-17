@@ -1,0 +1,545 @@
+{
+  "spike": "F",
+  "id": "F",
+  "title": "Bash allow-list under the Windows shell",
+  "question": "Do bash allow-list patterns evaluate correctly under OpenCode's Windows shell, including the quoted -clp:ErrorsOnly;NoSummary?",
+  "contractTest": "C3",
+  "fallback": "Ship ocu-compile.cmd <csproj> in the profile and allow that one command pattern",
+  "opencodeVersion": "1.18.31",
+  "platform": "win32 x64",
+  "node": "v24.13.0",
+  "ranAt": "2026-09-17T18:39:26.805Z",
+  "durationMs": 16737,
+  "outcome": "pass",
+  "decision": "Keep the rendered bash allow-list (spec 8.5.2). No ocu-compile.cmd wrapper is needed; the compile command may keep its quoted -clp argument.",
+  "checks": [
+    {
+      "name": "F1 compile check from the facts table: allow",
+      "pass": true,
+      "detail": {
+        "rules": [
+          "dotnet build Assembly-CSharp.csproj * -> allow",
+          "dotnet build Assembly-CSharp.csproj * -> allow",
+          "dotnet build Assembly-CSharp.csproj * -> allow"
+        ],
+        "output": "BUILD_OK\r\n"
+      }
+    },
+    {
+      "name": "F2 dotnet --version: allow",
+      "pass": true,
+      "detail": {
+        "rules": [
+          "dotnet --version -> allow"
+        ],
+        "output": "BUILD_OK\r\n"
+      }
+    },
+    {
+      "name": "F3 read-only git: allow",
+      "pass": true,
+      "detail": {
+        "rules": [
+          "git status * -> allow"
+        ],
+        "output": "(no output)"
+      }
+    },
+    {
+      "name": "F4 git push: deny",
+      "pass": true,
+      "detail": {
+        "rules": [
+          "git * -> deny",
+          "git * -> deny",
+          "git * -> deny"
+        ],
+        "output": "The user has specified a rule which prevents you from using this specific tool call. Here are some of the relevant rules [{\"permission\":\"*\",\"action\":\"allow\",\"pa"
+      }
+    },
+    {
+      "name": "F5 git commit: deny",
+      "pass": true,
+      "detail": {
+        "rules": [
+          "git * -> deny"
+        ],
+        "output": "The user has specified a rule which prevents you from using this specific tool call. Here are some of the relevant rules [{\"permission\":\"*\",\"action\":\"allow\",\"pa"
+      }
+    },
+    {
+      "name": "F6 cm checkin: deny",
+      "pass": true,
+      "detail": {
+        "rules": [
+          "cm * -> deny"
+        ],
+        "output": "The user has specified a rule which prevents you from using this specific tool call. Here are some of the relevant rules [{\"permission\":\"*\",\"action\":\"allow\",\"pa"
+      }
+    },
+    {
+      "name": "F7 allowed command chained with git push (&&): deny",
+      "pass": true,
+      "detail": {
+        "rules": [
+          "git * -> deny",
+          "dotnet build Assembly-CSharp.csproj * -> allow",
+          "git * -> deny",
+          "dotnet build Assembly-CSharp.csproj * -> allow",
+          "git * -> deny"
+        ],
+        "output": "The user has specified a rule which prevents you from using this specific tool call. Here are some of the relevant rules [{\"permission\":\"*\",\"action\":\"allow\",\"pa"
+      }
+    },
+    {
+      "name": "F8 allowed command chained with git push (;): deny",
+      "pass": true,
+      "detail": {
+        "rules": [
+          "git * -> deny",
+          "dotnet build Assembly-CSharp.csproj * -> allow",
+          "git * -> deny",
+          "dotnet build Assembly-CSharp.csproj * -> allow",
+          "git * -> deny"
+        ],
+        "output": "The user has specified a rule which prevents you from using this specific tool call. Here are some of the relevant rules [{\"permission\":\"*\",\"action\":\"allow\",\"pa"
+      }
+    },
+    {
+      "name": "F9 cmd wrapper: deny",
+      "pass": true,
+      "detail": {
+        "rules": [
+          "git * -> deny",
+          "git * -> deny",
+          "git * -> deny",
+          "* -> deny"
+        ],
+        "output": "The user has specified a rule which prevents you from using this specific tool call. Here are some of the relevant rules [{\"permission\":\"*\",\"action\":\"allow\",\"pa"
+      }
+    },
+    {
+      "name": "F10 powershell wrapper: deny",
+      "pass": true,
+      "detail": {
+        "rules": [
+          "git * -> deny",
+          "git * -> deny",
+          "git * -> deny",
+          "* -> deny"
+        ],
+        "output": "The user has specified a rule which prevents you from using this specific tool call. Here are some of the relevant rules [{\"permission\":\"*\",\"action\":\"allow\",\"pa"
+      }
+    },
+    {
+      "name": "F11 recursive delete (PowerShell): deny",
+      "pass": true,
+      "detail": {
+        "rules": [
+          "Remove-Item *-Recurse* -> deny"
+        ],
+        "output": "The user has specified a rule which prevents you from using this specific tool call. Here are some of the relevant rules [{\"permission\":\"*\",\"action\":\"allow\",\"pa"
+      }
+    },
+    {
+      "name": "F12 recursive delete (posix form): deny",
+      "pass": true,
+      "detail": {
+        "rules": [
+          "rm -rf * -> deny"
+        ],
+        "output": "The user has specified a rule which prevents you from using this specific tool call. Here are some of the relevant rules [{\"permission\":\"*\",\"action\":\"allow\",\"pa"
+      }
+    },
+    {
+      "name": "F13 redirect into a protected asset: deny",
+      "pass": true,
+      "detail": {
+        "rules": [
+          "* -> deny"
+        ],
+        "output": "The user has specified a rule which prevents you from using this specific tool call. Here are some of the relevant rules [{\"permission\":\"*\",\"action\":\"allow\",\"pa"
+      }
+    },
+    {
+      "name": "F14 compile of an unmapped csproj: deny",
+      "pass": true,
+      "detail": {
+        "rules": [
+          "* -> deny"
+        ],
+        "output": "The user has specified a rule which prevents you from using this specific tool call. Here are some of the relevant rules [{\"permission\":\"*\",\"action\":\"allow\",\"pa"
+      }
+    },
+    {
+      "name": "F15 the shell tool id is \"bash\"",
+      "pass": true,
+      "detail": "bash"
+    },
+    {
+      "name": "F16 only the two allowed dotnet commands ran",
+      "pass": true,
+      "detail": {
+        "dotnet": [
+          "build Assembly-CSharp.csproj -nologo -tl:off -v q -clp:ErrorsOnly;NoSummary",
+          "--version"
+        ],
+        "cm": []
+      }
+    },
+    {
+      "name": "F17 the quoted -clp argument survives to the command line",
+      "pass": true,
+      "detail": [
+        "build Assembly-CSharp.csproj -nologo -tl:off -v q -clp:ErrorsOnly;NoSummary",
+        "--version"
+      ]
+    }
+  ],
+  "findings": [
+    "The Windows shell OpenCode picked was pwsh.EXE (first acceptable of pwsh, powershell, git bash, cmd; SHELL is unset in the clean room). The shell tool id is \"bash\".",
+    "The permission pattern is the whole command text of each parsed command node, so a chain such as `dotnet build X.csproj && git push` is evaluated per node and the VCS write still loses.",
+    "A quoted argument containing a semicolon stays inside one pattern and reaches the process command line unchanged, so `dotnet build <csproj> *` covers the facts compile command.",
+    "Denied calls return the tool error \"The user has specified a rule which prevents you from using this specific tool call\", including the matching ruleset, and the session keeps running.",
+    "With `--print-logs --log-level INFO`, every decision is logged as `message=evaluated permission=bash pattern=<command> action.pattern=<rule> action.action=<allow|deny>`, which is the cheapest evidence for contract test C3."
+  ],
+  "evidence": {
+    "run": {
+      "exitCode": 0,
+      "durationMs": 16496,
+      "timedOut": false,
+      "attempts": 1,
+      "chatRequests": 15,
+      "hookCounts": {
+        "server": 1,
+        "config": 1,
+        "event": 93,
+        "messages.transform": 15,
+        "system.transform": 15,
+        "chat.params": 15,
+        "tool.execute.before": 14,
+        "shell.env": 3,
+        "tool.execute.after": 3,
+        "text.complete": 1
+      },
+      "chatParamsAgents": [
+        "unity-code",
+        "unity-code",
+        "unity-code",
+        "unity-code",
+        "unity-code",
+        "unity-code",
+        "unity-code",
+        "unity-code",
+        "unity-code",
+        "unity-code",
+        "unity-code",
+        "unity-code",
+        "unity-code",
+        "unity-code",
+        "unity-code"
+      ],
+      "runErrorEvents": [],
+      "stdoutEventTypes": [
+        "step_start",
+        "tool_use",
+        "step_finish",
+        "step_start",
+        "tool_use",
+        "step_finish",
+        "step_start",
+        "tool_use",
+        "step_finish",
+        "step_start",
+        "tool_use",
+        "step_finish",
+        "step_start",
+        "tool_use",
+        "step_finish",
+        "step_start",
+        "tool_use",
+        "step_finish",
+        "step_start",
+        "tool_use",
+        "step_finish",
+        "step_start",
+        "tool_use",
+        "step_finish",
+        "step_start",
+        "tool_use",
+        "step_finish",
+        "step_start",
+        "tool_use",
+        "step_finish",
+        "step_start",
+        "tool_use",
+        "step_finish",
+        "step_start",
+        "tool_use",
+        "step_finish",
+        "step_start",
+        "tool_use",
+        "step_finish",
+        "step_start",
+        "tool_use",
+        "step_finish",
+        "step_start",
+        "text",
+        "step_finish"
+      ],
+      "stderrTail": "...imestamp=2026-09-17T18:39:26.262Z level=INFO run=2cdacb16 message=\"llm runtime selected\" llm.runtime=ai-sdk llm.provider=opencode-unity llm.model=ocu-spike-model-16k\ntimestamp=2026-09-17T18:39:26.517Z level=INFO run=2cdacb16 message=tracking hash=6b74e0604c066a82c231404dc83e79c62d36cd12 cwd=\"<tmp>\\\\opencode-unity-tests\\\\spike-f-bash-7sRJ8i\\\\project\" git=\"<tmp>\\\\opencode-unity-tests\\\\spike-f-bash-7sRJ8i\\\\home\\\\.local\\\\share\\\\opencode\\\\snapshot\\\\dd951b1cea7e74363d7fd165d78e019767ac2c3b\\\\0be19887c2accd8c2ef2eb80181ee9c894f7e05e\"\ntimestamp=2026-09-17T18:39:26.680Z level=INFO run=2cdacb16 message=loop session.id=ses_f4f5597e0ffe35253kxkuOnXV6 step=15\ntimestamp=2026-09-17T18:39:26.681Z level=INFO run=2cdacb16 message=\"exiting loop\" session.id=ses_f4f5597e0ffe35253kxkuOnXV6\ntimestamp=2026-09-17T18:39:26.689Z level=INFO run=2cdacb16 message=pruning\ntimestamp=2026-09-17T18:39:26.691Z level=INFO run=2cdacb16 message=found pruned=0 total=0\ntimestamp=2026-09-17T18:39:26.692Z level=INFO run=2cdacb16 message=\"disposing instance\" directory=\"<tmp>\\\\opencode-unity-tests\\\\spike-f-bash-7sRJ8i\\\\project\"\n"
+    },
+    "shell": "pwsh.EXE",
+    "shellToolId": "bash",
+    "cases": [
+      {
+        "id": "F1 compile check from the facts table",
+        "command": "dotnet build Assembly-CSharp.csproj -nologo -tl:off -v q \"-clp:ErrorsOnly;NoSummary\"",
+        "expected": "allow",
+        "actual": "allow",
+        "rules": [
+          "dotnet build Assembly-CSharp.csproj * -> allow",
+          "dotnet build Assembly-CSharp.csproj * -> allow",
+          "dotnet build Assembly-CSharp.csproj * -> allow"
+        ],
+        "output": "BUILD_OK\r\n"
+      },
+      {
+        "id": "F2 dotnet --version",
+        "command": "dotnet --version",
+        "expected": "allow",
+        "actual": "allow",
+        "rules": [
+          "dotnet --version -> allow"
+        ],
+        "output": "BUILD_OK\r\n"
+      },
+      {
+        "id": "F3 read-only git",
+        "command": "git status --short",
+        "expected": "allow",
+        "actual": "allow",
+        "rules": [
+          "git status * -> allow"
+        ],
+        "output": "(no output)"
+      },
+      {
+        "id": "F4 git push",
+        "command": "git push origin main",
+        "expected": "deny",
+        "actual": "deny",
+        "rules": [
+          "git * -> deny",
+          "git * -> deny",
+          "git * -> deny"
+        ],
+        "output": "The user has specified a rule which prevents you from using this specific tool call. Here are some of the relevant rules"
+      },
+      {
+        "id": "F5 git commit",
+        "command": "git commit -m \"wip\"",
+        "expected": "deny",
+        "actual": "deny",
+        "rules": [
+          "git * -> deny"
+        ],
+        "output": "The user has specified a rule which prevents you from using this specific tool call. Here are some of the relevant rules"
+      },
+      {
+        "id": "F6 cm checkin",
+        "command": "cm checkin -c \"wip\"",
+        "expected": "deny",
+        "actual": "deny",
+        "rules": [
+          "cm * -> deny"
+        ],
+        "output": "The user has specified a rule which prevents you from using this specific tool call. Here are some of the relevant rules"
+      },
+      {
+        "id": "F7 allowed command chained with git push (&&)",
+        "command": "dotnet build Assembly-CSharp.csproj && git push origin main",
+        "expected": "deny",
+        "actual": "deny",
+        "rules": [
+          "git * -> deny",
+          "dotnet build Assembly-CSharp.csproj * -> allow",
+          "git * -> deny",
+          "dotnet build Assembly-CSharp.csproj * -> allow",
+          "git * -> deny"
+        ],
+        "output": "The user has specified a rule which prevents you from using this specific tool call. Here are some of the relevant rules"
+      },
+      {
+        "id": "F8 allowed command chained with git push (;)",
+        "command": "dotnet build Assembly-CSharp.csproj; git push origin main",
+        "expected": "deny",
+        "actual": "deny",
+        "rules": [
+          "git * -> deny",
+          "dotnet build Assembly-CSharp.csproj * -> allow",
+          "git * -> deny",
+          "dotnet build Assembly-CSharp.csproj * -> allow",
+          "git * -> deny"
+        ],
+        "output": "The user has specified a rule which prevents you from using this specific tool call. Here are some of the relevant rules"
+      },
+      {
+        "id": "F9 cmd wrapper",
+        "command": "cmd /c git push origin main",
+        "expected": "deny",
+        "actual": "deny",
+        "rules": [
+          "git * -> deny",
+          "git * -> deny",
+          "git * -> deny",
+          "* -> deny"
+        ],
+        "output": "The user has specified a rule which prevents you from using this specific tool call. Here are some of the relevant rules"
+      },
+      {
+        "id": "F10 powershell wrapper",
+        "command": "powershell -Command git push origin main",
+        "expected": "deny",
+        "actual": "deny",
+        "rules": [
+          "git * -> deny",
+          "git * -> deny",
+          "git * -> deny",
+          "* -> deny"
+        ],
+        "output": "The user has specified a rule which prevents you from using this specific tool call. Here are some of the relevant rules"
+      },
+      {
+        "id": "F11 recursive delete (PowerShell)",
+        "command": "Remove-Item -Recurse -Force Assets",
+        "expected": "deny",
+        "actual": "deny",
+        "rules": [
+          "Remove-Item *-Recurse* -> deny"
+        ],
+        "output": "The user has specified a rule which prevents you from using this specific tool call. Here are some of the relevant rules"
+      },
+      {
+        "id": "F12 recursive delete (posix form)",
+        "command": "rm -rf Assets",
+        "expected": "deny",
+        "actual": "deny",
+        "rules": [
+          "rm -rf * -> deny"
+        ],
+        "output": "The user has specified a rule which prevents you from using this specific tool call. Here are some of the relevant rules"
+      },
+      {
+        "id": "F13 redirect into a protected asset",
+        "command": "echo broken > Assets/UI/Menu.prefab",
+        "expected": "deny",
+        "actual": "deny",
+        "rules": [
+          "* -> deny"
+        ],
+        "output": "The user has specified a rule which prevents you from using this specific tool call. Here are some of the relevant rules"
+      },
+      {
+        "id": "F14 compile of an unmapped csproj",
+        "command": "dotnet build Other.csproj",
+        "expected": "deny",
+        "actual": "deny",
+        "rules": [
+          "* -> deny"
+        ],
+        "output": "The user has specified a rule which prevents you from using this specific tool call. Here are some of the relevant rules"
+      }
+    ],
+    "fakeCalls": {
+      "dotnet": [
+        "build Assembly-CSharp.csproj -nologo -tl:off -v q -clp:ErrorsOnly;NoSummary",
+        "--version"
+      ],
+      "cm": []
+    },
+    "decisions": [
+      {
+        "pattern": "dotnet build Assembly-CSharp.csproj -nologo -tl:off -v q \"-clp:ErrorsOnly;NoSummary\"",
+        "rule": "dotnet build Assembly-CSharp.csproj *",
+        "action": "allow"
+      },
+      {
+        "pattern": "dotnet --version",
+        "rule": "dotnet --version",
+        "action": "allow"
+      },
+      {
+        "pattern": "git status --short",
+        "rule": "git status *",
+        "action": "allow"
+      },
+      {
+        "pattern": "git push origin main",
+        "rule": "git *",
+        "action": "deny"
+      },
+      {
+        "pattern": "git commit -m \"wip\"",
+        "rule": "git *",
+        "action": "deny"
+      },
+      {
+        "pattern": "cm checkin -c \"wip\"",
+        "rule": "cm *",
+        "action": "deny"
+      },
+      {
+        "pattern": "dotnet build Assembly-CSharp.csproj",
+        "rule": "dotnet build Assembly-CSharp.csproj *",
+        "action": "allow"
+      },
+      {
+        "pattern": "git push origin main",
+        "rule": "git *",
+        "action": "deny"
+      },
+      {
+        "pattern": "dotnet build Assembly-CSharp.csproj",
+        "rule": "dotnet build Assembly-CSharp.csproj *",
+        "action": "allow"
+      },
+      {
+        "pattern": "git push origin main",
+        "rule": "git *",
+        "action": "deny"
+      },
+      {
+        "pattern": "cmd /c git push origin main",
+        "rule": "*",
+        "action": "deny"
+      },
+      {
+        "pattern": "powershell -Command git push origin main",
+        "rule": "*",
+        "action": "deny"
+      },
+      {
+        "pattern": "Remove-Item -Recurse -Force Assets",
+        "rule": "Remove-Item *-Recurse*",
+        "action": "deny"
+      },
+      {
+        "pattern": "rm -rf Assets",
+        "rule": "rm -rf *",
+        "action": "deny"
+      },
+      {
+        "pattern": "echo broken > Assets/UI/Menu.prefab",
+        "rule": "*",
+        "action": "deny"
+      },
+      {
+        "pattern": "dotnet build Other.csproj",
+        "rule": "*",
+        "action": "deny"
+      }
+    ]
+  },
+  "crash": null
+}

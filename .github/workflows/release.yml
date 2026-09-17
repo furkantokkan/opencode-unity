@@ -1,0 +1,113 @@
+# Spec 21.3 and 27. A tag publishes only what CI proved: ci.yml runs first, the release metadata is
+# verified, the tarball is built once and the same bytes are published to npm (provenance through
+# trusted publishing, no long-lived token) and attached to the GitHub release with SHA256SUMS.
+name: release
+
+on:
+  push:
+    tags: ["v*.*.*"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  ci:
+    name: ci
+    uses: ./.github/workflows/ci.yml
+    permissions:
+      contents: read
+    secrets:
+      PERSONAL_DATA_DENYLIST: ${{ secrets.PERSONAL_DATA_DENYLIST }}
+
+  verify:
+    name: verify
+    needs: ci
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      # The hygiene scripts have no dependencies, so the release path installs nothing here.
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24"
+          package-manager-cache: false
+      - name: Tag, changelog, compat.json and package file list
+        run: node scripts/check-package-files.mjs --release --tag "$GITHUB_REF_NAME"
+      - name: Claims and evidence for every verified row
+        run: node scripts/check-claims.mjs --release
+      - name: No personal data
+        run: node scripts/check-no-personal-data.mjs
+        env:
+          OPENCODE_UNITY_DENYLIST: ${{ secrets.PERSONAL_DATA_DENYLIST }}
+
+  publish:
+    name: publish
+    needs: verify
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24"
+          registry-url: https://registry.npmjs.org
+          package-manager-cache: false
+      - name: npm must support trusted publishing
+        run: |
+          node -e "const v = process.argv[1].split('-')[0].split('.').map(Number); if (v[0] < 11 || (v[0] === 11 && (v[1] < 5 || (v[1] === 5 && v[2] < 1)))) { console.error('npm >= 11.5.1 is required for trusted publishing, found ' + process.argv[1]); process.exit(1); }" "$(npm --version)"
+      - name: Pack the tarball and hash it
+        id: pack
+        run: |
+          TARBALL="$(npm pack --ignore-scripts | tail -n 1)"
+          sha256sum "$TARBALL" > SHA256SUMS
+          cat SHA256SUMS
+          echo "tarball=$TARBALL" >> "$GITHUB_OUTPUT"
+          echo "dist_tag=$(node -p "require('./package.json').version.includes('-') ? 'next' : 'latest'")" >> "$GITHUB_OUTPUT"
+      - name: Publish to npm with provenance
+        run: npm publish "${{ steps.pack.outputs.tarball }}" --provenance --access public --tag "${{ steps.pack.outputs.dist_tag }}"
+      - name: Keep the published bytes for the GitHub release
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: release-tarball
+          path: |
+            ${{ steps.pack.outputs.tarball }}
+            SHA256SUMS
+          if-no-files-found: error
+
+  github-release:
+    name: github-release
+    needs: publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24"
+          package-manager-cache: false
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: release-tarball
+          path: ${{ runner.temp }}/dist
+      - name: Release notes from the changelog
+        run: node scripts/check-package-files.mjs --release --tag "$GITHUB_REF_NAME" --release-notes "$RUNNER_TEMP/notes.md"
+      - name: Create the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          PRERELEASE=""
+          case "$GITHUB_REF_NAME" in *-*) PRERELEASE="--prerelease";; esac
+          gh release create "$GITHUB_REF_NAME" "$RUNNER_TEMP"/dist/*.tgz "$RUNNER_TEMP/dist/SHA256SUMS" \
+            --title "$GITHUB_REF_NAME" --notes-file "$RUNNER_TEMP/notes.md" $PRERELEASE

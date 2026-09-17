@@ -1,0 +1,14 @@
+{
+  "name": "Controls",
+  "maps": [
+    {
+      "name": "Player",
+      "actions": [
+        {
+          "name": "Move",
+          "type": "Value"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "probePid": 1000,
+  "ancestors": [
+    900,
+    800
+  ],
+  "sampleMs": 1500,
+  "elapsedMs": 1512.4,
+  "processes": [
+    {
+      "pid": 4100,
+      "parentPid": 700,
+      "name": "Unity.exe",
+      "commandLine": "\"C:\\Program Files\\Unity\\Hub\\Editor\\6000.0.58f1\\Editor\\Unity.exe\" -projectPath D:\\Projects\\SampleGame",
+      "hasWindow": true,
+      "first": {
+        "state": "ok",
+        "seconds": 120.5,
+        "startMs": 1758000000000,
+        "error": null
+      },
+      "second": {
+        "state": "ok",
+        "seconds": 120.58,
+        "startMs": 1758000000000,
+        "error": null
+      }
+    },
+    {
+      "pid": 4310,
+      "parentPid": 4100,
+      "name": "Unity.exe",
+      "commandLine": "\"C:\\Program Files\\Unity\\Hub\\Editor\\6000.0.58f1\\Editor\\Unity.exe\" -adb2 -batchMode -noUpm -name AssetImportWorker0 -projectPath D:\\Projects\\SampleGame -logFile Logs/AssetImportWorker0.log -srvPort 55001",
+      "hasWindow": false,
+      "first": {
+        "state": "ok",
+        "seconds": 30.2,
+        "startMs": 1758000000000,
+        "error": null
+      },
+      "second": {
+        "state": "ok",
+        "seconds": 30.7,
+        "startMs": 1758000000000,
+        "error": null
+      }
+    },
+    {
+      "pid": 4311,
+      "parentPid": 4100,
+      "name": "Unity.exe",
+      "commandLine": "\"C:\\Program Files\\Unity\\Hub\\Editor\\6000.0.58f1\\Editor\\Unity.exe\" -adb2 -batchMode -noUpm -name AssetImportWorker1 -projectPath D:\\Projects\\SampleGame -logFile Logs/AssetImportWorker1.log -srvPort 55001",
+      "hasWindow": false,
+      "first": {
+        "state": "ok",
+        "seconds": 28.1,
+        "startMs": 1758000000000,
+        "error": null
+      },
+      "second": {
+        "state": "ok",
+        "seconds": 28.4,
+        "startMs": 1758000000000,
+        "error": null
+      }
+    }
+  ]
+}

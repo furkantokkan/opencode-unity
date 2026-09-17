@@ -1,0 +1,110 @@
+{
+  "opencodeVersion": "1.18.31",
+  "updatedAt": "2026-09-17T18:44:42.090Z",
+  "spikes": [
+    {
+      "spike": "A",
+      "title": "Guard throw semantics in system.transform and chat.params",
+      "outcome": "pass",
+      "passed": 16,
+      "total": 16,
+      "decision": "Run the guard in the plugin hooks (D1, D8): a stop Error for blocking verdicts and a \"temporarily at capacity\" Error for retryable ones. No loopback gate."
+    },
+    {
+      "spike": "B",
+      "title": "Fail-closed provider injection through the plugin config hook",
+      "outcome": "pass",
+      "passed": 32,
+      "total": 32,
+      "decision": "Keep the fail-closed plugin-injected provider (D3): no provider block in the profile, and no loopback gate for provider resolution."
+    },
+    {
+      "spike": "C",
+      "title": "Budget preflight: thrown overflow object turns into compaction",
+      "outcome": "pass",
+      "passed": 11,
+      "total": 11,
+      "decision": "Keep the in-plugin budget preflight (D6): throw the overflow object for normal agents, a stop Error for the compaction agent and for the loop breaker."
+    },
+    {
+      "spike": "D",
+      "title": "XDG isolation canaries and shell.env restoration",
+      "outcome": "pass",
+      "passed": 10,
+      "total": 10,
+      "decision": "Keep the isolated XDG_CONFIG_HOME plus OPENCODE_CONFIG_DIR clean room (D2), with shell.env restoring the original XDG_CONFIG_HOME for agent commands."
+    },
+    {
+      "spike": "E",
+      "title": "Built-in agents disabled (build, plan, title)",
+      "outcome": "pass",
+      "passed": 7,
+      "total": 7,
+      "decision": "Disable build, plan and title (D22). The TUI rendering itself stays a manual M0 and G10 check; run and the server session path are covered automatically."
+    },
+    {
+      "spike": "F",
+      "title": "Bash allow-list under the Windows shell",
+      "outcome": "pass",
+      "passed": 17,
+      "total": 17,
+      "decision": "Keep the rendered bash allow-list (spec 8.5.2). No ocu-compile.cmd wrapper is needed; the compile command may keep its quoted -clp argument."
+    },
+    {
+      "spike": "G",
+      "title": "Models catalogue fetch disabled",
+      "outcome": "pass",
+      "passed": 6,
+      "total": 6,
+      "decision": "Keep OPENCODE_DISABLE_MODELS_FETCH=1 in the clean-room launch environment (spec 8.1)."
+    },
+    {
+      "spike": "H",
+      "title": "Offline start with a failing background dependency install",
+      "outcome": "pass",
+      "passed": 7,
+      "total": 7,
+      "decision": "Offline starts need no pre-seed, but the launch environment must set npm_config_fetch_retries=0; the pre-seed stays an optional setup extra for quiet logs."
+    },
+    {
+      "spike": "I",
+      "title": "PowerShell process probe over stdin",
+      "outcome": "pass",
+      "passed": 13,
+      "total": 13,
+      "decision": "Keep the stdin transport: `powershell.exe -NoProfile -NonInteractive -Command -` with the script text piped in as one `& { ... }` block ending in a blank line. `-ExecutionPolicy Bypass -File` stays the documented fallback."
+    },
+    {
+      "spike": "J",
+      "title": "MCP tool argument policy and resource permissions",
+      "outcome": "pass",
+      "passed": 13,
+      "total": 13,
+      "decision": "Enforce the MCP argument policy in the plugin `tool.execute.before` hook (spec 11.3), and keep the editor agent behind the exact-name allow-list plus `read: { \"mcp:<server>:*\": \"allow\" }`."
+    },
+    {
+      "spike": "K",
+      "title": "debug agent / debug config introspection and schema keys",
+      "outcome": "pass",
+      "passed": 8,
+      "total": 8,
+      "decision": "Use `debug agent <name>` for V-b and V-c and `debug config` for V-d, both with a timeout and one retry, and generate `schema-keys-1.18.31.json` from `opencode generate` (components.schemas.Config, AgentConfig, CommandConfig)."
+    },
+    {
+      "spike": "L",
+      "title": "MCP for Unity instance id formula",
+      "outcome": "manual-pending",
+      "passed": 5,
+      "total": 5,
+      "decision": "Take the spec fallback for v0.1: the editor agent matches on the instance NAME from `mcpforunity://instances` and stops unless exactly one instance matches the project name, with a warning. A computed `<name>@<hash>` is only shown as a hint, never used to pin an instance, until a live Editor check confirms the exact `Application.dataPath` string."
+    },
+    {
+      "spike": "M",
+      "title": "MCP for Unity HTTP endpoint path",
+      "outcome": "partial",
+      "passed": 5,
+      "total": 5,
+      "decision": "Build the hub URL as <base>/mcp, default base http://127.0.0.1:8080, and take the spec fallback for discovery: the user pastes the HTTP base URL from the MCP for Unity window (doctor pre-fills the documented default and the URL of an existing configurator entry when one is there). Nothing outside the Editor's own preferences reveals a changed port."
+    }
+  ]
+}

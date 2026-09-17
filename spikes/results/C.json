@@ -1,0 +1,283 @@
+{
+  "spike": "C",
+  "id": "C",
+  "title": "Budget preflight: thrown overflow object turns into compaction",
+  "question": "Does a thrown context_length_exceeded object trigger compaction without sending the request?",
+  "contractTest": "C8",
+  "fallback": "Preflight becomes a stop message (\"send /compact or start a new session\") plus detection; gate 413 moves to v0.2",
+  "opencodeVersion": "1.18.31",
+  "platform": "win32 x64",
+  "node": "v24.13.0",
+  "ranAt": "2026-09-17T18:38:14.172Z",
+  "durationMs": 23201,
+  "outcome": "pass",
+  "decision": "Keep the in-plugin budget preflight (D6): throw the overflow object for normal agents, a stop Error for the compaction agent and for the loop breaker.",
+  "checks": [
+    {
+      "name": "C1 one overflow throw: the over-budget request is not sent",
+      "pass": true,
+      "detail": 2
+    },
+    {
+      "name": "C1 chat.params order is unity-code (threw), compaction, unity-code",
+      "pass": true,
+      "detail": [
+        "unity-code",
+        "compaction",
+        "unity-code"
+      ]
+    },
+    {
+      "name": "C1 a compaction ran",
+      "pass": true,
+      "detail": 1
+    },
+    {
+      "name": "C1 the overflow object is never retried",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "C1 the session continues after compaction and answers",
+      "pass": true,
+      "detail": {
+        "exitCode": 1,
+        "afterError": [
+          "step_start",
+          "text",
+          "step_finish",
+          "text",
+          "step_start",
+          "text",
+          "step_finish"
+        ]
+      }
+    },
+    {
+      "name": "C2 loop breaker: only the compaction request is sent",
+      "pass": true,
+      "detail": 1
+    },
+    {
+      "name": "C2 loop breaker: the second overflow becomes a stop message",
+      "pass": true,
+      "detail": [
+        "throw-overflow",
+        "compaction-pass",
+        "loop-breaker"
+      ]
+    },
+    {
+      "name": "C2 loop breaker: the run halts with that message",
+      "pass": true,
+      "detail": [
+        {
+          "name": "ContextOverflowError",
+          "data": {
+            "message": "Input exceeds context window of this model",
+            "responseBody": "{\"type\":\"error\",\"error\":{\"code\":\"context_length_exceeded\",\"message\":\"opencode-unity budget preflight: prompt over budget\"}}"
+          }
+        },
+        {
+          "name": "UnknownError",
+          "data": {
+            "message": "opencode-unity budget: this session is too large for the local context even after compaction; start a new session."
+          }
+        }
+      ]
+    },
+    {
+      "name": "C2 loop breaker: no retries",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "C3 stop inside compaction: 0 requests reach the mock",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "C3 stop inside compaction: the run halts with the stop message",
+      "pass": true,
+      "detail": [
+        {
+          "name": "ContextOverflowError",
+          "data": {
+            "message": "Input exceeds context window of this model",
+            "responseBody": "{\"type\":\"error\",\"error\":{\"code\":\"context_length_exceeded\",\"message\":\"opencode-unity budget preflight: prompt over budget\"}}"
+          }
+        },
+        {
+          "name": "UnknownError",
+          "data": {
+            "message": "opencode-unity budget: this session is too large for the local context even after compaction; start a new session."
+          }
+        }
+      ]
+    }
+  ],
+  "findings": [
+    "A non-Error object thrown from chat.params is parsed as ContextOverflowError: the request is never sent, it is not retried, and OpenCode starts its own compaction.",
+    "The compaction request itself runs through the same prepare path, so the plugin must exempt it from the budget and use a stop Error there instead.",
+    "A stop Error thrown for the second overflow after a compaction (the loop breaker) halts the session with a readable message.",
+    "OpenCode publishes the overflow as a session error even when it recovers, so `opencode run` exits 1 although the answer after compaction is produced. Bench, delegate and contract tests must judge the final assistant text, not the exit code alone."
+  ],
+  "evidence": {
+    "overflowOnce": {
+      "exitCode": 1,
+      "durationMs": 8838,
+      "timedOut": false,
+      "attempts": 1,
+      "chatRequests": 2,
+      "hookCounts": {
+        "server": 1,
+        "config": 1,
+        "event": 23,
+        "messages.transform": 3,
+        "system.transform": 3,
+        "chat.params": 3,
+        "overflow": 2,
+        "text.complete": 2
+      },
+      "chatParamsAgents": [
+        "unity-code",
+        "compaction",
+        "unity-code"
+      ],
+      "runErrorEvents": [
+        {
+          "name": "ContextOverflowError",
+          "data": {
+            "message": "Input exceeds context window of this model",
+            "responseBody": "{\"type\":\"error\",\"error\":{\"code\":\"context_length_exceeded\",\"message\":\"opencode-unity budget preflight: prompt over budget\"}}"
+          }
+        }
+      ],
+      "stdoutEventTypes": [
+        "error",
+        "step_start",
+        "text",
+        "step_finish",
+        "text",
+        "step_start",
+        "text",
+        "step_finish"
+      ],
+      "stderrTail": "",
+      "overflowActions": [
+        "throw-overflow",
+        "compaction-pass"
+      ],
+      "compactedEvents": 1,
+      "retryCount": 0,
+      "requestSystemHeads": [
+        "You are a context summarization agent. You are given a conve",
+        "You are the spike code agent. Use exact tool names.\nYou are "
+      ]
+    },
+    "loopBreaker": {
+      "exitCode": 1,
+      "durationMs": 7785,
+      "timedOut": false,
+      "attempts": 1,
+      "chatRequests": 1,
+      "hookCounts": {
+        "server": 1,
+        "config": 1,
+        "event": 23,
+        "messages.transform": 3,
+        "system.transform": 3,
+        "chat.params": 3,
+        "overflow": 3,
+        "text.complete": 1
+      },
+      "chatParamsAgents": [
+        "unity-code",
+        "compaction",
+        "unity-code"
+      ],
+      "runErrorEvents": [
+        {
+          "name": "ContextOverflowError",
+          "data": {
+            "message": "Input exceeds context window of this model",
+            "responseBody": "{\"type\":\"error\",\"error\":{\"code\":\"context_length_exceeded\",\"message\":\"opencode-unity budget preflight: prompt over budget\"}}"
+          }
+        },
+        {
+          "name": "UnknownError",
+          "data": {
+            "message": "opencode-unity budget: this session is too large for the local context even after compaction; start a new session."
+          }
+        }
+      ],
+      "stdoutEventTypes": [
+        "error",
+        "step_start",
+        "text",
+        "step_finish",
+        "text",
+        "error"
+      ],
+      "stderrTail": "",
+      "overflowActions": [
+        "throw-overflow",
+        "compaction-pass",
+        "loop-breaker"
+      ],
+      "compactedEvents": 1,
+      "retryCount": 0,
+      "requestSystemHeads": [
+        "You are a context summarization agent. You are given a conve"
+      ]
+    },
+    "stopInCompaction": {
+      "exitCode": 1,
+      "durationMs": 5596,
+      "timedOut": false,
+      "attempts": 1,
+      "chatRequests": 0,
+      "hookCounts": {
+        "server": 1,
+        "config": 1,
+        "event": 15,
+        "messages.transform": 2,
+        "system.transform": 2,
+        "chat.params": 2,
+        "overflow": 2
+      },
+      "chatParamsAgents": [
+        "unity-code",
+        "compaction"
+      ],
+      "runErrorEvents": [
+        {
+          "name": "ContextOverflowError",
+          "data": {
+            "message": "Input exceeds context window of this model",
+            "responseBody": "{\"type\":\"error\",\"error\":{\"code\":\"context_length_exceeded\",\"message\":\"opencode-unity budget preflight: prompt over budget\"}}"
+          }
+        },
+        {
+          "name": "UnknownError",
+          "data": {
+            "message": "opencode-unity budget: this session is too large for the local context even after compaction; start a new session."
+          }
+        }
+      ],
+      "stdoutEventTypes": [
+        "error",
+        "error"
+      ],
+      "stderrTail": "",
+      "overflowActions": [
+        "throw-overflow",
+        "stop-in-compaction"
+      ],
+      "compactedEvents": 0,
+      "retryCount": 0,
+      "requestSystemHeads": []
+    }
+  },
+  "crash": null
+}

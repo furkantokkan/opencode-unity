@@ -1,0 +1,12 @@
+{
+  "UI/DailyChest/Title": "デイリー宝箱",
+  "UI/DailyChest/Reward": "タイマーが終わる前に報酬を受け取ろう。強い敵が迫っている。",
+  "UI/Shop/Title": "商店",
+  "UI/Shop/Purchase": "购买后将立即发放到你的背包，请在活动结束前确认。",
+  "UI/Settings/Language": "언어 설정",
+  "UI/Settings/Audio": "배경 음악과 효과음의 볼륨을 따로 조절할 수 있습니다.",
+  "UI/Tutorial/Step1": "画面下部のボタンをタップして移動を開始します。",
+  "UI/Tutorial/Step2": "敌人进入攻击范围时，技能按钮会自动高亮显示。",
+  "UI/Result/Victory": "勝利！ 獲得した報酬を確認してください。",
+  "UI/Result/Defeat": "다시 도전하려면 확인 버튼을 누르세요."
+}

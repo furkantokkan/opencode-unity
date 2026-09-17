@@ -1,0 +1,10 @@
+{
+  "description": "Unity 2022.3 with HDRP, both input systems enabled, uGUI and UI Toolkit side by side, Zenject and Newtonsoft JSON, Perforce.",
+  "createAtTestTime": [
+    {
+      "path": ".p4config",
+      "type": "file",
+      "content": "P4CLIENT=fixture-workspace\nP4PORT=ssl:perforce.invalid:1666\n"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "models": [
+    {
+      "name": "ocu-qwen3-coder-30b-16k:latest",
+      "model": "ocu-qwen3-coder-30b-16k:latest",
+      "size": 20401094656,
+      "digest": "1194192cf2a187eb02722edcc3f77b11d21f537048ce04b67ccf8ba78863006a",
+      "details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "qwen3moe",
+        "families": ["qwen3moe"],
+        "parameter_size": "30.5B",
+        "quantization_level": "Q4_K_M"
+      },
+      "expires_at": "2026-09-17T12:19:02.531+03:00",
+      "size_vram": 20401094656,
+      "context_length": 16384
+    }
+  ]
+}

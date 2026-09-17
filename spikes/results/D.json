@@ -1,0 +1,266 @@
+{
+  "spike": "D",
+  "id": "D",
+  "title": "XDG isolation canaries and shell.env restoration",
+  "question": "Do the XDG isolation canaries stay out, and does shell.env restore XDG_CONFIG_HOME for shell commands?",
+  "contractTest": "C1, C10",
+  "fallback": "Run without XDG isolation and refuse launch when the global config has plugins, MCP servers, agents or permission keys unless --accept-global-config",
+  "opencodeVersion": "1.18.31",
+  "platform": "win32 x64",
+  "node": "v24.13.0",
+  "ranAt": "2026-09-17T18:38:31.269Z",
+  "durationMs": 17093,
+  "outcome": "pass",
+  "decision": "Keep the isolated XDG_CONFIG_HOME plus OPENCODE_CONFIG_DIR clean room (D2), with shell.env restoring the original XDG_CONFIG_HOME for agent commands.",
+  "checks": [
+    {
+      "name": "D1 no canary string reaches the request",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "D1 the canary global plugin never loads",
+      "pass": true,
+      "detail": false
+    },
+    {
+      "name": "D1 the canary MCP server is never contacted",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "D1 no canary tool in the request tool list",
+      "pass": true,
+      "detail": [
+        "bash",
+        "edit",
+        "glob",
+        "grep",
+        "read",
+        "skill",
+        "task",
+        "todowrite",
+        "webfetch",
+        "write"
+      ]
+    },
+    {
+      "name": "D1 effective config has no canary agent, MCP server, command or plugin",
+      "pass": true,
+      "detail": {
+        "agents": [
+          "build",
+          "plan",
+          "title",
+          "unity-code"
+        ],
+        "mcp": [],
+        "commands": [],
+        "pluginOrigins": [
+          "profile"
+        ]
+      }
+    },
+    {
+      "name": "D2 exactly one system message, carrying the facts file",
+      "pass": true,
+      "detail": {
+        "systemMessages": 1,
+        "systemHasFacts": true
+      }
+    },
+    {
+      "name": "D3 shell.env fires for the agent shell command",
+      "pass": true,
+      "detail": 1
+    },
+    {
+      "name": "D3 the shell sees the original XDG_CONFIG_HOME, not the isolated one",
+      "pass": true,
+      "detail": "XDG=<tmp>\\opencode-unity-tests\\spike-d-isolated-WKr3Bm\\home\\.config TELEMETRY=1 NOLOGO=1\n"
+    },
+    {
+      "name": "D3 the shell sees DOTNET_CLI_TELEMETRY_OPTOUT=1 and DOTNET_NOLOGO=1",
+      "pass": true,
+      "detail": "XDG=<tmp>\\opencode-unity-tests\\spike-d-isolated-WKr3Bm\\home\\.config TELEMETRY=1 NOLOGO=1\n"
+    },
+    {
+      "name": "D4 control run without isolation: the canaries are live",
+      "pass": true,
+      "detail": {
+        "leaked": [
+          "instructions"
+        ],
+        "pluginLoaded": true,
+        "hubRequests": 4,
+        "agents": [
+          "canary-agent",
+          "canary-file-agent",
+          "build",
+          "plan",
+          "title",
+          "unity-code"
+        ],
+        "mcp": [
+          "canaryMCP"
+        ]
+      }
+    }
+  ],
+  "findings": [
+    "With XDG_CONFIG_HOME pointed at an empty profile-owned directory, the global opencode.json, its agents, commands, instructions, plugins and MCP servers are all out of the session.",
+    "The per-launch OPENCODE_CONFIG_CONTENT instructions array puts the facts file into the single system message.",
+    "The shell.env hook is the only way agent shell commands see the user's real XDG_CONFIG_HOME again."
+  ],
+  "evidence": {
+    "isolated": {
+      "exitCode": 0,
+      "durationMs": 6652,
+      "timedOut": false,
+      "attempts": 1,
+      "chatRequests": 2,
+      "hookCounts": {
+        "server": 2,
+        "config": 2,
+        "event": 15,
+        "messages.transform": 2,
+        "system.transform": 2,
+        "chat.params": 2,
+        "tool.execute.before": 1,
+        "shell.env": 1,
+        "tool.execute.after": 1,
+        "text.complete": 1
+      },
+      "chatParamsAgents": [
+        "unity-code",
+        "unity-code"
+      ],
+      "runErrorEvents": [],
+      "stdoutEventTypes": [
+        "step_start",
+        "tool_use",
+        "step_finish",
+        "step_start",
+        "text",
+        "step_finish"
+      ],
+      "stderrTail": "",
+      "leakedCanaries": [],
+      "canaryPluginLoaded": false,
+      "canaryHubRequests": 0,
+      "systemMessages": 1,
+      "systemHasFacts": true,
+      "toolNames": [
+        "bash",
+        "edit",
+        "glob",
+        "grep",
+        "read",
+        "skill",
+        "task",
+        "todowrite",
+        "webfetch",
+        "write"
+      ],
+      "configAgents": [
+        "build",
+        "plan",
+        "title",
+        "unity-code"
+      ],
+      "configMcp": [],
+      "configInstructions": 1,
+      "configPluginOrigins": [
+        "profile"
+      ],
+      "configCommands": [],
+      "shellEnvHooks": 1,
+      "envProbeResult": "XDG=<tmp>\\opencode-unity-tests\\spike-d-isolated-WKr3Bm\\home\\.config TELEMETRY=1 NOLOGO=1\n"
+    },
+    "control": {
+      "exitCode": 0,
+      "durationMs": 6467,
+      "timedOut": false,
+      "attempts": 1,
+      "chatRequests": 2,
+      "hookCounts": {
+        "server": 2,
+        "config": 2,
+        "event": 15,
+        "messages.transform": 2,
+        "system.transform": 2,
+        "chat.params": 2,
+        "tool.execute.before": 1,
+        "shell.env": 1,
+        "tool.execute.after": 1,
+        "text.complete": 1
+      },
+      "chatParamsAgents": [
+        "unity-code",
+        "unity-code"
+      ],
+      "runErrorEvents": [],
+      "stdoutEventTypes": [
+        "step_start",
+        "tool_use",
+        "step_finish",
+        "step_start",
+        "text",
+        "step_finish"
+      ],
+      "stderrTail": "",
+      "leakedCanaries": [
+        "instructions"
+      ],
+      "canaryPluginLoaded": true,
+      "canaryHubRequests": 4,
+      "systemMessages": 1,
+      "systemHasFacts": true,
+      "toolNames": [
+        "bash",
+        "canaryMCP_find_gameobjects",
+        "canaryMCP_get_test_job",
+        "canaryMCP_manage_scene",
+        "canaryMCP_manage_script",
+        "canaryMCP_read_console",
+        "canaryMCP_refresh_unity",
+        "canaryMCP_run_tests",
+        "edit",
+        "glob",
+        "grep",
+        "list_mcp_resource_templates",
+        "list_mcp_resources",
+        "read",
+        "read_mcp_resource",
+        "skill",
+        "task",
+        "todowrite",
+        "webfetch",
+        "write"
+      ],
+      "configAgents": [
+        "canary-agent",
+        "canary-file-agent",
+        "build",
+        "plan",
+        "title",
+        "unity-code"
+      ],
+      "configMcp": [
+        "canaryMCP"
+      ],
+      "configInstructions": 2,
+      "configPluginOrigins": [
+        "canary",
+        "canary",
+        "profile"
+      ],
+      "configCommands": [
+        "canary"
+      ],
+      "shellEnvHooks": 1,
+      "envProbeResult": "XDG=<tmp>\\opencode-unity-tests\\spike-d-control-fQucaQ\\home\\.config TELEMETRY=1 NOLOGO=1\n"
+    }
+  },
+  "crash": null
+}

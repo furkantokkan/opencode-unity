@@ -1,0 +1,9 @@
+{
+  "description": "A minimal Unity 6000.2 project with no Packages folder, no ProjectSettings.asset and no project files, under Mercurial.",
+  "createAtTestTime": [
+    {
+      "path": ".hg",
+      "type": "dir"
+    }
+  ]
+}

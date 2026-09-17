@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "id": "nvidia-24gb-qwen3-coder-30b-16k",
+  "status": "reference-tested",
+  "evidence": "docs/evidence/v0.1/reference-rtx3090-16k.md",
+  "hardware": {
+    "os": ["win32"],
+    "gpuVendor": "nvidia",
+    "minTotalVramMiB": 24000
+  },
+  "model": {
+    "base": "qwen3-coder:30b",
+    "downloadGiB": 19,
+    "tag": "ocu-qwen3-coder-30b-16k",
+    "renderer": "qwen3-coder",
+    "parser": "qwen3-coder",
+    "numCtx": 16384,
+    "numKeep": 4,
+    "numBatch": 256,
+    "sampling": {
+      "temperature": 0.7,
+      "topP": 0.8,
+      "topK": 20,
+      "repeatPenalty": 1.05
+    },
+    "vram": {
+      "weightsMiB": 17524,
+      "computeMiB": 100,
+      "kvMiBPerTokenF16": 0.09375,
+      "marginMiB": 500
+    }
+  },
+  "ollamaServerEnv": {
+    "OLLAMA_FLASH_ATTENTION": "1",
+    "OLLAMA_KV_CACHE_TYPE": "q8_0",
+    "OLLAMA_NUM_PARALLEL": "1",
+    "OLLAMA_MAX_LOADED_MODELS": "1",
+    "OLLAMA_KEEP_ALIVE": "15m"
+  },
+  "opencode": {
+    "limit": {
+      "context": 16384,
+      "output": 4096
+    }
+  },
+  "guard": {
+    "minFreeVramAfterLoadMiB": 1500
+  },
+  "reliability": {
+    "toolCalls": null,
+    "edits": null,
+    "note": "Not measured at 16K yet. Published by the v0.1 release gate."
+  }
+}

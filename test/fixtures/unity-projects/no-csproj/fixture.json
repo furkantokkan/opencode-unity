@@ -1,0 +1,4 @@
+{
+  "description": "Unity 6000.3 with an asmdef but no .csproj, no .sln and no IDE package.",
+  "createAtTestTime": []
+}

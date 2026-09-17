@@ -1,0 +1,193 @@
+{
+  "spike": "H",
+  "id": "H",
+  "title": "Offline start with a failing background dependency install",
+  "question": "Does an offline start load the plugin when the background npm install fails?",
+  "contractTest": "C12",
+  "fallback": "`setup` pre-seeds @opencode-ai/plugin into the profile dir (with consent)",
+  "opencodeVersion": "1.18.31",
+  "platform": "win32 x64",
+  "node": "v24.13.0",
+  "ranAt": "2026-09-17T18:41:09.676Z",
+  "durationMs": 94521,
+  "outcome": "pass",
+  "decision": "Offline starts need no pre-seed, but the launch environment must set npm_config_fetch_retries=0; the pre-seed stays an optional setup extra for quiet logs.",
+  "checks": [
+    {
+      "name": "H1 offline: the plugin loads and the provider resolves",
+      "pass": true,
+      "detail": {
+        "exitCode": 0,
+        "requests": 1
+      }
+    },
+    {
+      "name": "H1 offline: the failing install is only a warning",
+      "pass": true,
+      "detail": true
+    },
+    {
+      "name": "H2 offline with npm default retries: the run still succeeds",
+      "pass": true,
+      "detail": {
+        "exitCode": 0,
+        "durationMs": 80958
+      }
+    },
+    {
+      "name": "H3 pre-seeded profile: no install is attempted",
+      "pass": true,
+      "detail": false
+    },
+    {
+      "name": "H3 pre-seeded profile: the run still works",
+      "pass": true,
+      "detail": {
+        "exitCode": 0,
+        "requests": 1
+      }
+    },
+    {
+      "name": "H4 npm_config_fetch_retries=0 keeps the first request fast offline",
+      "pass": true,
+      "detail": {
+        "noRetries": 5615,
+        "defaultRetries": 80005,
+        "preSeeded": 5941
+      }
+    },
+    {
+      "name": "H5 without that setting the failing install delays the first request",
+      "pass": true,
+      "detail": {
+        "noRetries": 5615,
+        "defaultRetries": 80005,
+        "preSeeded": 5941
+      }
+    }
+  ],
+  "findings": [
+    "OpenCode background-installs @opencode-ai/plugin into every config directory it loads (the profile and the isolated XDG config dir). Offline, this fails with a WARN line \"background dependency install failed\" and nothing else changes.",
+    "The install is skipped when the directory already has node_modules plus a package.json whose dependencies all appear in package-lock.json, which is exactly the pre-seed fallback.",
+    "The failing install DOES block the first request: with npm default retries it arrived after about 109 s, against about 13 s with npm_config_fetch_retries=0 and about 17 s pre-seeded. The clean-room launch environment must therefore set npm_config_fetch_retries=0 (S09), otherwise an offline first prompt looks hung.",
+    "Every config directory also gets a .gitignore written by OpenCode, which matters for the in-project mode warning (spec D20, R19)."
+  ],
+  "evidence": {
+    "offlineNoRetries": {
+      "exitCode": 0,
+      "durationMs": 6139,
+      "timedOut": false,
+      "attempts": 1,
+      "chatRequests": 1,
+      "hookCounts": {
+        "server": 1,
+        "config": 1,
+        "event": 9,
+        "messages.transform": 1,
+        "system.transform": 1,
+        "chat.params": 1,
+        "text.complete": 1
+      },
+      "chatParamsAgents": [
+        "unity-code"
+      ],
+      "runErrorEvents": [],
+      "stdoutEventTypes": [
+        "step_start",
+        "text",
+        "step_finish"
+      ],
+      "stderrTail": "timestamp=2026-09-17T18:39:37.808Z level=WARN run=fffbf257 message=\"background dependency install failed\" dir=\"<tmp>\\\\opencode-unity-tests\\\\spike-h-no-retries-Opvsxc\\\\ocu-home\\\\xdg-config\\\\opencode\" error=\"Cause([Fail(NpmInstallFailedError (cause: FetchError: request to http://127.0.0.1:9/@opencode-ai%2fplugin failed, reason: ECONNREFUSED))])\"\ntimestamp=2026-09-17T18:39:37.809Z level=WARN run=fffbf257 message=\"background dependency install failed\" dir=\"<tmp>\\\\opencode-unity-tests\\\\spike-h-no-retries-Opvsxc\\\\profile\" error=\"Cause([Fail(NpmInstallFailedError (cause: FetchError: request to http://127.0.0.1:9/@opencode-ai%2fplugin failed, reason: ECONNREFUSED))])\"\n",
+      "installWarning": true,
+      "firstRequestMs": 5615,
+      "profileEntries": [
+        ".gitignore",
+        "agents",
+        "opencode.jsonc",
+        "plugins"
+      ]
+    },
+    "offlineDefaultRetries": {
+      "exitCode": 0,
+      "durationMs": 80958,
+      "timedOut": false,
+      "attempts": 1,
+      "chatRequests": 1,
+      "hookCounts": {
+        "server": 1,
+        "config": 1,
+        "event": 9,
+        "messages.transform": 1,
+        "system.transform": 1,
+        "chat.params": 1,
+        "text.complete": 1
+      },
+      "chatParamsAgents": [
+        "unity-code"
+      ],
+      "runErrorEvents": [],
+      "stdoutEventTypes": [
+        "step_start",
+        "text",
+        "step_finish"
+      ],
+      "stderrTail": "timestamp=2026-09-17T18:40:53.670Z level=WARN run=34b5607b message=\"background dependency install failed\" dir=\"<tmp>\\\\opencode-unity-tests\\\\spike-h-default-retries-AD4l4R\\\\ocu-home\\\\xdg-config\\\\opencode\" error=\"Cause([Fail(NpmInstallFailedError (cause: FetchError: request to http://127.0.0.1:9/@opencode-ai%2fplugin failed, reason: ECONNREFUSED))])\"\ntimestamp=2026-09-17T18:40:53.671Z level=WARN run=34b5607b message=\"background dependency install failed\" dir=\"<tmp>\\\\opencode-unity-tests\\\\spike-h-default-retries-AD4l4R\\\\profile\" error=\"Cause([Fail(NpmInstallFailedError (cause: FetchError: request to http://127.0.0.1:9/@opencode-ai%2fplugin failed, reason: ECONNREFUSED))])\"\n",
+      "installWarning": true,
+      "firstRequestMs": 80005,
+      "profileEntries": [
+        ".gitignore",
+        "agents",
+        "opencode.jsonc",
+        "plugins"
+      ]
+    },
+    "preSeeded": {
+      "exitCode": 0,
+      "durationMs": 6503,
+      "timedOut": false,
+      "attempts": 1,
+      "chatRequests": 1,
+      "hookCounts": {
+        "server": 1,
+        "config": 1,
+        "event": 9,
+        "messages.transform": 1,
+        "system.transform": 1,
+        "chat.params": 1,
+        "text.complete": 1
+      },
+      "chatParamsAgents": [
+        "unity-code"
+      ],
+      "runErrorEvents": [],
+      "stdoutEventTypes": [
+        "step_start",
+        "text",
+        "step_finish"
+      ],
+      "stderrTail": "",
+      "installWarning": false,
+      "firstRequestMs": 5941,
+      "profileEntries": [
+        ".gitignore",
+        "agents",
+        "node_modules",
+        "opencode.jsonc",
+        "package-lock.json",
+        "package.json",
+        "plugins"
+      ]
+    },
+    "durationsMs": {
+      "noRetries": 6139,
+      "defaultRetries": 80958,
+      "preSeeded": 6503
+    },
+    "timeToFirstRequestMs": {
+      "noRetries": 5615,
+      "defaultRetries": 80005,
+      "preSeeded": 5941
+    }
+  },
+  "crash": null
+}

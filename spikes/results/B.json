@@ -1,0 +1,530 @@
+{
+  "spike": "B",
+  "id": "B",
+  "title": "Fail-closed provider injection through the plugin config hook",
+  "question": "Does the config-hook provider injection resolve the model, and do a missing or broken plugin and OPENCODE_PURE give 0 requests?",
+  "contractTest": "C7",
+  "fallback": "Build the loopback gate with a closed-port static provider (spec 8.10)",
+  "opencodeVersion": "1.18.31",
+  "platform": "win32 x64",
+  "node": "v24.13.0",
+  "ranAt": "2026-09-17T18:37:50.967Z",
+  "durationMs": 58608,
+  "outcome": "pass",
+  "decision": "Keep the fail-closed plugin-injected provider (D3): no provider block in the profile, and no loopback gate for provider resolution.",
+  "checks": [
+    {
+      "name": "B1 injected provider: exactly one request reaches the mock",
+      "pass": true,
+      "detail": 1
+    },
+    {
+      "name": "B1 injected provider: request uses the preset model tag",
+      "pass": true,
+      "detail": "ocu-spike-model-16k"
+    },
+    {
+      "name": "B1 injected provider: run exits 0",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "B1 profile has no provider block before the hook runs",
+      "pass": true,
+      "detail": {
+        "hook": "config",
+        "at": 1789670214751,
+        "hadProvider": false,
+        "enabledProviders": [
+          "opencode-unity"
+        ],
+        "model": "opencode-unity/ocu-spike-model-16k",
+        "instructions": null,
+        "agents": [
+          "build",
+          "plan",
+          "title",
+          "unity-code"
+        ],
+        "mcp": [],
+        "pluginOrigins": [
+          "<tmp>\\opencode-unity-tests\\spike-b-injected-VBruvO\\profile"
+        ]
+      }
+    },
+    {
+      "name": "B1 debug config shows the injected provider and our plugin origin",
+      "pass": true,
+      "detail": {
+        "exitCode": 0,
+        "providerIds": [
+          "opencode-unity"
+        ],
+        "pluginOriginCount": 1,
+        "enabledProviders": [
+          "opencode-unity"
+        ],
+        "model": "opencode-unity/ocu-spike-model-16k"
+      }
+    },
+    {
+      "name": "B1 `models <provider>` lists the model (V-a signal)",
+      "pass": true,
+      "detail": {
+        "exitCode": 0,
+        "stdout": "opencode-unity/ocu-spike-model-16k",
+        "stderrTail": ""
+      }
+    },
+    {
+      "name": "B2 plugin file missing: 0 requests reach the mock",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "B2 plugin file missing: run exits non-zero",
+      "pass": true,
+      "detail": 1
+    },
+    {
+      "name": "B2 plugin file missing: the log names the unresolved model",
+      "pass": true,
+      "detail": [
+        {
+          "name": "UnknownError",
+          "data": {
+            "message": "Unexpected server error. Check server logs for details.",
+            "ref": "err_44bc2be2"
+          }
+        }
+      ]
+    },
+    {
+      "name": "B2 plugin file missing: `models <provider>` fails (V-a signal)",
+      "pass": true,
+      "detail": {
+        "exitCode": 1,
+        "stdout": "",
+        "stderrTail": "\u001b[91m\u001b[1mError: \u001b[0mProvider not found: opencode-unity"
+      }
+    },
+    {
+      "name": "B2 plugin file missing: debug config has no provider block",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "B3 syntax error in a lib module: 0 requests reach the mock",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "B3 syntax error in a lib module: run exits non-zero",
+      "pass": true,
+      "detail": 1
+    },
+    {
+      "name": "B3 syntax error in a lib module: the log names the unresolved model",
+      "pass": true,
+      "detail": [
+        {
+          "name": "UnknownError",
+          "data": {
+            "message": "Unexpected server error. Check server logs for details.",
+            "ref": "err_2e3db2bb"
+          }
+        }
+      ]
+    },
+    {
+      "name": "B3 syntax error in a lib module: `models <provider>` fails (V-a signal)",
+      "pass": true,
+      "detail": {
+        "exitCode": 1,
+        "stdout": "",
+        "stderrTail": "\u001b[91m\u001b[1mError: \u001b[0mProvider not found: opencode-unity"
+      }
+    },
+    {
+      "name": "B3 syntax error in a lib module: debug config has no provider block",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "B4 config hook throws: 0 requests reach the mock",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "B4 config hook throws: run exits non-zero",
+      "pass": true,
+      "detail": 1
+    },
+    {
+      "name": "B4 config hook throws: the log names the unresolved model",
+      "pass": true,
+      "detail": [
+        {
+          "name": "UnknownError",
+          "data": {
+            "message": "Unexpected server error. Check server logs for details.",
+            "ref": "err_b29567ac"
+          }
+        }
+      ]
+    },
+    {
+      "name": "B4 config hook throws: `models <provider>` fails (V-a signal)",
+      "pass": true,
+      "detail": {
+        "exitCode": 1,
+        "stdout": "",
+        "stderrTail": "\u001b[91m\u001b[1mError: \u001b[0mProvider not found: opencode-unity"
+      }
+    },
+    {
+      "name": "B4 config hook throws: debug config has no provider block",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "B4 config hook throws: the plugin itself loaded, the error is ignored",
+      "pass": true,
+      "detail": {
+        "server": 3,
+        "config": 3,
+        "event": 4
+      }
+    },
+    {
+      "name": "B5 OPENCODE_PURE=1: 0 requests reach the mock",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "B5 OPENCODE_PURE=1: run exits non-zero",
+      "pass": true,
+      "detail": 1
+    },
+    {
+      "name": "B5 OPENCODE_PURE=1: the log names the unresolved model",
+      "pass": true,
+      "detail": [
+        {
+          "name": "UnknownError",
+          "data": {
+            "message": "Unexpected server error. Check server logs for details.",
+            "ref": "err_3393ac19"
+          }
+        }
+      ]
+    },
+    {
+      "name": "B5 OPENCODE_PURE=1: `models <provider>` fails (V-a signal)",
+      "pass": true,
+      "detail": {
+        "exitCode": 1,
+        "stdout": "",
+        "stderrTail": "\u001b[91m\u001b[1mError: \u001b[0mProvider not found: opencode-unity"
+      }
+    },
+    {
+      "name": "B5 OPENCODE_PURE=1: debug config has no provider block",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "B6 --pure flag: 0 requests reach the mock",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "B6 --pure flag: run exits non-zero",
+      "pass": true,
+      "detail": 1
+    },
+    {
+      "name": "B6 --pure flag: the log names the unresolved model",
+      "pass": true,
+      "detail": [
+        {
+          "name": "UnknownError",
+          "data": {
+            "message": "Unexpected server error. Check server logs for details.",
+            "ref": "err_9d2f652d"
+          }
+        }
+      ]
+    },
+    {
+      "name": "B6 --pure flag: `models <provider>` fails (V-a signal)",
+      "pass": true,
+      "detail": {
+        "exitCode": 1,
+        "stdout": "",
+        "stderrTail": "\u001b[91m\u001b[1mError: \u001b[0mProvider not found: opencode-unity"
+      }
+    },
+    {
+      "name": "B6 --pure flag: debug config has no provider block",
+      "pass": true,
+      "detail": []
+    }
+  ],
+  "findings": [
+    "The plugin config hook adds provider \"opencode-unity\" and pins enabled_providers; the model then resolves and requests reach the configured baseURL.",
+    "Without the injection (plugin missing, lib import error, config hook error, pure mode) OpenCode resolves no model and sends nothing.",
+    "The user-facing run error is only \"Unexpected server error. Check server logs for details.\"; the real reason (\"Model not found: <provider>/<tag>\") appears in the log stream, so `start` must verify before launching instead of relying on the TUI error.",
+    "`opencode debug agent <name>` exits 0 even when the provider is missing, because the configured model id is used as given. `opencode models <provider>` is the cheap fail-closed signal: exit 1 with \"Provider not found\" when the plugin did not inject. `debug config` also shows the injected provider and `plugin_origins`.",
+    "`debug config` output contains a `username` key, so every doctor or spike dump of it must be redacted."
+  ],
+  "evidence": {
+    "injected": {
+      "run": {
+        "exitCode": 0,
+        "durationMs": 5919,
+        "timedOut": false,
+        "attempts": 1,
+        "chatRequests": 1,
+        "hookCounts": {
+          "server": 3,
+          "config": 3,
+          "event": 9,
+          "messages.transform": 1,
+          "system.transform": 1,
+          "chat.params": 1,
+          "text.complete": 1
+        },
+        "chatParamsAgents": [
+          "unity-code"
+        ],
+        "runErrorEvents": [],
+        "stdoutEventTypes": [
+          "step_start",
+          "text",
+          "step_finish"
+        ],
+        "stderrTail": "...26-09-17T18:36:57.937Z level=INFO run=99ee2f69 message=\"llm runtime selected\" llm.runtime=ai-sdk llm.provider=opencode-unity llm.model=ocu-spike-model-16k\ntimestamp=2026-09-17T18:36:58.184Z level=INFO run=99ee2f69 message=tracking hash=6b74e0604c066a82c231404dc83e79c62d36cd12 cwd=\"<tmp>\\\\opencode-unity-tests\\\\spike-b-injected-VBruvO\\\\project\" git=\"<tmp>\\\\opencode-unity-tests\\\\spike-b-injected-VBruvO\\\\home\\\\.local\\\\share\\\\opencode\\\\snapshot\\\\cbe24f7213198fa4bc492af3dd9d4cf8f53ac597\\\\c4e8fe7200d91d309cdfae79026b186e9e14e7f8\"\ntimestamp=2026-09-17T18:36:58.384Z level=INFO run=99ee2f69 message=loop session.id=ses_f4f57b254ffe6omH1caJBMI2Wu step=1\ntimestamp=2026-09-17T18:36:58.385Z level=INFO run=99ee2f69 message=\"exiting loop\" session.id=ses_f4f57b254ffe6omH1caJBMI2Wu\ntimestamp=2026-09-17T18:36:58.406Z level=INFO run=99ee2f69 message=pruning\ntimestamp=2026-09-17T18:36:58.407Z level=INFO run=99ee2f69 message=found pruned=0 total=0\ntimestamp=2026-09-17T18:36:58.408Z level=INFO run=99ee2f69 message=\"disposing instance\" directory=\"<tmp>\\\\opencode-unity-tests\\\\spike-b-injected-VBruvO\\\\project\"\n"
+      },
+      "requestModel": "ocu-spike-model-16k",
+      "models": {
+        "exitCode": 0,
+        "stdout": "opencode-unity/ocu-spike-model-16k",
+        "stderrTail": ""
+      },
+      "debugConfig": {
+        "exitCode": 0,
+        "providerIds": [
+          "opencode-unity"
+        ],
+        "pluginOriginCount": 1,
+        "enabledProviders": [
+          "opencode-unity"
+        ],
+        "model": "opencode-unity/ocu-spike-model-16k"
+      }
+    },
+    "pluginMissing": {
+      "run": {
+        "exitCode": 1,
+        "durationMs": 3911,
+        "timedOut": false,
+        "attempts": 1,
+        "chatRequests": 0,
+        "hookCounts": {},
+        "chatParamsAgents": [],
+        "runErrorEvents": [
+          {
+            "name": "UnknownError",
+            "data": {
+              "message": "Unexpected server error. Check server logs for details.",
+              "ref": "err_44bc2be2"
+            }
+          }
+        ],
+        "stdoutEventTypes": [
+          "error"
+        ],
+        "stderrTail": "...r: Model not found: opencode-unity/ocu-spike-model-16k.\" cause=\"ProviderModelNotFoundError: Model not found: opencode-unity/ocu-spike-model-16k.\\n    at <anonymous> (B:/~BUN/root/chunk-fkaxf29c.js:439:94093)\\n    at SessionPrompt.getModel (B:/~BUN/root/chunk-ewbxbymk.js:1142:11505)\\n    at SessionPrompt.getModel (definition) (B:/~BUN/root/chunk-ewbxbymk.js:1142:908)\\n    at SessionPrompt.run (B:/~BUN/root/chunk-ewbxbymk.js:1142:15339)\\n    at SessionPrompt.run (definition) (B:/~BUN/root/chunk-ewbxbymk.js:1142:10503)\\n    at SessionRunState.ensureRunning (B:/~BUN/root/chunk-ewbxbymk.js:1142:15308)\\n    at SessionRunState.ensureRunning (definition) (B:/~BUN/root/chunk-ewbxbymk.js:2:8188)\\n    at SessionPrompt.loop (B:/~BUN/root/chunk-ewbxbymk.js:1142:10225)\\n    at SessionPrompt.loop (definition) (B:/~BUN/root/chunk-ewbxbymk.js:1142:15244)\\n    at SessionPrompt.prompt (B:/~BUN/root/chunk-artadsfb.js:4:13297)\\n    at SessionPrompt.prompt (definition) (B:/~BUN/root/chunk-ewbxbymk.js:1142:9844)\"\ntimestamp=2026-09-17T18:37:07.615Z level=INFO run=9ff109d4 message=\"disposing instance\" directory=\"<tmp>\\\\opencode-unity-tests\\\\spike-b-missing-E7lMPO\\\\project\"\n"
+      },
+      "requestModel": null,
+      "models": {
+        "exitCode": 1,
+        "stdout": "",
+        "stderrTail": "\u001b[91m\u001b[1mError: \u001b[0mProvider not found: opencode-unity"
+      },
+      "debugConfig": {
+        "exitCode": 0,
+        "providerIds": [],
+        "pluginOriginCount": 0,
+        "enabledProviders": [
+          "opencode-unity"
+        ],
+        "model": "opencode-unity/ocu-spike-model-16k"
+      }
+    },
+    "brokenLib": {
+      "run": {
+        "exitCode": 1,
+        "durationMs": 3102,
+        "timedOut": false,
+        "attempts": 1,
+        "chatRequests": 0,
+        "hookCounts": {},
+        "chatParamsAgents": [],
+        "runErrorEvents": [
+          {
+            "name": "UnknownError",
+            "data": {
+              "message": "Unexpected server error. Check server logs for details.",
+              "ref": "err_2e3db2bb"
+            }
+          }
+        ],
+        "stdoutEventTypes": [
+          "error"
+        ],
+        "stderrTail": "...Model not found: opencode-unity/ocu-spike-model-16k.\" cause=\"ProviderModelNotFoundError: Model not found: opencode-unity/ocu-spike-model-16k.\\n    at <anonymous> (B:/~BUN/root/chunk-fkaxf29c.js:439:94093)\\n    at SessionPrompt.getModel (B:/~BUN/root/chunk-ewbxbymk.js:1142:11505)\\n    at SessionPrompt.getModel (definition) (B:/~BUN/root/chunk-ewbxbymk.js:1142:908)\\n    at SessionPrompt.run (B:/~BUN/root/chunk-ewbxbymk.js:1142:15339)\\n    at SessionPrompt.run (definition) (B:/~BUN/root/chunk-ewbxbymk.js:1142:10503)\\n    at SessionRunState.ensureRunning (B:/~BUN/root/chunk-ewbxbymk.js:1142:15308)\\n    at SessionRunState.ensureRunning (definition) (B:/~BUN/root/chunk-ewbxbymk.js:2:8188)\\n    at SessionPrompt.loop (B:/~BUN/root/chunk-ewbxbymk.js:1142:10225)\\n    at SessionPrompt.loop (definition) (B:/~BUN/root/chunk-ewbxbymk.js:1142:15244)\\n    at SessionPrompt.prompt (B:/~BUN/root/chunk-artadsfb.js:4:13297)\\n    at SessionPrompt.prompt (definition) (B:/~BUN/root/chunk-ewbxbymk.js:1142:9844)\"\ntimestamp=2026-09-17T18:37:17.164Z level=INFO run=1749296b message=\"disposing instance\" directory=\"<tmp>\\\\opencode-unity-tests\\\\spike-b-broken-lib-pY0ZHQ\\\\project\"\n"
+      },
+      "requestModel": null,
+      "models": {
+        "exitCode": 1,
+        "stdout": "",
+        "stderrTail": "\u001b[91m\u001b[1mError: \u001b[0mProvider not found: opencode-unity"
+      },
+      "debugConfig": {
+        "exitCode": 0,
+        "providerIds": [],
+        "pluginOriginCount": 1,
+        "enabledProviders": [
+          "opencode-unity"
+        ],
+        "model": "opencode-unity/ocu-spike-model-16k"
+      }
+    },
+    "configHookThrows": {
+      "run": {
+        "exitCode": 1,
+        "durationMs": 3472,
+        "timedOut": false,
+        "attempts": 1,
+        "chatRequests": 0,
+        "hookCounts": {
+          "server": 3,
+          "config": 3,
+          "event": 4
+        },
+        "chatParamsAgents": [],
+        "runErrorEvents": [
+          {
+            "name": "UnknownError",
+            "data": {
+              "message": "Unexpected server error. Check server logs for details.",
+              "ref": "err_b29567ac"
+            }
+          }
+        ],
+        "stdoutEventTypes": [
+          "error"
+        ],
+        "stderrTail": "...el not found: opencode-unity/ocu-spike-model-16k.\" cause=\"ProviderModelNotFoundError: Model not found: opencode-unity/ocu-spike-model-16k.\\n    at <anonymous> (B:/~BUN/root/chunk-fkaxf29c.js:439:94093)\\n    at SessionPrompt.getModel (B:/~BUN/root/chunk-ewbxbymk.js:1142:11505)\\n    at SessionPrompt.getModel (definition) (B:/~BUN/root/chunk-ewbxbymk.js:1142:908)\\n    at SessionPrompt.run (B:/~BUN/root/chunk-ewbxbymk.js:1142:15339)\\n    at SessionPrompt.run (definition) (B:/~BUN/root/chunk-ewbxbymk.js:1142:10503)\\n    at SessionRunState.ensureRunning (B:/~BUN/root/chunk-ewbxbymk.js:1142:15308)\\n    at SessionRunState.ensureRunning (definition) (B:/~BUN/root/chunk-ewbxbymk.js:2:8188)\\n    at SessionPrompt.loop (B:/~BUN/root/chunk-ewbxbymk.js:1142:10225)\\n    at SessionPrompt.loop (definition) (B:/~BUN/root/chunk-ewbxbymk.js:1142:15244)\\n    at SessionPrompt.prompt (B:/~BUN/root/chunk-artadsfb.js:4:13297)\\n    at SessionPrompt.prompt (definition) (B:/~BUN/root/chunk-ewbxbymk.js:1142:9844)\"\ntimestamp=2026-09-17T18:37:27.071Z level=INFO run=001249b3 message=\"disposing instance\" directory=\"<tmp>\\\\opencode-unity-tests\\\\spike-b-config-throws-86MjsE\\\\project\"\n"
+      },
+      "requestModel": null,
+      "models": {
+        "exitCode": 1,
+        "stdout": "",
+        "stderrTail": "\u001b[91m\u001b[1mError: \u001b[0mProvider not found: opencode-unity"
+      },
+      "debugConfig": {
+        "exitCode": 0,
+        "providerIds": [],
+        "pluginOriginCount": 1,
+        "enabledProviders": [
+          "opencode-unity"
+        ],
+        "model": "opencode-unity/ocu-spike-model-16k"
+      }
+    },
+    "opencodePureEnv": {
+      "run": {
+        "exitCode": 1,
+        "durationMs": 3859,
+        "timedOut": false,
+        "attempts": 1,
+        "chatRequests": 0,
+        "hookCounts": {},
+        "chatParamsAgents": [],
+        "runErrorEvents": [
+          {
+            "name": "UnknownError",
+            "data": {
+              "message": "Unexpected server error. Check server logs for details.",
+              "ref": "err_3393ac19"
+            }
+          }
+        ],
+        "stdoutEventTypes": [
+          "error"
+        ],
+        "stderrTail": "...: Model not found: opencode-unity/ocu-spike-model-16k.\" cause=\"ProviderModelNotFoundError: Model not found: opencode-unity/ocu-spike-model-16k.\\n    at <anonymous> (B:/~BUN/root/chunk-fkaxf29c.js:439:94093)\\n    at SessionPrompt.getModel (B:/~BUN/root/chunk-ewbxbymk.js:1142:11505)\\n    at SessionPrompt.getModel (definition) (B:/~BUN/root/chunk-ewbxbymk.js:1142:908)\\n    at SessionPrompt.run (B:/~BUN/root/chunk-ewbxbymk.js:1142:15339)\\n    at SessionPrompt.run (definition) (B:/~BUN/root/chunk-ewbxbymk.js:1142:10503)\\n    at SessionRunState.ensureRunning (B:/~BUN/root/chunk-ewbxbymk.js:1142:15308)\\n    at SessionRunState.ensureRunning (definition) (B:/~BUN/root/chunk-ewbxbymk.js:2:8188)\\n    at SessionPrompt.loop (B:/~BUN/root/chunk-ewbxbymk.js:1142:10225)\\n    at SessionPrompt.loop (definition) (B:/~BUN/root/chunk-ewbxbymk.js:1142:15244)\\n    at SessionPrompt.prompt (B:/~BUN/root/chunk-artadsfb.js:4:13297)\\n    at SessionPrompt.prompt (definition) (B:/~BUN/root/chunk-ewbxbymk.js:1142:9844)\"\ntimestamp=2026-09-17T18:37:36.908Z level=INFO run=1d1798c9 message=\"disposing instance\" directory=\"<tmp>\\\\opencode-unity-tests\\\\spike-b-pure-env-kM2aTh\\\\project\"\n"
+      },
+      "requestModel": null,
+      "models": {
+        "exitCode": 1,
+        "stdout": "",
+        "stderrTail": "\u001b[91m\u001b[1mError: \u001b[0mProvider not found: opencode-unity"
+      },
+      "debugConfig": {
+        "exitCode": 0,
+        "providerIds": [],
+        "pluginOriginCount": 1,
+        "enabledProviders": [
+          "opencode-unity"
+        ],
+        "model": "opencode-unity/ocu-spike-model-16k"
+      },
+      "pluginLoaded": false
+    },
+    "pureFlag": {
+      "run": {
+        "exitCode": 1,
+        "durationMs": 4169,
+        "timedOut": false,
+        "attempts": 1,
+        "chatRequests": 0,
+        "hookCounts": {},
+        "chatParamsAgents": [],
+        "runErrorEvents": [
+          {
+            "name": "UnknownError",
+            "data": {
+              "message": "Unexpected server error. Check server logs for details.",
+              "ref": "err_9d2f652d"
+            }
+          }
+        ],
+        "stdoutEventTypes": [
+          "error"
+        ],
+        "stderrTail": "... Model not found: opencode-unity/ocu-spike-model-16k.\" cause=\"ProviderModelNotFoundError: Model not found: opencode-unity/ocu-spike-model-16k.\\n    at <anonymous> (B:/~BUN/root/chunk-fkaxf29c.js:439:94093)\\n    at SessionPrompt.getModel (B:/~BUN/root/chunk-ewbxbymk.js:1142:11505)\\n    at SessionPrompt.getModel (definition) (B:/~BUN/root/chunk-ewbxbymk.js:1142:908)\\n    at SessionPrompt.run (B:/~BUN/root/chunk-ewbxbymk.js:1142:15339)\\n    at SessionPrompt.run (definition) (B:/~BUN/root/chunk-ewbxbymk.js:1142:10503)\\n    at SessionRunState.ensureRunning (B:/~BUN/root/chunk-ewbxbymk.js:1142:15308)\\n    at SessionRunState.ensureRunning (definition) (B:/~BUN/root/chunk-ewbxbymk.js:2:8188)\\n    at SessionPrompt.loop (B:/~BUN/root/chunk-ewbxbymk.js:1142:10225)\\n    at SessionPrompt.loop (definition) (B:/~BUN/root/chunk-ewbxbymk.js:1142:15244)\\n    at SessionPrompt.prompt (B:/~BUN/root/chunk-artadsfb.js:4:13297)\\n    at SessionPrompt.prompt (definition) (B:/~BUN/root/chunk-ewbxbymk.js:1142:9844)\"\ntimestamp=2026-09-17T18:37:45.251Z level=INFO run=084b820e message=\"disposing instance\" directory=\"<tmp>\\\\opencode-unity-tests\\\\spike-b-pure-flag-n9pv4F\\\\project\"\n"
+      },
+      "requestModel": null,
+      "models": {
+        "exitCode": 1,
+        "stdout": "",
+        "stderrTail": "\u001b[91m\u001b[1mError: \u001b[0mProvider not found: opencode-unity"
+      },
+      "debugConfig": {
+        "exitCode": 0,
+        "providerIds": [],
+        "pluginOriginCount": 1,
+        "enabledProviders": [
+          "opencode-unity"
+        ],
+        "model": "opencode-unity/ocu-spike-model-16k"
+      },
+      "pluginLoaded": false
+    }
+  },
+  "crash": null
+}

@@ -1,0 +1,9 @@
+{
+  "description": "Unity 2021.3 with the built-in render pipeline, the legacy Input Manager, a TestAssemblies-style test asmdef and SVN.",
+  "createAtTestTime": [
+    {
+      "path": ".svn",
+      "type": "dir"
+    }
+  ]
+}

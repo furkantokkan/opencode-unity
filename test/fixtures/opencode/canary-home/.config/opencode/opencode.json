@@ -1,0 +1,26 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "instructions": [
+    "~/.config/opencode/ocu-canary-instructions.md"
+  ],
+  "plugin": [
+    "./ocu-canary/listed-plugin.js"
+  ],
+  "agent": {
+    "ocu-canary-config-agent": {
+      "description": "Canary agent from the global config (OCU_CANARY_GLOBAL_CONFIG_AGENT_9E24).",
+      "mode": "subagent",
+      "prompt": "Canary prompt OCU_CANARY_GLOBAL_CONFIG_AGENT_9E24."
+    }
+  },
+  "mcp": {
+    "ocu-canary": {
+      "type": "remote",
+      "url": "http://127.0.0.1:9/ocu-canary-mcp",
+      "enabled": true,
+      "headers": {
+        "x-ocu-canary": "OCU_CANARY_GLOBAL_MCP_SERVER_D09A"
+      }
+    }
+  }
+}

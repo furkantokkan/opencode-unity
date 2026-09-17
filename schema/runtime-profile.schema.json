@@ -1,0 +1,487 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "opencode-unity runtime profile",
+  "description": "Rendered by setup into profile/<cliVersion>/opencode-unity.runtime.json and read by the plugin, which injects no provider when this file is missing or invalid.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "cliVersion",
+    "presetId",
+    "presetStatus",
+    "custom",
+    "overriddenPaths",
+    "provider",
+    "ollama",
+    "guard",
+    "budget",
+    "safety",
+    "home",
+    "compat"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "cliVersion": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+(-[0-9A-Za-z.-]+)?$"
+    },
+    "presetId": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]{0,63}$"
+    },
+    "presetStatus": {
+      "enum": [
+        "verified",
+        "reference-tested",
+        "experimental"
+      ]
+    },
+    "custom": {
+      "description": "True when config overrides changed any preset field.",
+      "type": "boolean"
+    },
+    "overriddenPaths": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "provider": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "npm",
+        "name",
+        "baseURL",
+        "modelTag",
+        "numCtx",
+        "limit",
+        "sampling",
+        "numKeep",
+        "keepAlive"
+      ],
+      "properties": {
+        "id": {
+          "const": "opencode-unity"
+        },
+        "npm": {
+          "const": "@ai-sdk/openai-compatible"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "baseURL": {
+          "type": "string",
+          "pattern": "^https?://[^\\s/?#]+/v1$"
+        },
+        "modelTag": {
+          "type": "string",
+          "pattern": "^ocu-[a-z0-9][a-z0-9._-]{0,79}$"
+        },
+        "numCtx": {
+          "type": "integer",
+          "minimum": 2048,
+          "maximum": 1048576
+        },
+        "limit": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "context",
+            "output"
+          ],
+          "properties": {
+            "context": {
+              "type": "integer",
+              "minimum": 2048,
+              "maximum": 1048576
+            },
+            "output": {
+              "type": "integer",
+              "minimum": 256,
+              "maximum": 32000
+            }
+          }
+        },
+        "sampling": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "temperature",
+            "topP",
+            "topK",
+            "repeatPenalty"
+          ],
+          "properties": {
+            "temperature": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 2
+            },
+            "topP": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "topK": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1000
+            },
+            "repeatPenalty": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "maximum": 10
+            }
+          }
+        },
+        "numKeep": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1048576
+        },
+        "keepAlive": {
+          "type": "string",
+          "pattern": "^(-1|\\d+|(\\d+(\\.\\d+)?(ms|s|m|h))+)$"
+        }
+      }
+    },
+    "ollama": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "baseUrl"
+      ],
+      "properties": {
+        "baseUrl": {
+          "type": "string",
+          "pattern": "^https?://[^\\s/?#]+$"
+        }
+      }
+    },
+    "guard": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "modelVramMiB",
+        "kvType",
+        "kvTypeSource",
+        "minFreeVramAfterLoadMiB",
+        "maxGpuUtilPercent",
+        "gpuUtilSampleIntervalMs",
+        "assetImportCpuPercent",
+        "assetImportSampleMs",
+        "assetImportProcessPatterns",
+        "editorImportCpuPercent",
+        "maxUnityEditors",
+        "importWhileLoaded",
+        "keepAliveMarginSec",
+        "coldPassCacheSec",
+        "loadedPassCacheSec",
+        "probeTimeoutSec",
+        "onColdBlock",
+        "onLoadedBusy",
+        "remote",
+        "adapter",
+        "nvidiaSmiCommand"
+      ],
+      "properties": {
+        "modelVramMiB": {
+          "description": "Estimated VRAM the model needs at numCtx (spec 7.4).",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1048576
+        },
+        "kvType": {
+          "enum": [
+            "f16",
+            "q8_0",
+            "q4_0"
+          ]
+        },
+        "kvTypeSource": {
+          "enum": [
+            "server-log",
+            "env",
+            "default"
+          ]
+        },
+        "minFreeVramAfterLoadMiB": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1048576
+        },
+        "maxGpuUtilPercent": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        },
+        "gpuUtilSampleIntervalMs": {
+          "type": "integer",
+          "minimum": 100,
+          "maximum": 10000
+        },
+        "assetImportCpuPercent": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 102400
+        },
+        "assetImportSampleMs": {
+          "type": "integer",
+          "minimum": 100,
+          "maximum": 60000
+        },
+        "assetImportProcessPatterns": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "editorImportCpuPercent": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 102400
+        },
+        "maxUnityEditors": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 64
+        },
+        "importWhileLoaded": {
+          "enum": [
+            "wait",
+            "allow"
+          ]
+        },
+        "keepAliveMarginSec": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3600
+        },
+        "coldPassCacheSec": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 60
+        },
+        "loadedPassCacheSec": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 300
+        },
+        "probeTimeoutSec": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 120
+        },
+        "onColdBlock": {
+          "enum": [
+            "stop",
+            "retry"
+          ]
+        },
+        "onLoadedBusy": {
+          "enum": [
+            "retry",
+            "stop"
+          ]
+        },
+        "remote": {
+          "enum": [
+            "block",
+            "unguarded"
+          ]
+        },
+        "adapter": {
+          "enum": [
+            "auto",
+            "none"
+          ]
+        },
+        "nvidiaSmiCommand": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "promptBudget",
+        "toolsTokens",
+        "toolsTokensSource",
+        "reserveTokens",
+        "charsPerToken",
+        "safetyMargin",
+        "calibrationClamp",
+        "prefixTargetTokens",
+        "prefixFailTokens"
+      ],
+      "properties": {
+        "promptBudget": {
+          "description": "limit.context - limit.output - reserveTokens.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1048576
+        },
+        "toolsTokens": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "unity-code",
+            "unity-editor"
+          ],
+          "properties": {
+            "unity-code": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 1048576
+            },
+            "unity-editor": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 1048576
+            }
+          }
+        },
+        "toolsTokensSource": {
+          "type": "string",
+          "pattern": "^(default-allowance|capture:[0-9A-Za-z:._-]+)$"
+        },
+        "reserveTokens": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 65536
+        },
+        "charsPerToken": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 10
+        },
+        "safetyMargin": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "calibrationClamp": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "maximum": 10
+          }
+        },
+        "prefixTargetTokens": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "unity-code",
+            "unity-editor"
+          ],
+          "properties": {
+            "unity-code": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 1048576
+            },
+            "unity-editor": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 1048576
+            }
+          }
+        },
+        "prefixFailTokens": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "unity-code",
+            "unity-editor"
+          ],
+          "properties": {
+            "unity-code": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 1048576
+            },
+            "unity-editor": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 1048576
+            }
+          }
+        }
+      }
+    },
+    "safety": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "bashMode",
+        "readLimitLines",
+        "extraProtectedEditGlobs",
+        "extraProtectedReadGlobs"
+      ],
+      "properties": {
+        "bashMode": {
+          "enum": [
+            "allowlist",
+            "ask"
+          ]
+        },
+        "readLimitLines": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2000
+        },
+        "extraProtectedEditGlobs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "extraProtectedReadGlobs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "home": {
+      "description": "Absolute opencode-unity home directory.",
+      "type": "string",
+      "minLength": 1
+    },
+    "compat": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "opencode",
+        "ollama"
+      ],
+      "properties": {
+        "opencode": {
+          "type": "string",
+          "minLength": 1
+        },
+        "ollama": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

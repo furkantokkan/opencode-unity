@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "id": "nvidia-24gb-qwen3-coder-30b-32k",
+  "status": "experimental",
+  "evidence": "docs/evidence/v0.1/32k-exploration.md",
+  "warning": "This preset matches the configuration of the recorded driver hang: 32K context, q8_0 KV cache and flash attention on a 24 GB GPU while Unity editors were importing assets. The only full-series runs at 32K ended with a CUDA error and a driver hang. It is experimental, needs --experimental, is never chosen by default, and its guard is stricter (2.5 GiB free video memory after the load, at most one Unity editor). Do not use it while Unity is open.",
+  "hardware": {
+    "os": ["win32"],
+    "gpuVendor": "nvidia",
+    "minTotalVramMiB": 24000
+  },
+  "model": {
+    "base": "qwen3-coder:30b",
+    "downloadGiB": 19,
+    "tag": "ocu-qwen3-coder-30b-32k",
+    "renderer": "qwen3-coder",
+    "parser": "qwen3-coder",
+    "numCtx": 32768,
+    "numKeep": 4,
+    "numBatch": 256,
+    "sampling": {
+      "temperature": 0.7,
+      "topP": 0.8,
+      "topK": 20,
+      "repeatPenalty": 1.05
+    },
+    "vram": {
+      "weightsMiB": 17524,
+      "computeMiB": 116,
+      "kvMiBPerTokenF16": 0.09375,
+      "marginMiB": 500
+    }
+  },
+  "ollamaServerEnv": {
+    "OLLAMA_FLASH_ATTENTION": "1",
+    "OLLAMA_KV_CACHE_TYPE": "q8_0",
+    "OLLAMA_NUM_PARALLEL": "1",
+    "OLLAMA_MAX_LOADED_MODELS": "1",
+    "OLLAMA_KEEP_ALIVE": "15m"
+  },
+  "opencode": {
+    "limit": {
+      "context": 32768,
+      "output": 4096
+    }
+  },
+  "guard": {
+    "minFreeVramAfterLoadMiB": 2500,
+    "maxUnityEditors": 1
+  },
+  "reliability": {
+    "toolCalls": null,
+    "edits": null,
+    "note": "Exploratory 32K runs are documented separately and do not count as a measurement of this preset. Not recommended while Unity is open."
+  }
+}

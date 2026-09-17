@@ -1,0 +1,10 @@
+{
+  "description": "Plugins, Standard Assets, Pro Standard Assets, Editor folders, an asmdef, a named asmref and a GUID asmref.",
+  "createAtTestTime": [
+    {
+      "path": "Library/PackageCache/com.unity.cached/Runtime/Cached.asmdef",
+      "type": "file",
+      "content": "{\"name\":\"Cached\"}"
+    }
+  ]
+}

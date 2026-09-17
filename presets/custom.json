@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "id": "custom",
+  "status": "experimental",
+  "evidence": null,
+  "warning": "The custom preset runs a model and settings nobody has measured with opencode-unity. Supply every null field through config.json overrides, check the VRAM numbers against your Ollama load log, and run doctor --capture before relying on the budget.",
+  "hardware": {
+    "os": ["win32"],
+    "gpuVendor": "nvidia",
+    "minTotalVramMiB": 0
+  },
+  "model": {
+    "base": null,
+    "downloadGiB": null,
+    "tag": null,
+    "renderer": null,
+    "parser": null,
+    "numCtx": null,
+    "numKeep": 4,
+    "numBatch": 256,
+    "sampling": {
+      "temperature": null,
+      "topP": null,
+      "topK": null,
+      "repeatPenalty": null
+    },
+    "vram": {
+      "weightsMiB": null,
+      "computeMiB": null,
+      "kvMiBPerTokenF16": null,
+      "marginMiB": 500
+    }
+  },
+  "ollamaServerEnv": {
+    "OLLAMA_NUM_PARALLEL": "1",
+    "OLLAMA_MAX_LOADED_MODELS": "1",
+    "OLLAMA_KEEP_ALIVE": "15m"
+  },
+  "opencode": {
+    "limit": {
+      "context": null,
+      "output": null
+    }
+  },
+  "guard": {},
+  "reliability": {
+    "toolCalls": null,
+    "edits": null,
+    "note": "Not measured. bench and doctor --capture still apply."
+  }
+}

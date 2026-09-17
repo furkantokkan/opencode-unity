@@ -1,0 +1,10 @@
+12:31:05.123 [INFO] Starting build for target StandaloneWindows64 (development)
+12:31:05.481 [INFO] Refreshing asset database: 214 assets queued, 3 import workers
+12:31:07.902 [WARN] Assets/Game/UI/HudPresenter.cs(42,17): warning CS0168: The variable 'unused' is declared but never used
+12:31:09.114 [INFO] Compiling assembly Game.Runtime.dll (312 files, 1.42 MB)
+12:31:12.660 [ERROR] Assets/Game/Combat/DamageOverTimeEffect.cs(58,13): error CS1503: Argument 2: cannot convert from 'int' to 'DamageType'
+12:31:12.661 [ERROR] Assets/Game/Combat/DamageOverTimeEffect.cs(61,9): error CS0246: The type or namespace name 'IDamageable' could not be found (are you missing a using directive or an assembly reference?)
+12:31:12.998 [INFO] Build failed after 7.88 seconds with 2 errors and 1 warning
+12:31:13.004 [INFO] Peak memory 2,481 MB; GC allocations 118 MB; longest import Assets/Art/Textures/atlas_ui.png (1.31 s)
+12:31:13.220 [INFO] Reloading domain: 0.94 s (scripts 0.51 s, serialization 0.43 s)
+12:31:14.007 [INFO] Editor idle; 0 shader variants compiled, 0 jobs pending

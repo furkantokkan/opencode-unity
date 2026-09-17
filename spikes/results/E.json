@@ -1,0 +1,197 @@
+{
+  "spike": "E",
+  "id": "E",
+  "title": "Built-in agents disabled (build, plan, title)",
+  "question": "Do the TUI and run work with build/plan/title disabled, and are no extra requests sent?",
+  "contractTest": "C13",
+  "fallback": "Keep build/plan (config-level denies still apply) and/or keep title (guarded; one extra small request per session)",
+  "opencodeVersion": "1.18.31",
+  "platform": "win32 x64",
+  "node": "v24.13.0",
+  "ranAt": "2026-09-17T18:39:10.060Z",
+  "durationMs": 32369,
+  "outcome": "pass",
+  "decision": "Disable build, plan and title (D22). The TUI rendering itself stays a manual M0 and G10 check; run and the server session path are covered automatically.",
+  "checks": [
+    {
+      "name": "E1 `run --agent unity-code` works with the built-ins disabled",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "E1 exactly one request, from unity-code",
+      "pass": true,
+      "detail": {
+        "requests": 1,
+        "agents": [
+          "unity-code"
+        ]
+      }
+    },
+    {
+      "name": "E2 without --agent the default_agent unity-code answers",
+      "pass": true,
+      "detail": {
+        "exitCode": 0,
+        "requests": 1,
+        "agents": [
+          "unity-code"
+        ],
+        "stdoutTail": "\"msg_0b0a9fe960016mILsOfqLEqujL\",\"sessionID\":\"ses_f4f56043fffe3RXl6JYWXxDwEC\",\"type\":\"step-finish\",\"tokens\":{\"total\":105,\"input\":100,\"output\":5,\"reasoning\":0,\"cache\":{\"write\":0,\"read\":0}},\"cost\":0}}\r\n"
+      }
+    },
+    {
+      "name": "E3 the build agent is gone",
+      "pass": true,
+      "detail": {
+        "debugBuildExit": 1,
+        "debugBuildStderr": "Agent build not found, run 'opencode.exe agent list' to get an agent list",
+        "agentListNames": [
+          "unity-code"
+        ]
+      }
+    },
+    {
+      "name": "E4 control: with the title agent enabled an extra title request is sent",
+      "pass": true,
+      "detail": {
+        "requests": 2,
+        "agents": [
+          "title",
+          "unity-code"
+        ]
+      }
+    },
+    {
+      "name": "E5 server session path answers with one unity-code request",
+      "pass": true,
+      "detail": {
+        "promptStatus": 200,
+        "requests": 1,
+        "agents": [
+          "unity-code"
+        ],
+        "listedAgents": [
+          "compaction",
+          "explore",
+          "general",
+          "summary",
+          "unity-code"
+        ],
+        "agentListStatus": 200,
+        "assistantErrors": null
+      }
+    },
+    {
+      "name": "E5 build, plan and title are not listed as agents",
+      "pass": true,
+      "detail": [
+        "compaction",
+        "explore",
+        "general",
+        "summary",
+        "unity-code"
+      ]
+    }
+  ],
+  "findings": [
+    "With agent.build/plan/title disabled, `opencode run` works with and without --agent, and the only request per step comes from unity-code.",
+    "The title agent is the only source of the extra small request; with it enabled the same prompt produces a second request from agent \"title\". `summary.summarize` sends no request.",
+    "`debug agent build` exits non-zero once the agent is disabled, which is a cheap check for the effective-config verification.",
+    "The TUI needs a real console, so its startup is a manual M0 check (and gate G10); the server session path used here is the same processor and agent code the TUI drives."
+  ],
+  "evidence": {
+    "runWithAgentFlag": {
+      "exitCode": 0,
+      "durationMs": 5269,
+      "timedOut": false,
+      "attempts": 1,
+      "chatRequests": 1,
+      "hookCounts": {
+        "server": 1,
+        "config": 1,
+        "event": 9,
+        "messages.transform": 1,
+        "system.transform": 1,
+        "chat.params": 1,
+        "text.complete": 1
+      },
+      "chatParamsAgents": [
+        "unity-code"
+      ],
+      "runErrorEvents": [],
+      "stdoutEventTypes": [
+        "step_start",
+        "text",
+        "step_finish"
+      ],
+      "stderrTail": ""
+    },
+    "runWithDefaultAgent": {
+      "exitCode": 0,
+      "requests": 1,
+      "agents": [
+        "unity-code"
+      ],
+      "stdoutTail": "\"msg_0b0a9fe960016mILsOfqLEqujL\",\"sessionID\":\"ses_f4f56043fffe3RXl6JYWXxDwEC\",\"type\":\"step-finish\",\"tokens\":{\"total\":105,\"input\":100,\"output\":5,\"reasoning\":0,\"cache\":{\"write\":0,\"read\":0}},\"cost\":0}}\r\n"
+    },
+    "disabledAgentsGone": {
+      "debugBuildExit": 1,
+      "debugBuildStderr": "Agent build not found, run 'opencode.exe agent list' to get an agent list",
+      "agentListNames": [
+        "unity-code"
+      ]
+    },
+    "controlTitleEnabled": {
+      "exitCode": 0,
+      "durationMs": 9530,
+      "timedOut": false,
+      "attempts": 1,
+      "chatRequests": 2,
+      "hookCounts": {
+        "server": 1,
+        "config": 1,
+        "event": 9,
+        "system.transform": 2,
+        "chat.params": 2,
+        "messages.transform": 1,
+        "text.complete": 1
+      },
+      "chatParamsAgents": [
+        "title",
+        "unity-code"
+      ],
+      "runErrorEvents": [],
+      "stdoutEventTypes": [
+        "step_start",
+        "text",
+        "step_finish"
+      ],
+      "stderrTail": "",
+      "agents": [
+        "title",
+        "unity-code"
+      ]
+    },
+    "serverPath": {
+      "promptStatus": 200,
+      "requests": 1,
+      "agents": [
+        "unity-code"
+      ],
+      "listedAgents": [
+        "compaction",
+        "explore",
+        "general",
+        "summary",
+        "unity-code"
+      ],
+      "agentListStatus": 200,
+      "assistantErrors": null
+    },
+    "manualPending": [
+      "TUI startup and error rendering with the built-ins disabled: needs a real console (spec 20.3 C13, gate G10)."
+    ]
+  },
+  "crash": null
+}

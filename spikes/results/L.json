@@ -1,0 +1,67 @@
+{
+  "spike": "L",
+  "id": "L",
+  "title": "MCP for Unity instance id formula",
+  "question": "Does the expected instance id formula match on Windows (the Application.dataPath string)?",
+  "contractTest": "Manual with MCP for Unity",
+  "fallback": "Name-only match with a warning",
+  "opencodeVersion": "1.18.31",
+  "platform": "win32 x64",
+  "node": "v24.13.0",
+  "ranAt": "2026-09-17T18:42:06.760Z",
+  "durationMs": 1,
+  "outcome": "manual-pending",
+  "decision": "Take the spec fallback for v0.1: the editor agent matches on the instance NAME from `mcpforunity://instances` and stops unless exactly one instance matches the project name, with a warning. A computed `<name>@<hash>` is only shown as a hint, never used to pin an instance, until a live Editor check confirms the exact `Application.dataPath` string.",
+  "checks": [
+    {
+      "name": "L1 the SHA-1 implementation matches the published test vector",
+      "pass": true
+    },
+    {
+      "name": "L2 the id has the shape <name>@<16 hex>",
+      "pass": true,
+      "detail": "SampleGame@90e4add198525d3e"
+    },
+    {
+      "name": "L3 the name is the folder above Assets",
+      "pass": true,
+      "detail": [
+        "SampleGame",
+        "SampleGame"
+      ]
+    },
+    {
+      "name": "L4 every normalization gives a different hash, so a computed hash cannot be trusted blindly",
+      "pass": true,
+      "detail": {
+        "forward slashes (what Application.dataPath returns on Windows)": "90e4add198525d3e",
+        "backslashes": "161b86e8d81a37b1",
+        "lower-case drive letter": "57a843952b27323e",
+        "trailing slash": "21ece1759d6cf9a3"
+      }
+    },
+    {
+      "name": "L5 no offline source of a real instance id exists here, so the live check is manual",
+      "pass": true,
+      "detail": 0
+    }
+  ],
+  "findings": [
+    "Formula (UM v10.1.0): id = `<name>@<hash>`; hash = SHA-1 over the UTF-8 bytes of Application.dataPath, hex, first 16 characters, lower case; name = the folder above `Assets`, or \"Unknown\".",
+    "The hash is taken over the raw string, so slash direction, drive-letter case and a trailing separator each change it. Windows returns forward slashes from Application.dataPath, but the spike cannot prove the exact casing without an Editor.",
+    "In batch mode MCP for Unity falls back to hashing `<current working directory>/Assets`, which is another reason not to rely on a locally computed hash.",
+    "Manual check still open: start an Editor with MCP for Unity, read `mcpforunity://instances` and compare the id against the formula applied to that project's Application.dataPath."
+  ],
+  "evidence": {
+    "sampleDataPath": "D:/Projects/SampleGame/Assets",
+    "expectedId": "SampleGame@90e4add198525d3e",
+    "hashesByNormalization": {
+      "forward slashes (what Application.dataPath returns on Windows)": "90e4add198525d3e",
+      "backslashes": "161b86e8d81a37b1",
+      "lower-case drive letter": "57a843952b27323e",
+      "trailing slash": "21ece1759d6cf9a3"
+    },
+    "localStatusFiles": 0
+  },
+  "crash": null
+}

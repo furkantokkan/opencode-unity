@@ -1,0 +1,26 @@
+time=2026-09-17T10:50:09.114+03:00 level=INFO source=routes.go:1941 msg="server config" env="map[OLLAMA_CONTEXT_LENGTH:16384 OLLAMA_FLASH_ATTENTION:false OLLAMA_KEEP_ALIVE:5m0s OLLAMA_KV_CACHE_TYPE: OLLAMA_MAX_LOADED_MODELS:0 OLLAMA_NUM_PARALLEL:1]"
+[GIN] 2026/09/17 - 10:50:09 | 200 |            0s |       127.0.0.1 | GET      "/api/version"
+[GIN] 2026/09/17 - 10:50:09 | 200 |    133.2324ms |       127.0.0.1 | GET      "/api/tags"
+time=2026-09-17T10:58:41.007+03:00 level=INFO source=llama_server.go:434 msg="starting llama-server" cmd="<home>\\AppData\\Local\\Programs\\Ollama\\lib\\ollama\\llama-server.exe --model <home>\\.ollama\\models\\blobs\\sha256-0000000000000000000000000000000000000000000000000000000000000000 --port 51001 --host 127.0.0.1 --no-webui --offline -c 16384 -np 1 --log-verbosity 4 --no-log-prefix --no-log-timestamps --no-jinja --chat-template chatml --load-mode none --flash-attn off -b 512 -ub 512 --context-shift --keep 4"
+llama_context: n_ctx                 = 16384
+llama_kv_cache:      CUDA0 KV buffer size =  1536.00 MiB
+llama_kv_cache: size = 1536.00 MiB ( 16384 cells,  48 layers,  1/1 seqs), K (f16):  768.00 MiB, V (f16):  768.00 MiB
+srv    load_model: initializing, n_slots = 1, n_ctx_slot = 16384, kv_unified = 'false'
+slot   load_model: id  0 | task -1 | new slot, n_ctx = 16384
+time=2026-09-17T10:58:53.607+03:00 level=INFO source=llama_server.go:1372 msg="llama-server started in 12.60 seconds"
+slot launch_slot_: id  0 | task -1 | sampler chain: logits -> penalties -> ?dry -> top-k -> top-p -> temp-ext -> dist
+slot launch_slot_: id  0 | task -1 | sampler params:
+	repeat_last_n = 64, repeat_penalty = 1.000, frequency_penalty = 0.000, presence_penalty = 0.000
+	dry_multiplier = 0.000, dry_base = 1.750, dry_allowed_length = 2, dry_penalty_last_n = 64
+	top_k = 40, top_p = 1.000, min_p = 0.000, xtc_probability = 0.000, xtc_threshold = 0.100, typical_p = 1.000, top_n_sigma = -1.000, temp = 1.000
+	mirostat = 0, mirostat_lr = 0.100, mirostat_ent = 5.000, adaptive_target = -1.000, adaptive_decay = 0.900
+time=2026-09-17T11:00:00.655+03:00 level=WARN source=llama_server.go:318 msg="truncating input prompt" limit=8194 prompt=45110 keep=4 new=8194
+[GIN] 2026/09/17 - 11:00:31 | 200 |         31.44s |       127.0.0.1 | POST     "/v1/chat/completions"
+slot launch_slot_: id  0 | task -1 | sampler params:
+	repeat_last_n = 64, repeat_penalty = 1.000, frequency_penalty = 0.000, presence_penalty = 0.000
+	top_k = 40, top_p = 1.000, min_p = 0.000, xtc_probability = 0.000, xtc_threshold = 0.100, typical_p = 1.000, top_n_sigma = -1.000, temp = 1.000
+time=2026-09-17T11:02:30.165+03:00 level=WARN source=llama_server.go:318 msg="truncating input prompt" limit=8194 prompt=34598 keep=4 new=8194
+[GIN] 2026/09/17 - 11:02:58 | 200 |         28.01s |       127.0.0.1 | POST     "/v1/chat/completions"
+time=2026-09-17T11:05:11.900+03:00 level=WARN source=llama_server.go:318 msg="truncating input prompt" limit=8194 prompt=17761 keep=4 new=8194
+[GIN] 2026/09/17 - 11:05:39 | 200 |         27.65s |       127.0.0.1 | POST     "/v1/chat/completions"
+[GIN] 2026/09/17 - 11:06:02 | 200 |     3.0012ms |       127.0.0.1 | GET      "/api/ps"

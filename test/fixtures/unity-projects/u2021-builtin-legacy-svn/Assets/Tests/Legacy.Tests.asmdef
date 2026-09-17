@@ -1,0 +1,9 @@
+{
+  "name": "Legacy.Tests",
+  "includePlatforms": [
+    "Editor"
+  ],
+  "optionalUnityReferences": [
+    "TestAssemblies"
+  ]
+}

@@ -1,0 +1,1269 @@
+{
+  "schemaVersion": 1,
+  "server": "MCP for Unity (com.coplaydev.unity-mcp, MIT)",
+  "serverVersion": "10.1.0",
+  "source": "Derived, not captured: tool names and groups from the reference docs tree of the 10.1.0 tag; parameter shapes and annotation hints from the tool sources listed in exactShapeTools; total size from the recorded tools/list measurement (spec section 18.3 E6). Every description is placeholder text.",
+  "toolCount": 48,
+  "totalBytes": 93000,
+  "exactShapeTools": [
+    "apply_text_edits",
+    "create_script",
+    "delete_script",
+    "find_gameobjects",
+    "get_sha",
+    "get_test_job",
+    "manage_script",
+    "manage_script_capabilities",
+    "read_console",
+    "refresh_unity",
+    "run_tests",
+    "validate_script"
+  ],
+  "groups": {
+    "apply_text_edits": "core",
+    "batch_execute": "core",
+    "create_script": "core",
+    "debug_request_context": "core",
+    "delete_script": "core",
+    "execute_code": "scripting_ext",
+    "execute_custom_tool": "core",
+    "execute_menu_item": "core",
+    "find_gameobjects": "core",
+    "find_in_file": "core",
+    "generate_audio": "asset_gen",
+    "generate_image": "asset_gen",
+    "generate_model": "asset_gen",
+    "get_sha": "core",
+    "get_test_job": "testing",
+    "import_model": "asset_gen",
+    "import_model_file": "asset_gen",
+    "manage_animation": "animation",
+    "manage_asset": "core",
+    "manage_build": "core",
+    "manage_camera": "core",
+    "manage_components": "core",
+    "manage_editor": "core",
+    "manage_gameobject": "core",
+    "manage_graphics": "core",
+    "manage_material": "core",
+    "manage_packages": "core",
+    "manage_physics": "core",
+    "manage_prefabs": "core",
+    "manage_probuilder": "probuilder",
+    "manage_profiler": "profiling",
+    "manage_scene": "core",
+    "manage_script": "core",
+    "manage_script_capabilities": "core",
+    "manage_scriptable_object": "scripting_ext",
+    "manage_shader": "vfx",
+    "manage_texture": "vfx",
+    "manage_tools": "core",
+    "manage_ui": "ui",
+    "manage_vfx": "vfx",
+    "read_console": "core",
+    "refresh_unity": "core",
+    "run_tests": "testing",
+    "script_apply_edits": "core",
+    "set_active_instance": "core",
+    "unity_docs": "docs",
+    "unity_reflect": "docs",
+    "validate_script": "core"
+  },
+  "tools": [
+    {
+      "name": "apply_text_edits",
+      "description": "Placeholder description for apply_text_edits; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for apply_text_edits; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for apply_text_edits; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for apply_text_edits; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for apply_text_edits; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for apply_text_edits; the MCP for Unity 10.1.0 text is not reproduced, this filler",
+      "inputSchema": {
+        "properties": {
+          "uri": {
+            "description": "Placeholder for uri.",
+            "type": "string"
+          },
+          "edits": {
+            "description": "Placeholder for edits.",
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "precondition_sha256": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Placeholder for precondition_sha256."
+          },
+          "strict": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Placeholder for strict."
+          },
+          "options": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Placeholder for options."
+          }
+        },
+        "required": [
+          "uri",
+          "edits"
+        ],
+        "type": "object"
+      },
+      "annotations": {
+        "title": "Apply Text Edits",
+        "destructiveHint": true
+      }
+    },
+    {
+      "name": "batch_execute",
+      "description": "Placeholder description for batch_execute; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for batch_execute; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for batch_execute; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for batch_execute; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for batch_execute; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for batch_execute; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for batch_execute; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for batch_execute; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for batch_execute; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for batch_execute; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for batch_execute; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for batch_execute; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for batch_execute; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for batch_execute; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for batch_execute; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for batch_execute; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for batch_execute; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for batch_execute; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for batch_execute; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for batch_execute; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for batch_execute; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for batch_execute; the MCP for Unity 1",
+      "inputSchema": {
+        "properties": {
+          "params": {
+            "additionalProperties": true,
+            "description": "Placeholder for params.",
+            "type": "object"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "name": "create_script",
+      "description": "Placeholder description for create_script; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for create_script; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder descripti",
+      "inputSchema": {
+        "properties": {
+          "path": {
+            "description": "Placeholder for path.",
+            "type": "string"
+          },
+          "contents": {
+            "description": "Placeholder for contents.",
+            "type": "string"
+          },
+          "script_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Placeholder for script_type."
+          },
+          "namespace": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Placeholder for namespace."
+          }
+        },
+        "required": [
+          "path",
+          "contents"
+        ],
+        "type": "object"
+      },
+      "annotations": {
+        "title": "Create Script",
+        "destructiveHint": true
+      }
+    },
+    {
+      "name": "debug_request_context",
+      "description": "Placeholder description for debug_request_context; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for debug_request_context; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for debug_request_context; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size",
+      "inputSchema": {
+        "properties": {
+          "params": {
+            "additionalProperties": true,
+            "description": "Placeholder for params.",
+            "type": "object"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "name": "delete_script",
+      "description": "Placeholder description for delete_script; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for delete_script; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for delete_script; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for delete_script; the",
+      "inputSchema": {
+        "properties": {
+          "uri": {
+            "description": "Placeholder for uri.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "uri"
+        ],
+        "type": "object"
+      },
+      "annotations": {
+        "title": "Delete Script",
+        "destructiveHint": true
+      }
+    },
+    {
+      "name": "execute_code",
+      "description": "Placeholder description for execute_code; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for execute_code; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for execute_code; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for execute_code; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for execute_code; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for execute_code; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for execute_code; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for execute_code; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for execute_code; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for execute_code; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for execute_code; the MCP for Unity 10.1.0 text is",
+      "inputSchema": {
+        "properties": {
+          "params": {
+            "additionalProperties": true,
+            "description": "Placeholder for params.",
+            "type": "object"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "name": "execute_custom_tool",
+      "description": "Placeholder description for execute_custom_tool; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for execute_custom_tool; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for execute_custom_tool; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for execute_custom_tool; the MCP for",
+      "inputSchema": {
+        "properties": {
+          "params": {
+            "additionalProperties": true,
+            "description": "Placeholder for params.",
+            "type": "object"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "name": "execute_menu_item",
+      "description": "Placeholder description for execute_menu_item; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for execute_menu_item; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for execute_menu_item; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for execute_menu_it",
+      "inputSchema": {
+        "properties": {
+          "params": {
+            "additionalProperties": true,
+            "description": "Placeholder for params.",
+            "type": "object"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "name": "find_gameobjects",
+      "description": "Placeholder description for find_gameobjects; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for find_gameobjects; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the rec",
+      "inputSchema": {
+        "properties": {
+          "search_term": {
+            "description": "Placeholder for search_term.",
+            "type": "string"
+          },
+          "search_method": {
+            "default": "by_name",
+            "description": "Placeholder for search_method.",
+            "enum": [
+              "by_name",
+              "by_tag",
+              "by_layer",
+              "by_component",
+              "by_path",
+              "by_id"
+            ],
+            "type": "string"
+          },
+          "include_inactive": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Placeholder for include_inactive."
+          },
+          "page_size": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Placeholder for page_size."
+          },
+          "cursor": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Placeholder for cursor."
+          }
+        },
+        "required": [
+          "search_term"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "name": "find_in_file",
+      "description": "Placeholder description for find_in_file; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for find_in_file; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for find_in_file; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for find_in_file; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for find_in_file; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for fin",
+      "inputSchema": {
+        "properties": {
+          "params": {
+            "additionalProperties": true,
+            "description": "Placeholder for params.",
+            "type": "object"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "name": "generate_audio",
+      "description": "Placeholder description for generate_audio; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for generate_audio; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for generate_audio; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for generate_audio; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for generate_audio; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for generate_audio; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for generate_audio; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for generate_audio; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for generate_audio; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for generate_audio; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for generate_audio; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for generate_audio;",
+      "inputSchema": {
+        "properties": {
+          "params": {
+            "additionalProperties": true,
+            "description": "Placeholder for params.",
+            "type": "object"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "name": "generate_image",
+      "description": "Placeholder description for generate_image; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for generate_image; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for generate_image; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for generate_image; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for generate_image; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for generate_image; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for generate_image; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for generate_image; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for generate_image; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for generate_image; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for generate_image; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for generate_image; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for generate_image; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema siz",
+      "inputSchema": {
+        "properties": {
+          "params": {
+            "additionalProperties": true,
+            "description": "Placeholder for params.",
+            "type": "object"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "name": "generate_model",
+      "description": "Placeholder description for generate_model; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for generate_model; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for generate_model; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for generate_model; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for generate_model; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for generate_model; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for generate_model; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for generate_model; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for generate_model; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for generate_model; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for generate_model; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for generate_model; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder desc",
+      "inputSchema": {
+        "properties": {
+          "params": {
+            "additionalProperties": true,
+            "description": "Placeholder for params.",
+            "type": "object"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "name": "get_sha",
+      "description": "Placeholder description for get_sha; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for get_sha; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for get_sha; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for get_sha; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for get_sha; the MC",
+      "inputSchema": {
+        "properties": {
+          "uri": {
+            "description": "Placeholder for uri.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "uri"
+        ],
+        "type": "object"
+      },
+      "annotations": {
+        "title": "Get SHA",
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "get_test_job",
+      "description": "Placeholder description for get_test_job; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for get_test_job; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for get_test_job; the MCP for Unity 10.1.0 text is not reproduced, this fil",
+      "inputSchema": {
+        "properties": {
+          "job_id": {
+            "description": "Placeholder for job_id.",
+            "type": "string"
+          },
+          "include_failed_tests": {
+            "default": false,
+            "description": "Placeholder for include_failed_tests.",
+            "type": "boolean"
+          },
+          "include_details": {
+            "default": false,
+            "description": "Placeholder for include_details.",
+            "type": "boolean"
+          },
+          "wait_timeout": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Placeholder for wait_timeout."
+          }
+        },
+        "required": [
+          "job_id"
+        ],
+        "type": "object"
+      },
+      "annotations": {
+        "title": "Get Test Job",
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "import_model",
+      "description": "Placeholder description for import_model; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for import_model; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for import_model; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for import_model; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for import_model; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for import_model; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for import_model; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for import_model; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for import_model; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for import_model; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for import_model; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for import_model;",
+      "inputSchema": {
+        "properties": {
+          "params": {
+            "additionalProperties": true,
+            "description": "Placeholder for params.",
+            "type": "object"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "name": "import_model_file",
+      "description": "Placeholder description for import_model_file; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for import_model_file; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for import_model_file; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for import_model_file; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for import_model_file; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for import_model_file; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for import_model_file; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for import_model_file; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for import_model_file; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for import_model_file; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for import_model_file; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for import_model_file; the MCP for Unity 10.1.0 text is not reproduced, this filler onl",
+      "inputSchema": {
+        "properties": {
+          "params": {
+            "additionalProperties": true,
+            "description": "Placeholder for params.",
+            "type": "object"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "name": "manage_animation",
+      "description": "Placeholder description for manage_animation; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_animation; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_animation; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_animation; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_animation; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_animation; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_animation; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_animation; the MCP for Unity 10.1.0 text is not reproduced, this filler only kee",
+      "inputSchema": {
+        "properties": {
+          "params": {
+            "additionalProperties": true,
+            "description": "Placeholder for params.",
+            "type": "object"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "name": "manage_asset",
+      "description": "Placeholder description for manage_asset; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_asset; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_asset; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_asset; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_asset; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_asset; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_asset; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_asset; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_asset; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_asset; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_asset; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_asset; the MCP for Unity 10.1.0 text",
+      "inputSchema": {
+        "properties": {
+          "params": {
+            "additionalProperties": true,
+            "description": "Placeholder for params.",
+            "type": "object"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "name": "manage_build",
+      "description": "Placeholder description for manage_build; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_build; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_build; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_build; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_build; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_build; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_build; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_build; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_build; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_build; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_build; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_build; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema si",
+      "inputSchema": {
+        "properties": {
+          "params": {
+            "additionalProperties": true,
+            "description": "Placeholder for params.",
+            "type": "object"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "name": "manage_camera",
+      "description": "Placeholder description for manage_camera; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_camera; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_camera; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_camera; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_camera; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_camera; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_camera; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_camera; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_camera; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_camera; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_camera; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_camera; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_camera; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_camera; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_camera; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_camera; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_camera; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_camera; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_camera; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_camera; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_camera; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_camera; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_camera; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_camera; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_camera; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_camera; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_camera; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_camera; the MCP for Unity 10.1.0 text is n",
+      "inputSchema": {
+        "properties": {
+          "params": {
+            "additionalProperties": true,
+            "description": "Placeholder for params.",
+            "type": "object"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "name": "manage_components",
+      "description": "Placeholder description for manage_components; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_components; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_components; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_components; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_components; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_components; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_components; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_components; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_components; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_components; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_components; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for ma",
+      "inputSchema": {
+        "properties": {
+          "params": {
+            "additionalProperties": true,
+            "description": "Placeholder for params.",
+            "type": "object"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "name": "manage_editor",
+      "description": "Placeholder description for manage_editor; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_editor; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_editor; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_editor; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_editor; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_editor; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_editor; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_editor; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_editor; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_editor; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the",
+      "inputSchema": {
+        "properties": {
+          "params": {
+            "additionalProperties": true,
+            "description": "Placeholder for params.",
+            "type": "object"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "name": "manage_gameobject",
+      "description": "Placeholder description for manage_gameobject; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_gameobject; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_gameobject; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_gameobject; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_gameobject; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_gameobject; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_gameobject; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_gameobject; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_gameobject; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_gameobject; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_gameobject; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_gameobject; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_gameobject; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_gameobject; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_gameobject; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_gameobject; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_gameobject; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_gameobject; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_gameobject; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_gameobject; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_gameobject; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_gameobject; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_gameobject; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_gameobject; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_gameobject; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_gameobject; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_gameobject; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_gameobject; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_gameobject; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_gameobject; the MCP for Unity 10.1.0 text is",
+      "inputSchema": {
+        "properties": {
+          "params": {
+            "additionalProperties": true,
+            "description": "Placeholder for params.",
+            "type": "object"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "name": "manage_graphics",
+      "description": "Placeholder description for manage_graphics; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_graphics; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_graphics; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_graphics; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_graphics; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_graphics; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_graphics; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_graphics; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_graphics; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_graphics; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_graphics; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_graphics; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_graphics; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_graphics; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_graphics; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_graphics; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_graphics; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_graphics; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_graphics; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_graphics; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_graphics; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_graphics; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_graphics; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_graphics; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_graphics; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_graphics; the MCP for Unity 10.1.0 text is not reproduced, this f",
+      "inputSchema": {
+        "properties": {
+          "params": {
+            "additionalProperties": true,
+            "description": "Placeholder for params.",
+            "type": "object"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "name": "manage_material",
+      "description": "Placeholder description for manage_material; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_material; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_material; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_material; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_material; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_material; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_material; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_material; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_material; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_material; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_material; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_material; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_material; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_material; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_material; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_material; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_material; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the",
+      "inputSchema": {
+        "properties": {
+          "params": {
+            "additionalProperties": true,
+            "description": "Placeholder for params.",
+            "type": "object"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "name": "manage_packages",
+      "description": "Placeholder description for manage_packages; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_packages; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_packages; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_packages; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_packages; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_packages; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_packages; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_packages; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_packages; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_packages; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_p",
+      "inputSchema": {
+        "properties": {
+          "params": {
+            "additionalProperties": true,
+            "description": "Placeholder for params.",
+            "type": "object"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "name": "manage_physics",
+      "description": "Placeholder description for manage_physics; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_physics; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_physics; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_physics; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_physics; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_physics; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_physics; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_physics; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_physics; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_physics; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_physics; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_physics; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_physics; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_physics; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_physics; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_physics; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_physics; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_physics; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_physics; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_physics; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_physics; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_physics; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_physics; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_physics; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_physics; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_physics; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_physics; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_physics; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_physics; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_physics; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_physics; the MCP for Unity 10.1.0",
+      "inputSchema": {
+        "properties": {
+          "params": {
+            "additionalProperties": true,
+            "description": "Placeholder for params.",
+            "type": "object"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "name": "manage_prefabs",
+      "description": "Placeholder description for manage_prefabs; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_prefabs; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_prefabs; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_prefabs; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_prefabs; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_prefabs; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_prefabs; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_prefabs; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_prefabs; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_prefabs; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_prefabs; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_prefabs; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_prefabs; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_prefabs; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_prefabs; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_prefabs; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_prefabs; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_prefabs; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_prefabs; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_prefabs; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_prefabs; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_prefabs; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_prefabs; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_prefabs; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_prefabs; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder d",
+      "inputSchema": {
+        "properties": {
+          "params": {
+            "additionalProperties": true,
+            "description": "Placeholder for params.",
+            "type": "object"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "name": "manage_probuilder",
+      "description": "Placeholder description for manage_probuilder; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_probuilder; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_probuilder; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_probuilder; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_probuilder; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_probuilder; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_probuilder; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_probuilder; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_probuilder; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_probuilder; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_probuilder; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_probuilder; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_probuilder; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_probuilder; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_probuilder; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_probuilder; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_probuilder; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_probuilder; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_probuilder; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_probuilder; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_probuilder; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_probuilder; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_probuilder; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_probuilder; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the r",
+      "inputSchema": {
+        "properties": {
+          "params": {
+            "additionalProperties": true,
+            "description": "Placeholder for params.",
+            "type": "object"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "name": "manage_profiler",
+      "description": "Placeholder description for manage_profiler; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_profiler; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_profiler; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_profiler; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_profiler; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_profiler; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_profiler; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_profiler; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_profiler; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_profiler; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_profiler; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_profiler; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_profiler; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_profiler; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description fo",
+      "inputSchema": {
+        "properties": {
+          "params": {
+            "additionalProperties": true,
+            "description": "Placeholder for params.",
+            "type": "object"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "name": "manage_scene",
+      "description": "Placeholder description for manage_scene; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_scene; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_scene; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_scene; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_scene; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_scene; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_scene; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_scene; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_scene; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_scene; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_scene; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_scene; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_scene; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_scene; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_scene; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_scene; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_scene; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_scene; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_scene; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_scene; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_scene; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the",
+      "inputSchema": {
+        "properties": {
+          "params": {
+            "additionalProperties": true,
+            "description": "Placeholder for params.",
+            "type": "object"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "name": "manage_script",
+      "description": "Placeholder description for manage_script; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_script; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_script; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_script; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_script; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_script; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_script; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_script; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_script; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_script; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_script; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placehol",
+      "inputSchema": {
+        "properties": {
+          "action": {
+            "description": "Placeholder for action.",
+            "enum": [
+              "create",
+              "read",
+              "delete"
+            ],
+            "type": "string"
+          },
+          "name": {
+            "description": "Placeholder for name.",
+            "type": "string"
+          },
+          "path": {
+            "description": "Placeholder for path.",
+            "type": "string"
+          },
+          "contents": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Placeholder for contents."
+          },
+          "script_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Placeholder for script_type."
+          },
+          "namespace": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Placeholder for namespace."
+          }
+        },
+        "required": [
+          "action",
+          "name",
+          "path"
+        ],
+        "type": "object"
+      },
+      "annotations": {
+        "title": "Manage Script",
+        "destructiveHint": true
+      }
+    },
+    {
+      "name": "manage_script_capabilities",
+      "description": "Placeholder description for manage_script_capabilities; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_script_capabilities; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_script_capabilities; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_script_capabilities; the MCP for Unity 10.1.0 text is not reproduced, this filler only keep",
+      "inputSchema": {
+        "properties": {},
+        "type": "object"
+      },
+      "annotations": {
+        "title": "Manage Script Capabilities",
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "manage_scriptable_object",
+      "description": "Placeholder description for manage_scriptable_object; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_scriptable_object; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_scriptable_object; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_scriptable_object; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_scriptable_object; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_scriptable_object; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_scriptable_object; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_scriptable_object; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size.",
+      "inputSchema": {
+        "properties": {
+          "params": {
+            "additionalProperties": true,
+            "description": "Placeholder for params.",
+            "type": "object"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "name": "manage_shader",
+      "description": "Placeholder description for manage_shader; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_shader; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_shader; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_shader; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_shader; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size",
+      "inputSchema": {
+        "properties": {
+          "params": {
+            "additionalProperties": true,
+            "description": "Placeholder for params.",
+            "type": "object"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "name": "manage_texture",
+      "description": "Placeholder description for manage_texture; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_texture; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_texture; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_texture; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_texture; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_texture; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_texture; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_texture; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_texture; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_texture; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_texture; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_texture; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_texture; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_texture; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_texture; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_texture; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_texture; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder",
+      "inputSchema": {
+        "properties": {
+          "params": {
+            "additionalProperties": true,
+            "description": "Placeholder for params.",
+            "type": "object"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "name": "manage_tools",
+      "description": "Placeholder description for manage_tools; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_tools; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_tools; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_tools; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_tools; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_tools; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for",
+      "inputSchema": {
+        "properties": {
+          "params": {
+            "additionalProperties": true,
+            "description": "Placeholder for params.",
+            "type": "object"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "name": "manage_ui",
+      "description": "Placeholder description for manage_ui; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_ui; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_ui; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_ui; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_ui; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_ui; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_ui; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_ui; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_ui; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_ui; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_ui; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_ui; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_ui; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_ui; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_ui; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_ui; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_ui; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_ui; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_ui; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_ui; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_ui; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_ui; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_ui; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_ui; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_ui; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_ui; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_ui; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_ui; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_ui; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_ui; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_ui; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_ui; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_ui; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_ui; the MCP for Unity 10.",
+      "inputSchema": {
+        "properties": {
+          "params": {
+            "additionalProperties": true,
+            "description": "Placeholder for params.",
+            "type": "object"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "name": "manage_vfx",
+      "description": "Placeholder description for manage_vfx; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_vfx; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_vfx; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_vfx; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_vfx; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_vfx; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for manage_vfx; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description fo",
+      "inputSchema": {
+        "properties": {
+          "params": {
+            "additionalProperties": true,
+            "description": "Placeholder for params.",
+            "type": "object"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "name": "read_console",
+      "description": "Placeholder description for read_console; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for read_console; th",
+      "inputSchema": {
+        "properties": {
+          "action": {
+            "anyOf": [
+              {
+                "enum": [
+                  "get",
+                  "clear"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Placeholder for action."
+          },
+          "types": {
+            "anyOf": [
+              {
+                "items": {
+                  "enum": [
+                    "error",
+                    "warning",
+                    "log",
+                    "all"
+                  ],
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Placeholder for types."
+          },
+          "count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Placeholder for count."
+          },
+          "filter_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Placeholder for filter_text."
+          },
+          "page_size": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Placeholder for page_size."
+          },
+          "cursor": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Placeholder for cursor."
+          },
+          "format": {
+            "anyOf": [
+              {
+                "enum": [
+                  "plain",
+                  "detailed",
+                  "json"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Placeholder for format."
+          },
+          "include_stacktrace": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Placeholder for include_stacktrace."
+          }
+        },
+        "type": "object"
+      },
+      "annotations": {
+        "title": "Read Console"
+      }
+    },
+    {
+      "name": "refresh_unity",
+      "description": "Placeholder description for refresh_unity; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for refresh_unity; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description f",
+      "inputSchema": {
+        "properties": {
+          "mode": {
+            "default": "if_dirty",
+            "description": "Placeholder for mode.",
+            "enum": [
+              "if_dirty",
+              "force"
+            ],
+            "type": "string"
+          },
+          "scope": {
+            "default": "all",
+            "description": "Placeholder for scope.",
+            "enum": [
+              "assets",
+              "scripts",
+              "all"
+            ],
+            "type": "string"
+          },
+          "compile": {
+            "default": "none",
+            "description": "Placeholder for compile.",
+            "enum": [
+              "none",
+              "request"
+            ],
+            "type": "string"
+          },
+          "wait_for_ready": {
+            "default": true,
+            "description": "Placeholder for wait_for_ready.",
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "annotations": {
+        "title": "Refresh Unity",
+        "destructiveHint": true
+      }
+    },
+    {
+      "name": "run_tests",
+      "description": "Placeholder description for run_tests; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size.",
+      "inputSchema": {
+        "properties": {
+          "mode": {
+            "default": "EditMode",
+            "description": "Placeholder for mode.",
+            "enum": [
+              "EditMode",
+              "PlayMode"
+            ],
+            "type": "string"
+          },
+          "test_names": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Placeholder for test_names."
+          },
+          "group_names": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Placeholder for group_names."
+          },
+          "category_names": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Placeholder for category_names."
+          },
+          "assembly_names": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Placeholder for assembly_names."
+          },
+          "include_failed_tests": {
+            "default": false,
+            "description": "Placeholder for include_failed_tests.",
+            "type": "boolean"
+          },
+          "include_details": {
+            "default": false,
+            "description": "Placeholder for include_details.",
+            "type": "boolean"
+          },
+          "init_timeout": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Placeholder for init_timeout."
+          }
+        },
+        "type": "object"
+      },
+      "annotations": {
+        "title": "Run Tests",
+        "destructiveHint": true
+      }
+    },
+    {
+      "name": "script_apply_edits",
+      "description": "Placeholder description for script_apply_edits; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for script_apply_edits; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for script_apply_edits; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for script_apply_edits; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for script_apply_edits; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for script_apply_edits; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for script_apply_edits; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for script_apply_edits; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for script_apply_edits; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for script_apply_edits; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for script_apply_edits; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for script_apply_edits; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for script_apply_edits; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for script_apply_edits; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for script_apply_edits; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for script_apply_edits; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for script_apply_edits; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for script_apply_edits; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for script_apply_edits; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for script_apply_edits; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for script_apply_edits; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for script_apply_edits; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for script_apply_edits; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for script_apply_edits; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for script_apply_edits; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for script_apply_edits; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for script_apply_edits; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for script_apply_edits; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for script_apply_edits; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for script_apply_edits; the MCP for Unity 10.1.0 text is not repr",
+      "inputSchema": {
+        "properties": {
+          "params": {
+            "additionalProperties": true,
+            "description": "Placeholder for params.",
+            "type": "object"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "name": "set_active_instance",
+      "description": "Placeholder description for set_active_instance; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for set_active_instance; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for set_active_instance; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for set_active_instance; the MCP for Unity 10.1.0 text is not reproduced, this filler on",
+      "inputSchema": {
+        "properties": {
+          "params": {
+            "additionalProperties": true,
+            "description": "Placeholder for params.",
+            "type": "object"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "name": "unity_docs",
+      "description": "Placeholder description for unity_docs; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for unity_docs; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for unity_docs; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for unity_docs; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for unity_docs; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for unity_docs; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for unity_docs; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for unity_docs; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for unity_docs; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for unity_docs; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for unity_docs; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for unity_docs; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for unity_docs; the MCP for Unity 10.1.0",
+      "inputSchema": {
+        "properties": {
+          "params": {
+            "additionalProperties": true,
+            "description": "Placeholder for params.",
+            "type": "object"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "name": "unity_reflect",
+      "description": "Placeholder description for unity_reflect; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for unity_reflect; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for unity_reflect; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for unity_reflect; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for unity_reflect; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for unity_reflect; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for unity_reflect; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recor",
+      "inputSchema": {
+        "properties": {
+          "params": {
+            "additionalProperties": true,
+            "description": "Placeholder for params.",
+            "type": "object"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "name": "validate_script",
+      "description": "Placeholder description for validate_script; the MCP for Unity 10.1.0 text is not reproduced, this filler only keeps the recorded schema size. Placeholder description for validate_script; the MCP for Unity 10.1.0 tex",
+      "inputSchema": {
+        "properties": {
+          "uri": {
+            "description": "Placeholder for uri.",
+            "type": "string"
+          },
+          "level": {
+            "default": "basic",
+            "description": "Placeholder for level.",
+            "enum": [
+              "basic",
+              "standard"
+            ],
+            "type": "string"
+          },
+          "include_diagnostics": {
+            "default": false,
+            "description": "Placeholder for include_diagnostics.",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "uri"
+        ],
+        "type": "object"
+      },
+      "annotations": {
+        "title": "Validate Script",
+        "readOnlyHint": true
+      }
+    }
+  ]
+}

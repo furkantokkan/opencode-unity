@@ -1,0 +1,62 @@
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace SampleGame.Combat
+{
+    /// <summary>Applies damage over time to a target and raises events for the UI.</summary>
+    public sealed class DamageOverTimeEffect : MonoBehaviour
+    {
+        [SerializeField] private float m_tickInterval = 0.5f;
+        [SerializeField] private int m_damagePerTick = 3;
+        [SerializeField] private AnimationCurve m_falloff = AnimationCurve.Linear(0f, 1f, 1f, 0f);
+
+        private readonly List<IDamageable> m_targets = new List<IDamageable>(8);
+        private float m_elapsed;
+        private static readonly int k_maxTargets = 32;
+
+        private void OnEnable()
+        {
+            m_elapsed = 0f;
+            m_targets.Clear();
+        }
+
+        private void Update()
+        {
+            m_elapsed += Time.deltaTime;
+            if (m_elapsed < m_tickInterval)
+            {
+                return;
+            }
+
+            m_elapsed -= m_tickInterval;
+            ApplyTick();
+        }
+
+        private void ApplyTick()
+        {
+            for (int index = 0; index < m_targets.Count && index < k_maxTargets; index++)
+            {
+                IDamageable target = m_targets[index];
+                if (target == null || !target.IsAlive)
+                {
+                    continue;
+                }
+
+                float scale = m_falloff.Evaluate(Mathf.Clamp01(m_elapsed / m_tickInterval));
+                int amount = Mathf.Max(1, Mathf.RoundToInt(m_damagePerTick * scale));
+                target.TakeDamage(amount, DamageType.Poison);
+            }
+        }
+
+        public bool AddTarget(IDamageable target)
+        {
+            if (target == null || m_targets.Contains(target) || m_targets.Count >= k_maxTargets)
+            {
+                return false;
+            }
+
+            m_targets.Add(target);
+            return true;
+        }
+    }
+}

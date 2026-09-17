@@ -1,0 +1,88 @@
+{
+  "schema": 1,
+  "probePid": 1000,
+  "ancestors": [
+    900,
+    800
+  ],
+  "sampleMs": 1500,
+  "elapsedMs": 1512.4,
+  "processes": [
+    {
+      "pid": 4100,
+      "parentPid": 700,
+      "name": "Unity.exe",
+      "commandLine": "\"C:\\Program Files\\Unity\\Hub\\Editor\\6000.0.58f1\\Editor\\Unity.exe\" -projectPath D:\\Projects\\SampleGame",
+      "hasWindow": true,
+      "first": {
+        "state": "ok",
+        "seconds": 120.5,
+        "startMs": 1758000000000,
+        "error": null
+      },
+      "second": {
+        "state": "ok",
+        "seconds": 120.58,
+        "startMs": 1758000000000,
+        "error": null
+      }
+    },
+    {
+      "pid": 4101,
+      "parentPid": 700,
+      "name": "Unity.exe",
+      "commandLine": "\"C:\\Program Files\\Unity\\Hub\\Editor\\6000.0.58f1\\Editor\\Unity.exe\" -projectPath D:\\Projects\\SampleTools",
+      "hasWindow": true,
+      "first": {
+        "state": "ok",
+        "seconds": 90.1,
+        "startMs": 1758000000000,
+        "error": null
+      },
+      "second": {
+        "state": "ok",
+        "seconds": 90.15,
+        "startMs": 1758000000000,
+        "error": null
+      }
+    },
+    {
+      "pid": 4102,
+      "parentPid": 700,
+      "name": "Unity.exe",
+      "commandLine": "\"C:\\Program Files\\Unity\\Hub\\Editor\\6000.0.58f1\\Editor\\Unity.exe\" -projectPath D:\\Projects\\SampleDemo",
+      "hasWindow": true,
+      "first": {
+        "state": "ok",
+        "seconds": 60.4,
+        "startMs": 1758000000000,
+        "error": null
+      },
+      "second": {
+        "state": "ok",
+        "seconds": 60.46,
+        "startMs": 1758000000000,
+        "error": null
+      }
+    },
+    {
+      "pid": 4103,
+      "parentPid": 700,
+      "name": "Unity.exe",
+      "commandLine": "\"C:\\Program Files\\Unity\\Hub\\Editor\\6000.0.58f1\\Editor\\Unity.exe\" -projectPath D:\\Projects\\SampleTests",
+      "hasWindow": true,
+      "first": {
+        "state": "ok",
+        "seconds": 15,
+        "startMs": 1758000000000,
+        "error": null
+      },
+      "second": {
+        "state": "ok",
+        "seconds": 15.05,
+        "startMs": 1758000000000,
+        "error": null
+      }
+    }
+  ]
+}

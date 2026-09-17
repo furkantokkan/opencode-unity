@@ -1,0 +1,17 @@
+time=2026-09-17T11:48:24.287+03:00 level=INFO source=routes.go:1941 msg="server config" env="map[OLLAMA_CONTEXT_LENGTH:16384 OLLAMA_FLASH_ATTENTION:true OLLAMA_KEEP_ALIVE:15m0s OLLAMA_KV_CACHE_TYPE:q8_0 OLLAMA_MAX_LOADED_MODELS:1 OLLAMA_NUM_PARALLEL:1]"
+[GIN] 2026/09/17 - 11:48:24 | 200 |            0s |       127.0.0.1 | GET      "/api/version"
+time=2026-09-17T11:49:02.531+03:00 level=INFO source=llama_server.go:434 msg="starting llama-server" cmd="<home>\\AppData\\Local\\Programs\\Ollama\\lib\\ollama\\llama-server.exe --model <home>\\.ollama\\models\\blobs\\sha256-0000000000000000000000000000000000000000000000000000000000000000 --port 56868 --host 127.0.0.1 --no-webui --offline -c 16384 -np 1 --log-verbosity 4 --no-log-prefix --no-log-timestamps --no-jinja --chat-template chatml --load-mode none --cache-type-k q8_0 --cache-type-v q8_0 --flash-attn on -b 512 -ub 512 --context-shift --keep 4"
+llama_kv_cache:      CUDA0 KV buffer size =   816.00 MiB
+llama_kv_cache: size =  816.00 MiB ( 16384 cells,  48 layers,  1/1 seqs), K (q8_0):  408.00 MiB, V (q8_0):  408.00 MiB
+srv    load_model: initializing, n_slots = 1, n_ctx_slot = 16384, kv_unified = 'false'
+time=2026-09-17T11:49:14.101+03:00 level=INFO source=llama_server.go:1372 msg="llama-server started in 11.57 seconds"
+slot launch_slot_: id  0 | task -1 | sampler params:
+	repeat_last_n = 64, repeat_penalty = 1.050, frequency_penalty = 0.000, presence_penalty = 0.000
+	top_k = 20, top_p = 0.800, min_p = 0.000, xtc_probability = 0.000, xtc_threshold = 0.100, typical_p = 1.000, top_n_sigma = -1.000, temp = 0.700
+	mirostat = 0, mirostat_lr = 0.100, mirostat_ent = 5.000, adaptive_target = -1.000, adaptive_decay = 0.900
+[GIN] 2026/09/17 - 11:49:41 | 200 |    26.6402s |       127.0.0.1 | POST     "/v1/chat/completions"
+slot launch_slot_: id  0 | task -1 | sampler params:
+	repeat_last_n = 64, repeat_penalty = 1.050, frequency_penalty = 0.000, presence_penalty = 0.000
+	top_k = 20, top_p = 0.800, min_p = 0.000, xtc_probability = 0.000, xtc_threshold = 0.100, typical_p = 1.000, top_n_sigma = -1.000, temp = 0.700
+[GIN] 2026/09/17 - 11:51:02 | 200 |    18.4413s |       127.0.0.1 | POST     "/v1/chat/completions"
+[GIN] 2026/09/17 - 11:51:20 | 200 |     2.5511ms |       127.0.0.1 | GET      "/api/ps"

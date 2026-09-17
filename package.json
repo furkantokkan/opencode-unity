@@ -1,0 +1,48 @@
+{
+  "name": "opencode-unity",
+  "version": "0.1.0",
+  "description": "Set up and launch OpenCode for Unity C# work with a local model, a GPU guard and a doctor. Unofficial; not affiliated with OpenCode, Ollama or Unity Technologies.",
+  "keywords": [
+    "opencode",
+    "unity",
+    "ollama",
+    "local-llm",
+    "cli"
+  ],
+  "license": "MIT",
+  "author": "The opencode-unity contributors",
+  "type": "module",
+  "bin": {
+    "opencode-unity": "bin/opencode-unity.mjs"
+  },
+  "files": [
+    "bin/",
+    "src/",
+    "plugin/",
+    "templates/",
+    "presets/",
+    "schema/",
+    "compat.json",
+    "NOTICE.md",
+    "CHANGELOG.md"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "npm run test:unit",
+    "test:unit": "node --test \"test/unit/**/*.test.mjs\" \"test/plugin/**/*.test.mjs\" \"test/doctor/**/*.test.mjs\" \"test/install/**/*.test.mjs\" \"test/delegate/**/*.test.mjs\" \"test/bench/**/*.test.mjs\" \"test/lint/**/*.test.mjs\"",
+    "test:contract": "node --test \"test/contract/**/*.test.mjs\"",
+    "test:lint": "node --test \"test/lint/**/*.test.mjs\"",
+    "test:spikes": "node --test \"spikes/test/**/*.test.mjs\"",
+    "test:coverage": "node --test --experimental-test-coverage \"test/unit/**/*.test.mjs\" \"test/plugin/**/*.test.mjs\" \"test/doctor/**/*.test.mjs\" \"test/install/**/*.test.mjs\" \"test/delegate/**/*.test.mjs\" \"test/bench/**/*.test.mjs\" \"test/lint/**/*.test.mjs\"",
+    "lint": "node scripts/check-no-personal-data.mjs && node scripts/check-claims.mjs && node scripts/check-package-files.mjs",
+    "check:release": "node scripts/check-claims.mjs --release && node scripts/check-package-files.mjs --release",
+    "typecheck": "tsc -p jsconfig.json"
+  },
+  "devDependencies": {
+    "@opencode-ai/plugin": "1.18.31",
+    "@types/node": "22.20.3",
+    "typescript": "7.0.2"
+  }
+}

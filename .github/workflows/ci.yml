@@ -1,0 +1,178 @@
+# Spec 21.1. No job loads a model, calls an Ollama chat, generate or /v1 endpoint, needs a GPU, or
+# opens Unity: every test uses mocks on loopback. Actions are pinned by commit SHA (spec 16 P8).
+#
+# Branch protection on main requires: lint, the four unit legs, contract and package.
+# macos-smoke is informational.
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_call:
+    secrets:
+      PERSONAL_DATA_DENYLIST:
+        description: Extra denylist terms for scripts/check-no-personal-data.mjs, one per line.
+        required: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
+
+env:
+  # A stray request must fail fast instead of reaching a real service.
+  OLLAMA_HOST: http://127.0.0.1:9
+  OPENCODE_DISABLE_AUTOUPDATE: "1"
+  OPENCODE_DISABLE_MODELS_FETCH: "1"
+  OPENCODE_DISABLE_CLAUDE_CODE: "1"
+
+jobs:
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24"
+          cache: npm
+      - run: npm ci
+      - name: Type check (checkJs over bin, src, plugin and scripts)
+        run: npx tsc -p jsconfig.json --noEmit
+      - name: No personal data
+        run: node scripts/check-no-personal-data.mjs
+        env:
+          OPENCODE_UNITY_DENYLIST: ${{ secrets.PERSONAL_DATA_DENYLIST }}
+      - name: Claims, labels and offline relative links
+        run: node scripts/check-claims.mjs
+      - name: Package file list equals the allow-list
+        run: node scripts/check-package-files.mjs
+      - name: Generated docs are up to date
+        run: |
+          node scripts/gen-cli-docs.mjs
+          node scripts/gen-config-docs.mjs
+          node scripts/gen-doctor-docs.mjs
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "Generated docs differ from the committed ones. Run the gen-* scripts and commit the result."
+            git status --porcelain
+            git --no-pager diff
+            exit 1
+          fi
+
+  unit:
+    name: unit (${{ matrix.os }}, node ${{ matrix.node }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+        node: ["22", "24"]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      - run: npm ci
+      # node --test rejects directory arguments on Node 24, so every suite is named by a glob.
+      - name: Unit, plugin, doctor, install, delegate, bench and lint suites
+        run: >
+          node --test --experimental-test-coverage
+          --test-coverage-include="plugin/opencode-unity-lib/guard/**"
+          --test-coverage-include="plugin/opencode-unity-lib/budget.js"
+          --test-coverage-include="plugin/opencode-unity-lib/shell-classify.js"
+          --test-coverage-include="src/opencode/permission-eval.js"
+          --test-coverage-include="src/facts/**"
+          --test-coverage-include="src/unity/**"
+          --test-coverage-lines=90
+          "test/unit/**/*.test.mjs"
+          "test/plugin/**/*.test.mjs"
+          "test/doctor/**/*.test.mjs"
+          "test/install/**/*.test.mjs"
+          "test/delegate/**/*.test.mjs"
+          "test/bench/**/*.test.mjs"
+          "test/lint/**/*.test.mjs"
+      - name: CLI starts
+        run: node bin/opencode-unity.mjs --version
+
+  contract:
+    name: contract
+    needs: unit
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24"
+          cache: npm
+      - run: npm ci
+      - name: Restore the tested OpenCode binary
+        id: opencode-cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ runner.temp }}/opencode
+          key: opencode-ai-1.18.31-${{ runner.os }}
+      - name: Install opencode-ai@1.18.31 into a temp prefix
+        if: steps.opencode-cache.outputs.cache-hit != 'true'
+        run: npm install --prefix "$env:RUNNER_TEMP/opencode" --no-audit --no-fund opencode-ai@1.18.31
+      - name: Contract tests (real OpenCode binary, mock servers)
+        run: node --test "test/contract/**/*.test.mjs"
+        env:
+          OPENCODE_UNITY_TEST_OPENCODE: ${{ runner.temp }}\opencode\node_modules\opencode-ai\bin\opencode.exe
+          OPENCODE_UNITY_TEST_ARTIFACTS: ${{ runner.temp }}\contract-artifacts
+      - name: Upload captured requests and OpenCode logs
+        if: failure()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: contract-artifacts
+          path: ${{ runner.temp }}/contract-artifacts
+          if-no-files-found: ignore
+          include-hidden-files: true
+
+  package:
+    name: package
+    needs: unit
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24"
+          cache: npm
+      - run: npm ci
+      - name: Package file list equals the allow-list
+        run: node scripts/check-package-files.mjs
+      - name: Round trip (pack, install, setup, init, start --print-env, doctor, uninstall)
+        run: node --test "test/install/package-roundtrip.test.mjs"
+        env:
+          OPENCODE_UNITY_TEST_PACKAGE_ROUNDTRIP: "1"
+
+  macos-smoke:
+    name: macos-smoke
+    runs-on: macos-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24"
+          cache: npm
+      - run: npm ci
+      - name: Platform-neutral unit and lint suites
+        run: node --test "test/unit/**/*.test.mjs" "test/lint/**/*.test.mjs"
+      - name: Doctor on a fixture project
+        run: node "$GITHUB_WORKSPACE/bin/opencode-unity.mjs" doctor --json
+        working-directory: test/fixtures/unity-projects/u6-urp-ugui-git

@@ -1,0 +1,21 @@
+{
+  "parameters": "num_ctx                        8192\nnum_batch                      256\ntemperature                    1\ntop_p                          1\ntop_k                          20\nrepeat_penalty                 1.05",
+  "template": "{{- range $index, $_ := .Messages }}...",
+  "renderer": "",
+  "parser": "",
+  "details": {
+    "parent_model": "qwen3-coder:30b",
+    "format": "gguf",
+    "family": "qwen3moe",
+    "families": [
+      "qwen3moe"
+    ],
+    "parameter_size": "30.5B",
+    "quantization_level": "Q4_K_M"
+  },
+  "model_info": {},
+  "capabilities": [
+    "completion"
+  ],
+  "modified_at": "2026-09-16T22:10:00.000000+03:00"
+}

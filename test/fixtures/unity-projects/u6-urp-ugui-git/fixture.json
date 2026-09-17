@@ -1,0 +1,24 @@
+{
+  "description": "Unity 6000.3 with URP, uGUI, the Input System, EditMode and PlayMode tests, and up-to-date .csproj files.",
+  "createAtTestTime": [
+    {
+      "path": ".git",
+      "type": "dir"
+    },
+    {
+      "path": "Library/PackageCache/com.unity.other/Runtime/Other.asmdef",
+      "type": "file",
+      "content": "{\"name\":\"Other\"}"
+    },
+    {
+      "path": "Temp/UnityLockfile",
+      "type": "file",
+      "content": ""
+    },
+    {
+      "path": "Logs/AssetImportWorker0.log",
+      "type": "file",
+      "content": ""
+    }
+  ]
+}

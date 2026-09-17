@@ -1,0 +1,413 @@
+{
+  "spike": "I",
+  "id": "I",
+  "title": "PowerShell process probe over stdin",
+  "question": "Does the PowerShell stdin probe return JSON reliably on Windows PowerShell 5.1 and 7, within the time budget, and without common EDR blocks?",
+  "contractTest": "Unit + manual on reference hardware",
+  "fallback": "-ExecutionPolicy Bypass -File <script> (process scope)",
+  "opencodeVersion": "1.18.31",
+  "platform": "win32 x64",
+  "node": "v24.13.0",
+  "ranAt": "2026-09-17T18:41:41.585Z",
+  "durationMs": 26280,
+  "outcome": "pass",
+  "decision": "Keep the stdin transport: `powershell.exe -NoProfile -NonInteractive -Command -` with the script text piped in as one `& { ... }` block ending in a blank line. `-ExecutionPolicy Bypass -File` stays the documented fallback.",
+  "checks": [
+    {
+      "name": "I1 both PowerShell hosts are present on this machine",
+      "pass": true,
+      "detail": [
+        "windows-powershell-5.1",
+        "powershell-7"
+      ]
+    },
+    {
+      "name": "I2 windows-powershell-5.1: every stdin run returns parsable JSON",
+      "pass": true,
+      "detail": [
+        {
+          "parsed": true,
+          "exitCode": 0,
+          "error": null
+        },
+        {
+          "parsed": true,
+          "exitCode": 0,
+          "error": null
+        },
+        {
+          "parsed": true,
+          "exitCode": 0,
+          "error": null
+        }
+      ]
+    },
+    {
+      "name": "I3 windows-powershell-5.1: both marked processes are found with readable command lines",
+      "pass": true,
+      "detail": [
+        2,
+        2,
+        2
+      ]
+    },
+    {
+      "name": "I4 windows-powershell-5.1: the busy process reads as busy and the idle one as idle",
+      "pass": true,
+      "detail": [
+        [
+          99,
+          0
+        ],
+        [
+          99,
+          0
+        ],
+        [
+          99,
+          0
+        ]
+      ]
+    },
+    {
+      "name": "I5 windows-powershell-5.1: median stdin run stays inside the 10000 ms budget",
+      "pass": true,
+      "detail": {
+        "medianMs": 3043,
+        "sampleMs": 1500
+      }
+    },
+    {
+      "name": "I6 windows-powershell-5.1: without a trailing blank line the block never runs (silent, exit 0)",
+      "pass": true,
+      "detail": {
+        "exitCode": 0,
+        "stdoutLength": 0,
+        "parsed": false,
+        "error": null,
+        "processCount": 0,
+        "elapsedMs": null,
+        "cpuPercents": [],
+        "commandLineReadable": false,
+        "hasWindowFlags": []
+      }
+    },
+    {
+      "name": "I7 windows-powershell-5.1: the -ExecutionPolicy Bypass -File fallback also works",
+      "pass": true,
+      "detail": {
+        "exitCode": 0,
+        "durationMs": 2846,
+        "parsed": true,
+        "error": null,
+        "processCount": 2,
+        "elapsedMs": 1524.4664500000001,
+        "cpuPercents": [
+          96,
+          0
+        ],
+        "commandLineReadable": true,
+        "hasWindowFlags": [
+          false,
+          false
+        ]
+      }
+    },
+    {
+      "name": "I2 powershell-7: every stdin run returns parsable JSON",
+      "pass": true,
+      "detail": [
+        {
+          "parsed": true,
+          "exitCode": 0,
+          "error": null
+        },
+        {
+          "parsed": true,
+          "exitCode": 0,
+          "error": null
+        },
+        {
+          "parsed": true,
+          "exitCode": 0,
+          "error": null
+        }
+      ]
+    },
+    {
+      "name": "I3 powershell-7: both marked processes are found with readable command lines",
+      "pass": true,
+      "detail": [
+        2,
+        2,
+        2
+      ]
+    },
+    {
+      "name": "I4 powershell-7: the busy process reads as busy and the idle one as idle",
+      "pass": true,
+      "detail": [
+        [
+          96,
+          0
+        ],
+        [
+          100,
+          0
+        ],
+        [
+          100,
+          0
+        ]
+      ]
+    },
+    {
+      "name": "I5 powershell-7: median stdin run stays inside the 10000 ms budget",
+      "pass": true,
+      "detail": {
+        "medianMs": 3018,
+        "sampleMs": 1500
+      }
+    },
+    {
+      "name": "I6 powershell-7: without a trailing blank line the block never runs (silent, exit 0)",
+      "pass": true,
+      "detail": {
+        "exitCode": 0,
+        "stdoutLength": 0,
+        "parsed": false,
+        "error": null,
+        "processCount": 0,
+        "elapsedMs": null,
+        "cpuPercents": [],
+        "commandLineReadable": false,
+        "hasWindowFlags": []
+      }
+    },
+    {
+      "name": "I7 powershell-7: the -ExecutionPolicy Bypass -File fallback also works",
+      "pass": true,
+      "detail": {
+        "exitCode": 0,
+        "durationMs": 3074,
+        "parsed": true,
+        "error": null,
+        "processCount": 2,
+        "elapsedMs": 1546.98155,
+        "cpuPercents": [
+          100,
+          0
+        ],
+        "commandLineReadable": true,
+        "hasWindowFlags": [
+          false,
+          false
+        ]
+      }
+    }
+  ],
+  "findings": [
+    "The stdin form needs no execution-policy change and no -EncodedCommand, on Windows PowerShell 5.1 and on PowerShell 7 (measured versions are in the evidence).",
+    "`-Command -` executes a multi-line statement only when a blank line closes it: the piped text MUST end with a blank line. Without it, the host exits 0 and prints nothing, so the guard must treat empty or unparsable output as a probe failure (block), never as \"no Unity processes\".",
+    "Blank and comment lines INSIDE the script block are harmless; stripping them is not required, and stripping the final blank line breaks the probe.",
+    "A Win32_Process snapshot plus a 1.5 s CPU sample fits inside the 10 s probe budget on the reference machine; per-host medians are in the evidence.",
+    "No endpoint-security block was observed on the reference machine. Other machines keep the documented -File fallback and a doctor check."
+  ],
+  "evidence": {
+    "transports": {
+      "windows-powershell-5.1": {
+        "host": "powershell.exe",
+        "version": "5.1.26100.9444",
+        "stdin": {
+          "runs": [
+            {
+              "exitCode": 0,
+              "durationMs": 3043,
+              "timedOut": false,
+              "stderrTail": "",
+              "parsed": true,
+              "error": null,
+              "processCount": 2,
+              "elapsedMs": 1519.43875,
+              "cpuPercents": [
+                99,
+                0
+              ],
+              "commandLineReadable": true,
+              "hasWindowFlags": [
+                false,
+                false
+              ]
+            },
+            {
+              "exitCode": 0,
+              "durationMs": 3145,
+              "timedOut": false,
+              "stderrTail": "",
+              "parsed": true,
+              "error": null,
+              "processCount": 2,
+              "elapsedMs": 1516.1535,
+              "cpuPercents": [
+                99,
+                0
+              ],
+              "commandLineReadable": true,
+              "hasWindowFlags": [
+                false,
+                false
+              ]
+            },
+            {
+              "exitCode": 0,
+              "durationMs": 3019,
+              "timedOut": false,
+              "stderrTail": "",
+              "parsed": true,
+              "error": null,
+              "processCount": 2,
+              "elapsedMs": 1514.3510500000002,
+              "cpuPercents": [
+                99,
+                0
+              ],
+              "commandLineReadable": true,
+              "hasWindowFlags": [
+                false,
+                false
+              ]
+            }
+          ],
+          "medianMs": 3043
+        },
+        "stdinWithoutTrailingBlankLine": {
+          "exitCode": 0,
+          "stdoutLength": 0,
+          "parsed": false,
+          "error": null,
+          "processCount": 0,
+          "elapsedMs": null,
+          "cpuPercents": [],
+          "commandLineReadable": false,
+          "hasWindowFlags": []
+        },
+        "executionPolicyBypassFile": {
+          "exitCode": 0,
+          "durationMs": 2846,
+          "parsed": true,
+          "error": null,
+          "processCount": 2,
+          "elapsedMs": 1524.4664500000001,
+          "cpuPercents": [
+            96,
+            0
+          ],
+          "commandLineReadable": true,
+          "hasWindowFlags": [
+            false,
+            false
+          ]
+        }
+      },
+      "powershell-7": {
+        "host": "pwsh.exe",
+        "version": "7.6.6",
+        "stdin": {
+          "runs": [
+            {
+              "exitCode": 0,
+              "durationMs": 2973,
+              "timedOut": false,
+              "stderrTail": "",
+              "parsed": true,
+              "error": null,
+              "processCount": 2,
+              "elapsedMs": 1541.43975,
+              "cpuPercents": [
+                96,
+                0
+              ],
+              "commandLineReadable": true,
+              "hasWindowFlags": [
+                false,
+                false
+              ]
+            },
+            {
+              "exitCode": 0,
+              "durationMs": 3023,
+              "timedOut": false,
+              "stderrTail": "",
+              "parsed": true,
+              "error": null,
+              "processCount": 2,
+              "elapsedMs": 1547.921,
+              "cpuPercents": [
+                100,
+                0
+              ],
+              "commandLineReadable": true,
+              "hasWindowFlags": [
+                false,
+                false
+              ]
+            },
+            {
+              "exitCode": 0,
+              "durationMs": 3018,
+              "timedOut": false,
+              "stderrTail": "",
+              "parsed": true,
+              "error": null,
+              "processCount": 2,
+              "elapsedMs": 1552.73605,
+              "cpuPercents": [
+                100,
+                0
+              ],
+              "commandLineReadable": true,
+              "hasWindowFlags": [
+                false,
+                false
+              ]
+            }
+          ],
+          "medianMs": 3018
+        },
+        "stdinWithoutTrailingBlankLine": {
+          "exitCode": 0,
+          "stdoutLength": 0,
+          "parsed": false,
+          "error": null,
+          "processCount": 0,
+          "elapsedMs": null,
+          "cpuPercents": [],
+          "commandLineReadable": false,
+          "hasWindowFlags": []
+        },
+        "executionPolicyBypassFile": {
+          "exitCode": 0,
+          "durationMs": 3074,
+          "parsed": true,
+          "error": null,
+          "processCount": 2,
+          "elapsedMs": 1546.98155,
+          "cpuPercents": [
+            100,
+            0
+          ],
+          "commandLineReadable": true,
+          "hasWindowFlags": [
+            false,
+            false
+          ]
+        }
+      }
+    },
+    "sampleMs": 1500,
+    "budgetMs": 10000,
+    "marker": "a per-run random string; never stored",
+    "currentUserExecutionPolicy": "Undefined"
+  },
+  "crash": null
+}

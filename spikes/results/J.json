@@ -1,0 +1,303 @@
+{
+  "spike": "J",
+  "id": "J",
+  "title": "MCP tool argument policy and resource permissions",
+  "question": "Does tool.execute.before for MCP tools throw into a tool error, does unity_instance removal reach the hub, and what is the read pattern format for MCP resources?",
+  "contractTest": "C11",
+  "fallback": "Keep run_tests/refresh_unity on ask with prompt rules only, and document that the argument policy is unenforced",
+  "opencodeVersion": "1.18.31",
+  "platform": "win32 x64",
+  "node": "v24.13.0",
+  "ranAt": "2026-09-17T18:41:55.451Z",
+  "durationMs": 13829,
+  "outcome": "pass",
+  "decision": "Enforce the MCP argument policy in the plugin `tool.execute.before` hook (spec 11.3), and keep the editor agent behind the exact-name allow-list plus `read: { \"mcp:<server>:*\": \"allow\" }`.",
+  "checks": [
+    {
+      "name": "J1 read_console with action clear: blocked",
+      "pass": true,
+      "detail": "opencode-unity: read_console only allows action \"get\" in the editor check agent."
+    },
+    {
+      "name": "J2 read_console with action get: ran",
+      "pass": true,
+      "detail": "mock hub ran read_console with {\"action\":\"get\",\"count\":5}"
+    },
+    {
+      "name": "J3 run_tests in PlayMode: blocked",
+      "pass": true,
+      "detail": "opencode-unity: run_tests only allows EditMode in the editor check agent."
+    },
+    {
+      "name": "J4 run_tests in EditMode: ran",
+      "pass": true,
+      "detail": "mock hub ran run_tests with {\"mode\":\"EditMode\"}"
+    },
+    {
+      "name": "J5 MCP resource read: ran",
+      "pass": true,
+      "detail": "Resource: mcpforunity://instances\nMIME: application/json\n{\"instances\":[{\"id\":\"SampleGame@0123456789abcdef\"}]}"
+    },
+    {
+      "name": "J6 a tool outside the allow-list: blocked",
+      "pass": true,
+      "detail": "Model tried to call unavailable tool 'invalid'. Available tools: list_mcp_resource_templates, list_mcp_resources, read, read_mcp_resource, unityMCP_find_gameobjects, unityMCP_get_test_job, unityMCP_re"
+    },
+    {
+      "name": "J7 unity_instance is removed before the hub sees the call",
+      "pass": true,
+      "detail": {
+        "name": "read_console",
+        "args": {
+          "action": "get",
+          "count": 5
+        }
+      }
+    },
+    {
+      "name": "J8 a blocked call never reaches the hub",
+      "pass": true,
+      "detail": [
+        {
+          "name": "read_console",
+          "args": {
+            "action": "get",
+            "count": 5
+          }
+        },
+        {
+          "name": "run_tests",
+          "args": {
+            "mode": "EditMode"
+          }
+        }
+      ]
+    },
+    {
+      "name": "J9 the visible MCP tools are exactly the allow-list",
+      "pass": true,
+      "detail": [
+        "list_mcp_resource_templates",
+        "list_mcp_resources",
+        "read",
+        "read_mcp_resource",
+        "unityMCP_find_gameobjects",
+        "unityMCP_get_test_job",
+        "unityMCP_read_console",
+        "unityMCP_refresh_unity",
+        "unityMCP_run_tests"
+      ]
+    },
+    {
+      "name": "J10 the MCP resource read is allowed by the `mcp:<server>:<uri>` pattern",
+      "pass": true,
+      "detail": [
+        "mcpforunity://instances"
+      ]
+    },
+    {
+      "name": "J11 the argument policy runs before the permission ask",
+      "pass": true,
+      "detail": [
+        "message=evaluated permission=unityMCP_read_console pattern=* action.permission=unityMCP_read_console action.action=allow action.pattern=*",
+        "message=evaluated permission=unityMCP_run_tests pattern=* action.permission=unityMCP_run_tests action.action=allow action.pattern=*",
+        "message=evaluated permission=read pattern=mcp:unityMCP:mcpforunity://instances action.permission=read action.pattern=mcp:unityMCP:* action.action=allow"
+      ]
+    },
+    {
+      "name": "J12 the editor agent gets the hub instructions",
+      "pass": true,
+      "detail": "  Platform: win32\n  Today's date: Thu Sep 17 2026\n</env>\n<mcp_instructions>\n  <server name=\"unityMCP\">\n    MOCK_HUB_INSTRUCTIONS_MARKER: check the Unity instance first.\n  </server>\n</mcp_instructions>"
+    },
+    {
+      "name": "J13 the code agent sees no MCP tool and no hub instructions",
+      "pass": true,
+      "detail": {
+        "exitCode": 0,
+        "toolNames": [
+          "bash",
+          "edit",
+          "glob",
+          "grep",
+          "list_mcp_resource_templates",
+          "list_mcp_resources",
+          "read",
+          "read_mcp_resource",
+          "skill",
+          "task",
+          "todowrite",
+          "webfetch",
+          "write"
+        ],
+        "hasHubInstructions": false
+      }
+    }
+  ],
+  "findings": [
+    "For MCP tools, `tool.execute.before` receives the same arguments object that is forwarded to the hub, so deleting a key there (unity_instance) really removes it from the JSON-RPC call, and throwing there fails the tool call before the permission ask, with the message returned to the model.",
+    "MCP resources are reached through the built-in tools list_mcp_resources, list_mcp_resource_templates and read_mcp_resource; they all map to the `read` permission, and read_mcp_resource asks with pattern `mcp:<server>:<uri>` (always `mcp:<server>:*`), which is exactly the rule format spec 8.5.2 renders.",
+    "A tool whose last matching rule is `*: deny` disappears from the request tool list, so the code agent's `*_*: deny` hides every MCP tool and the hub instructions stay out of its system prompt.",
+    "A hidden tool the model still tries to call comes back as \"Model tried to call unavailable tool\" plus the list of available tools, so hiding a tool is itself a usable guard.",
+    "The mock hub answers the streamable HTTP transport with plain JSON responses (no SSE stream) and a 405 on GET, which is enough for OpenCode 1.18.31."
+  ],
+  "evidence": {
+    "editorRun": {
+      "exitCode": 0,
+      "durationMs": 8943,
+      "timedOut": false,
+      "attempts": 1,
+      "chatRequests": 7,
+      "hookCounts": {
+        "server": 1,
+        "config": 1,
+        "event": 45,
+        "messages.transform": 7,
+        "system.transform": 7,
+        "chat.params": 7,
+        "tool.execute.before": 5,
+        "tool.execute.after": 3,
+        "text.complete": 1
+      },
+      "chatParamsAgents": [
+        "unity-editor",
+        "unity-editor",
+        "unity-editor",
+        "unity-editor",
+        "unity-editor",
+        "unity-editor",
+        "unity-editor"
+      ],
+      "runErrorEvents": [],
+      "stdoutEventTypes": [
+        "step_start",
+        "tool_use",
+        "step_finish",
+        "step_start",
+        "tool_use",
+        "step_finish",
+        "step_start",
+        "tool_use",
+        "step_finish",
+        "step_start",
+        "tool_use",
+        "step_finish",
+        "step_start",
+        "tool_use",
+        "step_finish",
+        "step_start",
+        "tool_use",
+        "step_finish",
+        "step_start",
+        "text",
+        "step_finish"
+      ],
+      "stderrTail": "...ry\ntimestamp=2026-09-17T18:41:50.415Z level=INFO run=2fe7dec5 message=\"llm runtime selected\" llm.runtime=ai-sdk llm.provider=opencode-unity llm.model=ocu-spike-model-16k\ntimestamp=2026-09-17T18:41:50.645Z level=INFO run=2fe7dec5 message=tracking hash=6b74e0604c066a82c231404dc83e79c62d36cd12 cwd=\"<tmp>\\\\opencode-unity-tests\\\\spike-j-mcp-yXOVxo\\\\project\" git=\"<tmp>\\\\opencode-unity-tests\\\\spike-j-mcp-yXOVxo\\\\home\\\\.local\\\\share\\\\opencode\\\\snapshot\\\\40720bef34f6f6cd1d0f85b2c095149031453b09\\\\de598124c1d306bbc1f19bf9bb0794cde21fa2bb\"\ntimestamp=2026-09-17T18:41:50.820Z level=INFO run=2fe7dec5 message=loop session.id=ses_f4f5348e7ffeFlrjEgFC8FQD2w step=7\ntimestamp=2026-09-17T18:41:50.821Z level=INFO run=2fe7dec5 message=\"exiting loop\" session.id=ses_f4f5348e7ffeFlrjEgFC8FQD2w\ntimestamp=2026-09-17T18:41:50.831Z level=INFO run=2fe7dec5 message=pruning\ntimestamp=2026-09-17T18:41:50.831Z level=INFO run=2fe7dec5 message=found pruned=0 total=0\ntimestamp=2026-09-17T18:41:50.832Z level=INFO run=2fe7dec5 message=\"disposing instance\" directory=\"<tmp>\\\\opencode-unity-tests\\\\spike-j-mcp-yXOVxo\\\\project\"\n"
+    },
+    "cases": [
+      {
+        "id": "J1 read_console with action clear",
+        "tool": "unityMCP_read_console",
+        "expected": "blocked",
+        "actual": "blocked",
+        "output": "opencode-unity: read_console only allows action \"get\" in the editor check agent."
+      },
+      {
+        "id": "J2 read_console with action get",
+        "tool": "unityMCP_read_console",
+        "expected": "ran",
+        "actual": "ran",
+        "output": "mock hub ran read_console with {\"action\":\"get\",\"count\":5}"
+      },
+      {
+        "id": "J3 run_tests in PlayMode",
+        "tool": "unityMCP_run_tests",
+        "expected": "blocked",
+        "actual": "blocked",
+        "output": "opencode-unity: run_tests only allows EditMode in the editor check agent."
+      },
+      {
+        "id": "J4 run_tests in EditMode",
+        "tool": "unityMCP_run_tests",
+        "expected": "ran",
+        "actual": "ran",
+        "output": "mock hub ran run_tests with {\"mode\":\"EditMode\"}"
+      },
+      {
+        "id": "J5 MCP resource read",
+        "tool": "read_mcp_resource",
+        "expected": "ran",
+        "actual": "ran",
+        "output": "Resource: mcpforunity://instances\nMIME: application/json\n{\"instances\":[{\"id\":\"SampleGame@0123456789abcdef\"}]}"
+      },
+      {
+        "id": "J6 a tool outside the allow-list",
+        "tool": "unityMCP_manage_script",
+        "expected": "blocked",
+        "actual": "blocked",
+        "output": "Model tried to call unavailable tool 'invalid'. Available tools: list_mcp_resource_templates, list_mcp_resources, read, read_mcp_resource, unityMCP_find_gameobjects, unityMCP_get_test_job, unityMCP_re"
+      }
+    ],
+    "visibleTools": [
+      "list_mcp_resource_templates",
+      "list_mcp_resources",
+      "read",
+      "read_mcp_resource",
+      "unityMCP_find_gameobjects",
+      "unityMCP_get_test_job",
+      "unityMCP_read_console",
+      "unityMCP_refresh_unity",
+      "unityMCP_run_tests"
+    ],
+    "hubToolCalls": [
+      {
+        "name": "read_console",
+        "args": {
+          "action": "get",
+          "count": 5
+        }
+      },
+      {
+        "name": "run_tests",
+        "args": {
+          "mode": "EditMode"
+        }
+      }
+    ],
+    "hubResourceReads": [
+      "mcpforunity://instances"
+    ],
+    "hubMethods": [
+      "initialize",
+      "notifications/initialized",
+      "tools/list",
+      "tools/call",
+      "notifications/cancelled",
+      "resources/read"
+    ],
+    "permissionLines": [
+      "message=evaluated permission=unityMCP_read_console pattern=* action.permission=unityMCP_read_console action.action=allow action.pattern=*",
+      "message=evaluated permission=unityMCP_run_tests pattern=* action.permission=unityMCP_run_tests action.action=allow action.pattern=*",
+      "message=evaluated permission=read pattern=mcp:unityMCP:mcpforunity://instances action.permission=read action.pattern=mcp:unityMCP:* action.action=allow"
+    ],
+    "codeAgent": {
+      "exitCode": 0,
+      "toolNames": [
+        "bash",
+        "edit",
+        "glob",
+        "grep",
+        "list_mcp_resource_templates",
+        "list_mcp_resources",
+        "read",
+        "read_mcp_resource",
+        "skill",
+        "task",
+        "todowrite",
+        "webfetch",
+        "write"
+      ],
+      "hasHubInstructions": false
+    }
+  },
+  "crash": null
+}

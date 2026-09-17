@@ -1,0 +1,10 @@
+{
+  "name": "Game.Tests.PlayMode",
+  "references": [
+    "Game.Runtime",
+    "UnityEngine.TestRunner"
+  ],
+  "optionalUnityReferences": [
+    "TestAssemblies"
+  ]
+}
