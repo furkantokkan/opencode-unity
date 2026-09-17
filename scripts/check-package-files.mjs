@@ -188,6 +188,8 @@ export function checkForbiddenFiles(packed) {
 }
 
 /**
+ * npm reports a packed path with the separator of the machine that packed it, so the separator is
+ * normalized here rather than through `path.sep` of the machine that reads the report.
  * @param {string} stdout  Output of `npm pack --dry-run --json`.
  * @returns {string[]}  Packed paths with `/` separators.
  */
@@ -203,7 +205,7 @@ export function parsePackJson(stdout) {
   }
   const files = parsed?.[0]?.files;
   if (!Array.isArray(files)) throw new UsageError('npm pack --json output has no file list.');
-  return files.map((entry) => String(entry.path).split(path.sep).join('/')).sort();
+  return files.map((entry) => String(entry.path).replace(/\\/g, '/')).sort();
 }
 
 /**

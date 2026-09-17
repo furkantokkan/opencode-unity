@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
+import path from 'node:path';
 import { describe, it } from 'node:test';
 
 import { EXIT } from '../../../src/cli/exit-codes.js';
@@ -24,12 +25,15 @@ function createClock(start = Date.parse('2026-09-17T12:00:00.000Z')) {
 }
 
 /**
+ * The state directory exists, so a test may write the lock file itself before any acquire.
  * @param {import('node:test').TestContext} t
  * @param {string} label
  */
 async function lockPathIn(t, label) {
   const sandbox = await useSandbox(t, label);
-  return sandbox.path('state', 'gpu.lock');
+  const lockPath = sandbox.path('state', 'gpu.lock');
+  await fs.mkdir(path.dirname(lockPath), { recursive: true });
+  return lockPath;
 }
 
 describe('acquireGpuLock (spec 7.8)', () => {
@@ -75,7 +79,6 @@ describe('acquireGpuLock (spec 7.8)', () => {
 
   it('takes over a lock whose process is gone, and says so', async (t) => {
     const lockPath = await lockPathIn(t, 'lock-dead-pid');
-    await fs.mkdir(`${lockPath}/..`, { recursive: true });
     const clock = createClock();
     const first = await acquireGpuLock({ lockPath, command: 'bench', timeoutSec: 600, waitSec: 0, heartbeatMs: 0, now: clock.now });
     /** @type {Array<{ previous: any, reason: string }>} */
@@ -164,7 +167,6 @@ describe('readGpuLock (spec 5.5 status)', () => {
 
   it('treats a half-written file as being written, then as stale', async (t) => {
     const lockPath = await lockPathIn(t, 'lock-damaged');
-    await fs.mkdir(`${lockPath}/..`, { recursive: true });
     await fs.writeFile(lockPath, '{"pid":');
     const clock = createClock();
     const fresh = readGpuLock(lockPath, { now: () => Date.now() });

@@ -145,8 +145,9 @@ describe('check-package-files pack list', () => {
   });
 
   it('parses the npm pack JSON report and rejects unusable output', () => {
+    // A report packed on Windows carries `\` separators and must read the same on every platform.
     const report = JSON.stringify([{ files: [{ path: 'src\\a.js' }, { path: 'bin/demo.mjs' }] }]);
-    assert.deepEqual(parsePackJson(`npm notice\n${report}\n`), ['bin/demo.mjs', 'src/a.js'.replace('\\', '/')]);
+    assert.deepEqual(parsePackJson(`npm notice\n${report}\n`), ['bin/demo.mjs', 'src/a.js']);
     assert.throws(() => parsePackJson('no json here'), UsageError);
     assert.throws(() => parsePackJson('[{'), UsageError);
     assert.throws(() => parsePackJson('[{"name":"demo"}]'), UsageError);
