@@ -5,6 +5,15 @@ All notable changes to this project are documented here. The format follows
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html). While the version is `0.y.z`, a minor release
 may change the CLI or the config schema, with automatic migrations and a Breaking section.
 
+## [0.1.0-preview.2] - 2026-09-18
+
+### Added
+
+- `guard.allowOffload` (default `false`). When it is on, the guard lets a model load that does not fit
+  in video memory alone: the rest runs from system RAM and replies are slower. The free-memory minimum
+  (`guard.minFreeVramAfterLoadMiB`) still applies, and `doctor` reports the offload share instead of an
+  error.
+
 ## [0.1.0-preview.1] - 2026-09-18
 
 The first preview. It is installed from GitHub and is not published to npm. It is meant for Unity
@@ -74,4 +83,5 @@ release-gate series is not in this preview.
 - opencode-unity is not a sandbox. The permission rules and the shell guard stop the actions they name;
   a compile check runs the project's own MSBuild logic.
 
+[0.1.0-preview.2]: https://github.com/furkantokkan/opencode-unity/releases/tag/v0.1.0-preview.2
 [0.1.0-preview.1]: https://github.com/furkantokkan/opencode-unity/releases/tag/v0.1.0-preview.1

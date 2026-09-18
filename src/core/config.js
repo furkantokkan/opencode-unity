@@ -14,6 +14,7 @@ export const DEFAULT_PRESET_ID = 'nvidia-24gb-qwen3-coder-30b-16k';
 /**
  * @typedef {object} GuardSettings
  * @property {number} minFreeVramAfterLoadMiB
+ * @property {boolean} allowOffload
  * @property {number} maxGpuUtilPercent
  * @property {number} gpuUtilSampleIntervalMs
  * @property {number} assetImportCpuPercent
@@ -71,6 +72,7 @@ export const DEFAULT_CONFIG = deepFreeze({
   },
   guard: {
     minFreeVramAfterLoadMiB: 1500,
+    allowOffload: false,
     maxGpuUtilPercent: 60,
     gpuUtilSampleIntervalMs: 1000,
     assetImportCpuPercent: 20,
@@ -267,6 +269,7 @@ export function getConfigWarnings(config) {
   if (config.guard.remote === 'unguarded') warnings.push('guard.remote is unguarded: a non-loopback Ollama server loads models without the GPU guard');
   if (config.guard.adapter === 'none') warnings.push('guard.adapter is none: GPU memory and utilization are not checked');
   if (config.guard.importWhileLoaded === 'allow') warnings.push('guard.importWhileLoaded is allow: Unity imports are not checked while the model is loaded');
+  if (config.guard.allowOffload) warnings.push('guard.allowOffload is on: a model that does not fit in video memory runs partly from system RAM, and replies are slower');
   if (config.safety.bashMode === 'ask') warnings.push('safety.bashMode is ask: shell commands outside the allow-list prompt instead of being refused');
   if (config.guard.maxUnityEditors === 0) warnings.push('guard.maxUnityEditors is 0: the Unity editor count is not checked');
   if (config.guard.editorImportCpuPercent === 0) warnings.push('guard.editorImportCpuPercent is 0: an importing or compiling Unity editor is not checked');

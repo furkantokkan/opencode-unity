@@ -16,7 +16,7 @@ export const GPU_CHECKS = Object.freeze([
     title: 'Video memory headroom for the preset',
     severities: ['error', 'warn'],
     why: 'The preset states what the model needs; the guard refuses a load that would leave the rest of the machine below its minimum, and that refusal is the whole point of the guard.',
-    fix: 'Free video memory, choose a preset with a smaller context, or lower guard.minFreeVramAfterLoadMiB deliberately.',
+    fix: 'Free video memory, choose a preset with a smaller context, or set guard.allowOffload so the part that does not fit runs from system RAM.',
     source: 'spec 7.3 and 7.4',
     run: (context) => {
       const estimate = context.profileInfo.vram;
@@ -26,6 +26,7 @@ export const GPU_CHECKS = Object.freeze([
         return skip(memory === undefined ? 'no video memory reading was taken on this run' : `video memory could not be read: ${memory.error}`);
       }
       const minimum = context.home.config.guard.minFreeVramAfterLoadMiB;
+      const allowOffload = context.home.config.guard.allowOffload;
       const reclaimable = context.gpu.verdict?.model.reclaimableMiB ?? 0;
       const available = memory.freeMiB + reclaimable;
       const afterLoad = available - estimate.modelVramMiB;
@@ -37,9 +38,14 @@ export const GPU_CHECKS = Object.freeze([
         reclaimableMiB: reclaimable,
         freeAfterLoadMiB: afterLoad,
         minFreeVramAfterLoadMiB: minimum,
+        allowOffload,
       };
       const details = [`the preset needs about ${estimate.modelVramMiB} MiB with a ${estimate.kvType} cache; ${available} MiB is available`];
       if (afterLoad < minimum) {
+        if (allowOffload && available >= minimum) {
+          const offload = estimate.modelVramMiB - (available - minimum);
+          return warn(`about ${offload} MiB of the model would run from system RAM because guard.allowOffload is on, and replies will be slower`, { details, data });
+        }
         return error(`loading the model would leave ${afterLoad} MiB free, below the ${minimum} MiB minimum`, { details, data });
       }
       if (afterLoad - minimum < TIGHT_HEADROOM_MIB) {

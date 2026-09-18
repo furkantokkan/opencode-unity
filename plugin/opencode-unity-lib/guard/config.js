@@ -7,6 +7,7 @@ import { parseOllamaBaseUrl } from './probes/ollama-ps.js';
  * @typedef {object} GuardConfig
  * @property {number} modelVramMiB              Preset estimate (section 7.4); required, no default.
  * @property {number} minFreeVramAfterLoadMiB
+ * @property {boolean} allowOffload             Let a model that does not fit in video memory run the rest from system RAM.
  * @property {number} maxGpuUtilPercent
  * @property {number} gpuUtilSampleIntervalMs
  * @property {number} assetImportCpuPercent     Summed over import processes; 100 = one logical core.
@@ -36,6 +37,7 @@ import { parseOllamaBaseUrl } from './probes/ollama-ps.js';
 /** @type {Readonly<Omit<GuardConfig, 'modelVramMiB'>>} */
 export const GUARD_DEFAULTS = Object.freeze({
   minFreeVramAfterLoadMiB: 1500,
+  allowOffload: false,
   maxGpuUtilPercent: 60,
   gpuUtilSampleIntervalMs: 1000,
   assetImportCpuPercent: 20,
@@ -60,6 +62,7 @@ export const GUARD_DEFAULTS = Object.freeze({
 /**
  * @typedef {{ kind: 'integer', min: number, max: number }
  *   | { kind: 'choice', values: readonly string[] }
+ *   | { kind: 'boolean' }
  *   | { kind: 'patterns' }
  *   | { kind: 'text' }} FieldRule
  */
@@ -68,6 +71,7 @@ export const GUARD_DEFAULTS = Object.freeze({
 const k_rules = Object.freeze({
   modelVramMiB: { kind: 'integer', min: 1, max: 1048576 },
   minFreeVramAfterLoadMiB: { kind: 'integer', min: 0, max: 1048576 },
+  allowOffload: { kind: 'boolean' },
   maxGpuUtilPercent: { kind: 'integer', min: 1, max: 100 },
   gpuUtilSampleIntervalMs: { kind: 'integer', min: 100, max: 10000 },
   assetImportCpuPercent: { kind: 'integer', min: 1, max: 102400 },
@@ -141,6 +145,8 @@ function checkField(value, rule) {
     }
     case 'choice':
       return typeof value === 'string' && rule.values.includes(value) ? null : `must be one of ${rule.values.join(', ')}`;
+    case 'boolean':
+      return typeof value === 'boolean' ? null : 'must be true or false';
     case 'text':
       return typeof value === 'string' && value.trim() !== '' && !hasControlCharacter(value) ? null : 'must be a non-empty single-line string';
     default:

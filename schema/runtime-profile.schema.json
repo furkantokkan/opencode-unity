@@ -217,6 +217,9 @@
           "minimum": 0,
           "maximum": 1048576
         },
+        "allowOffload": {
+          "type": "boolean"
+        },
         "maxGpuUtilPercent": {
           "type": "integer",
           "minimum": 1,

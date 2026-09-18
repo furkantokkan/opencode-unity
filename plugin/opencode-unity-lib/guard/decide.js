@@ -242,11 +242,16 @@ function addVramReason(reasons, notes, memory, model, config) {
     minFreeVramAfterLoadMiB: config.minFreeVramAfterLoadMiB,
   };
   const summary = `free ${formatGiB(memory.freeMiB)}${model.reclaimableMiB > 0 ? ` plus ${formatGiB(model.reclaimableMiB)} the loaded model releases` : ''} minus the model's ${formatGiB(config.modelVramMiB)} leaves ${formatGiB(freeAfterLoadMiB)} (minimum ${formatGiB(config.minFreeVramAfterLoadMiB)})`;
-  if (freeAfterLoadMiB < config.minFreeVramAfterLoadMiB) {
-    reasons.push({ id: 'vram_low', mode: config.onColdBlock, detail: `not enough video memory: ${summary}`, data });
-  } else {
+  if (freeAfterLoadMiB >= config.minFreeVramAfterLoadMiB) {
     notes.push(`video memory: ${summary}`);
+    return;
   }
+  if (config.allowOffload && availableMiB >= config.minFreeVramAfterLoadMiB) {
+    const offloadMiB = config.modelVramMiB - (availableMiB - config.minFreeVramAfterLoadMiB);
+    notes.push(`video memory: ${summary}; guard.allowOffload is on, so about ${formatGiB(offloadMiB)} of the model runs from system RAM and replies are slower`);
+    return;
+  }
+  reasons.push({ id: 'vram_low', mode: config.onColdBlock, detail: `not enough video memory: ${summary}`, data });
 }
 
 /**

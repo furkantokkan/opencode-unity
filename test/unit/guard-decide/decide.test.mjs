@@ -220,6 +220,21 @@ describe('guard decision: cold path (C1-C6)', () => {
     assert.equal(decide({ gpu: gpuFacts({ freeMiB: 19800 }) }, { onColdBlock: 'retry' }).mode, 'retry');
   });
 
+  it('C2 lets the rest of the model run from system RAM when guard.allowOffload is on', () => {
+    const verdict = decide({ gpu: gpuFacts({ freeMiB: 19800 }) }, { allowOffload: true });
+    assert.equal(verdict.pass, true, verdict.reasons.map((reason) => reason.detail).join('; '));
+    assert.deepEqual(reasonIds(verdict), []);
+    const note = verdict.notes.find((line) => line.includes('system RAM'));
+    assert.ok(note, verdict.notes.join('; '));
+    assert.ok(note.includes('0.7 GiB'), note);
+  });
+
+  it('C2 still blocks with guard.allowOffload when even the minimum free memory is not there', () => {
+    const verdict = decide({ gpu: gpuFacts({ freeMiB: 1000 }) }, { allowOffload: true });
+    assert.deepEqual(reasonIds(verdict), ['vram_low']);
+    assert.equal(verdict.mode, 'stop');
+  });
+
   it('C3 blocks only when both utilization samples reach the limit', () => {
     assert.equal(decide({ gpu: gpuFacts({ samples: [85, 90] }) }).pass, false);
     assert.deepEqual(reasonIds(decide({ gpu: gpuFacts({ samples: [85, 90] }) })), ['gpu_busy']);

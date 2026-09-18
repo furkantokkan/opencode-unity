@@ -304,7 +304,7 @@ Checks in this build: 47.
 ### `vram.headroom` — Video memory headroom for the preset
 
 - Reports: ERROR / WARN
-- Fix: Free video memory, choose a preset with a smaller context, or lower guard.minFreeVramAfterLoadMiB deliberately.
+- Fix: Free video memory, choose a preset with a smaller context, or set guard.allowOffload so the part that does not fit runs from system RAM.
 - Source: spec 7.3 and 7.4
 
 ### `gpu.guard` — Guard verdict right now

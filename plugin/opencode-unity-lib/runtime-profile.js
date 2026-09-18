@@ -111,6 +111,7 @@ export const RUNTIME_PROFILE_SCHEMA = {
         kvType: { enum: ['f16', 'q8_0', 'q4_0'] },
         kvTypeSource: { enum: ['server-log', 'env', 'default'] },
         minFreeVramAfterLoadMiB: { type: 'integer', minimum: 0, maximum: 1048576 },
+        allowOffload: { type: 'boolean' },
         maxGpuUtilPercent: { type: 'integer', minimum: 1, maximum: 100 },
         gpuUtilSampleIntervalMs: { type: 'integer', minimum: 100, maximum: 10000 },
         assetImportCpuPercent: { type: 'integer', minimum: 1, maximum: 102400 },

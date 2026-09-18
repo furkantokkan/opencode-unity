@@ -7,6 +7,7 @@ describe('guard settings', () => {
   it('ships the defaults of spec 6.2', () => {
     assert.deepEqual(GUARD_DEFAULTS, {
       minFreeVramAfterLoadMiB: 1500,
+      allowOffload: false,
       maxGpuUtilPercent: 60,
       gpuUtilSampleIntervalMs: 1000,
       assetImportCpuPercent: 20,
@@ -73,6 +74,7 @@ describe('guard settings', () => {
       [{ adapter: 'nvidia' }, /adapter must be one of auto, none/],
       [{ nvidiaSmiCommand: '  ' }, /nvidiaSmiCommand must be a non-empty single-line string/],
       [{ nvidiaSmiCommand: 'nvidia-smi\nrm -rf' }, /nvidiaSmiCommand must be a non-empty single-line string/],
+      [{ allowOffload: 'yes' }, /allowOffload must be true or false/],
     ];
     for (const [overrides, expected] of cases) {
       const resolved = resolveGuardConfig({ modelVramMiB: 19000, ...overrides });

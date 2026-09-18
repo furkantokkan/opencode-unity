@@ -4,7 +4,7 @@
 
 | Version | Supported |
 |---|---|
-| `0.1.0-preview.1` (the latest preview) | Yes |
+| `0.1.0-preview.2` (the latest preview) | Yes |
 | Anything older | No |
 
 Fixes land on the latest preview. Please check that a problem still happens there before you report it.

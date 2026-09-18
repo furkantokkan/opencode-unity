@@ -42,6 +42,7 @@ Preset fields to replace, for example {"model": {"numCtx": 8192}}. Any override 
 | Key | Type | Default | Description |
 |---|---|---|---|
 | `guard.minFreeVramAfterLoadMiB` | integer (0 to 1048576) | `1500` | Free video memory that must remain after the model loads. |
+| `guard.allowOffload` | boolean | `false` | Let the model load when it does not fit in video memory alone; the rest runs from system RAM and replies are slower. The free-memory minimum still applies. |
 | `guard.maxGpuUtilPercent` | integer (1 to 100) | `60` | Block a cold load when GPU utilization is at or above this in both samples. |
 | `guard.gpuUtilSampleIntervalMs` | integer (100 to 10000) | `1000` | Delay between the two GPU utilization samples. |
 | `guard.assetImportCpuPercent` | integer (1 to 102400) | `20` | Import workers at or above this CPU percent (100 = one core) count as importing. |
