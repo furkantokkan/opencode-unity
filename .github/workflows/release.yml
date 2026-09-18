@@ -48,6 +48,9 @@ jobs:
   publish:
     name: publish
     needs: verify
+    # Previews ship from GitHub only (README: "installed from GitHub, not from npm"; the npm release is
+    # the v0.1 stable gate). A prerelease tag stops after verify; github-release is skipped with it.
+    if: ${{ !contains(github.ref_name, '-') }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
