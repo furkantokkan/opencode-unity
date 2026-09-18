@@ -79,8 +79,9 @@ you can paste into your coding agent so it installs everything for you, are unde
 For a full local-model session (the reference setup):
 
 - Windows 10 22H2 or Windows 11, x64.
-- An NVIDIA GPU with 24 GB of video memory and a current driver. The only shipped model preset targets
-  this class of card.
+- An NVIDIA GPU with at least 20 GB of video memory for the model, and a current driver. 24 GB is the
+  reference setup, so the Unity Editor has room on the card next to the model; the only shipped model
+  preset targets this class of card.
 - [Node.js](https://nodejs.org/en/download) 22 or newer, and [Git](https://git-scm.com/downloads):
   npm uses Git to install from GitHub.
 - [Ollama](https://ollama.com/download) 0.34.1 or newer (tested with 0.34.1).
