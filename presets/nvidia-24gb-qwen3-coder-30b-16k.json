@@ -1,10 +1,14 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "id": "nvidia-24gb-qwen3-coder-30b-16k",
   "status": "reference-tested",
   "evidence": "docs/evidence/v0.1/reference-rtx3090-16k.md",
   "hardware": {
-    "os": ["win32"],
+    "os": {
+      "win32": "reference-tested",
+      "linux": "experimental"
+    },
+    "arch": ["x64"],
     "gpuVendor": "nvidia",
     "minTotalVramMiB": 24000
   },

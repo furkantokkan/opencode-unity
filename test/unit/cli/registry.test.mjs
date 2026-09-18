@@ -10,6 +10,7 @@ import {
   isCommandAvailable,
   loadCommandModule,
 } from '../../../src/cli/registry.js';
+import { coversCommand } from '../../../src/core/platform.js';
 
 /** @typedef {import('../../../src/cli/registry.js').CommandSpec} CommandSpec */
 
@@ -43,12 +44,16 @@ describe('command registry', () => {
     }
   });
 
-  it('refuses auto-approval flags on start and limits setup and start to Windows (S6, D17)', () => {
+  it('refuses auto-approval flags on start (S6, D17)', () => {
     const start = /** @type {CommandSpec} */ (findCommand('start'));
     assert.deepEqual(Object.keys(start.refusedOptions ?? {}).sort(), ['auto', 'dangerously-skip-permissions', 'yolo']);
-    assert.deepEqual(start.platforms, ['win32']);
-    assert.deepEqual(findCommand('setup')?.platforms, ['win32']);
-    assert.equal(findCommand('doctor')?.platforms, undefined);
+  });
+
+  it('leaves platform support to the matrix and names every command in it (amendment 33.4)', () => {
+    for (const command of COMMANDS) {
+      assert.equal(command.platforms, undefined, `${command.name}: platform support belongs to src/core/tiers.json`);
+      assert.equal(coversCommand(command.name), true, `${command.name}: the support matrix has no column for it`);
+    }
   });
 
   it('finds commands and subcommands by name', () => {

@@ -16,6 +16,7 @@ import {
   findBuiltInMatches,
   findDenylistMatches,
   formatFinding,
+  hasTextExtension,
   isBinary,
   listRepoFiles,
   main,
@@ -233,6 +234,39 @@ describe('check-no-personal-data repository scan', () => {
   it('detects binary content', () => {
     assert.equal(isBinary(Buffer.from('text only')), false);
     assert.equal(isBinary(Buffer.from([65, 0, 66])), true);
+  });
+
+  it('knows which extensions this repository only ever writes as text', () => {
+    for (const file of ['src/a.js', 'test/b.test.mjs', 'schema/c.JSON', 'docs/d.md', 'a/b/e.yml']) {
+      assert.equal(hasTextExtension(file), true, file);
+    }
+    for (const file of ['assets/image.bin', 'assets/logo.png', 'bin/opencode-unity', 'Makefile']) {
+      assert.equal(hasTextExtension(file), false, file);
+    }
+  });
+
+  // The sniff subtracts a skipped file from the reported total, so a raw control byte in a source file
+  // takes it out of the only gate that enforces spec 2.6 principle 8 without anything going red.
+  it('reports a text file it cannot scan instead of silently skipping it', async (t) => {
+    const sandbox = await useSandbox(t, 'genericity');
+    const root = sandbox.path('repo');
+    await writeTree(root, {
+      'src/withNul.js': `const key = 'a${'\u0000'}b';\n`,
+      'assets/image.bin': `binary${'\u0000'}payload\n`,
+      'src/clean.js': 'const key = 1;\n',
+    });
+
+    const result = checkNoPersonalData({ root, env: {}, useGit: false });
+
+    assert.deepEqual(result.findings.map((finding) => [finding.file, finding.rule]), [['src/withNul.js', 'unscannable']]);
+    assert.match(result.findings[0].detail, /NUL byte/);
+    assert.equal(result.findings[0].line, 1);
+    assert.equal(result.scannedFiles, 1, 'the clean file is scanned and the genuine asset is skipped');
+  });
+
+  it('has no unscannable text file in this repository', () => {
+    const findings = checkNoPersonalData({ root: REPO_ROOT, env: process.env }).findings;
+    assert.deepEqual(findings.filter((finding) => finding.rule === 'unscannable'), []);
   });
 
   it('parses arguments and rejects bad ones', () => {

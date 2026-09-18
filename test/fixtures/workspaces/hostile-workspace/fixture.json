@@ -1,0 +1,14 @@
+{
+  "shape": "adversarial",
+  "note": "Read the canary rule before changing this tree. Every OCU-CANARY-* string must stay unreachable from facts, project.json, rendered rules, doctor output and the session log.",
+  "canaries": [
+    "OCU-CANARY-ENV",
+    "OCU-CANARY-ENV-LOCAL",
+    "OCU-CANARY-SERVICE-ACCOUNT",
+    "OCU-CANARY-GOOGLE-SERVICES",
+    "OCU-CANARY-RUNTIMECONFIG",
+    "OCU-CANARY-APPSETTINGS",
+    "OCU-CANARY-NPMRC",
+    "OCU-CANARY-COMPOSE"
+  ]
+}

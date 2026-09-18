@@ -60,8 +60,20 @@ import { CliError, EXIT } from './exit-codes.js';
  * @property {readonly PositionalSpec[]} positionals
  * @property {readonly SubcommandSpec[]} [subcommands]
  * @property {Readonly<Record<string, string>>} [refusedOptions]  Flag name -> reason; the flag exits 1.
- * @property {readonly NodeJS.Platform[]} [platforms]             Other platforms exit 8.
+ * @property {readonly NodeJS.Platform[]} [platforms]             Fallback gate for a command the support
+ *   matrix does not name. Every shipped command is in `src/core/tiers.json`, which decides instead
+ *   (amendment 33.4), so this field is empty here and exists for a command added without a matrix row.
+ * @property {PlatformRefusal} [platformRefusal]   Envelope shape when the matrix refuses this command
+ *   on this machine. Defaults to `unsupported_platform` with no extra data.
  * @property {readonly number[]} exitCodes
+ */
+
+/**
+ * A command whose caller is a program rather than a person states the code and the fields that caller
+ * needs, so the refusal reads the same whether the matrix or the command itself produced it.
+ * @typedef {object} PlatformRefusal
+ * @property {string} code
+ * @property {Readonly<Record<string, unknown>>} [data]  Merged beside `data.platform`.
  */
 
 /** @type {readonly OptionSpec[]} */
@@ -118,7 +130,6 @@ export const COMMANDS = Object.freeze([
       { name: 'delegate', type: 'list', valueName: 'targets', choices: ['claude', 'codex'], description: 'Preselect delegate skill installs' },
       { name: 'migrate', type: 'boolean', description: 'Migrate an earlier installation (used by upgrade)' },
     ],
-    platforms: ['win32'],
     exitCodes: [EXIT.OK, EXIT.USAGE, EXIT.BLOCKED, EXIT.RUNTIME, EXIT.UNSUPPORTED, EXIT.CONSENT_REQUIRED],
   },
   {
@@ -156,7 +167,6 @@ export const COMMANDS = Object.freeze([
       yolo: AUTO_APPROVAL_REASON,
       'dangerously-skip-permissions': AUTO_APPROVAL_REASON,
     },
-    platforms: ['win32'],
     exitCodes: [EXIT.OK, EXIT.USAGE, EXIT.BLOCKED, EXIT.VALIDATION, EXIT.RUNTIME, EXIT.UNSUPPORTED],
   },
   {
@@ -271,8 +281,11 @@ export const COMMANDS = Object.freeze([
         options: [{ name: 'since', type: 'string', valueName: 'duration', description: 'Only jobs newer than this, for example 7d' }],
       },
     ],
+    // The caller here is an orchestrator, and amendment 36.6 gives it one code and one action for
+    // "delegation is not available on this machine", whichever layer decided that.
+    platformRefusal: { code: 'delegate_unsupported', data: { orchestratorAction: 'do_it_yourself' } },
     exitCodes: [
-      EXIT.OK, EXIT.USAGE, EXIT.BLOCKED, EXIT.BUDGET, EXIT.VALIDATION, EXIT.CHECK_FAILED, EXIT.LOCK_TIMEOUT, EXIT.RUNTIME,
+      EXIT.OK, EXIT.USAGE, EXIT.BLOCKED, EXIT.BUDGET, EXIT.VALIDATION, EXIT.CHECK_FAILED, EXIT.LOCK_TIMEOUT, EXIT.RUNTIME, EXIT.UNSUPPORTED,
     ],
   },
   {

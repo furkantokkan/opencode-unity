@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "id": "dotnet",
+  "title": ".NET service: the web SDK anchor and the EF Core migrations folder",
+  "rows": [
+    {
+      "id": "dotnet/anchor.web-sdk",
+      "fact": "anchor",
+      "value": "dotnet-service",
+      "match": { "extension": ".csproj", "contains": ["Sdk=\"Microsoft.NET.Sdk.Web\""] },
+      "note": "Microsoft.NET.Sdk.Web is the MSBuild SDK for ASP.NET Core apps; a csproj using any other SDK is not a service.",
+      "claim": "B20",
+      "evidence": "aspnet-core-web-sdk.html",
+      "version": "Microsoft Learn, ASP.NET Core",
+      "retrieved": "2026-09-17"
+    },
+    {
+      "id": "dotnet/migrations.efcore",
+      "fact": "migrations",
+      "value": "ef-core",
+      "match": { "dirName": "Migrations" },
+      "note": "EF Core keeps generated migrations in a Migrations folder in the project, as C# files with a designer partial per migration. Listed, never opened.",
+      "claim": "B19",
+      "evidence": "efcore-migrations-overview.html",
+      "version": "Microsoft Learn, EF Core",
+      "retrieved": "2026-09-17"
+    }
+  ]
+}

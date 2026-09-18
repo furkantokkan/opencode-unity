@@ -1,0 +1,8 @@
+apiVersion: agones.dev/v1
+kind: GameServer
+metadata:
+  name: sample
+spec:
+  ports:
+    - name: default
+      containerPort: 7777

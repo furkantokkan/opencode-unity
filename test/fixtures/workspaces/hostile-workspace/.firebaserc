@@ -1,0 +1,7 @@
+{
+  "projects": {
+    "default": "production",
+    "staging": "sample-staging",
+    "local": "demo-local"
+  }
+}

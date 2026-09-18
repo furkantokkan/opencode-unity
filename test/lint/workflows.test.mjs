@@ -174,7 +174,17 @@ describe('ci.yml jobs', () => {
       assert.ok(unit.includes(`"test/${suite}/**/*.test.mjs"`), `the unit job must run the ${suite} suite`);
     }
     assert.match(unit, /--test-coverage-lines=90/);
-    for (const gated of ['plugin/opencode-unity-lib/guard/**', 'src/opencode/permission-eval.js', 'src/facts/**', 'src/unity/**']) {
+    const gatedPaths = [
+      'plugin/opencode-unity-lib/guard/**',
+      'src/opencode/permission-eval.js',
+      'src/facts/**',
+      'src/unity/**',
+      // The workspace scanner and the one path that may load a model: both decide what leaves the
+      // machine, so an untested branch in either is exactly what this gate exists to catch.
+      'src/project/**',
+      'src/ollama/guarded-chat.js',
+    ];
+    for (const gated of gatedPaths) {
       assert.ok(unit.includes(`--test-coverage-include="${gated}"`), `the coverage gate must include ${gated}`);
     }
   });

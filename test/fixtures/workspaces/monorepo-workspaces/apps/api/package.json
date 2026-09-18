@@ -1,0 +1,11 @@
+{
+  "name": "@sample/api",
+  "type": "module",
+  "scripts": {
+    "test": "node --test",
+    "start": "node src/index.js"
+  },
+  "dependencies": {
+    "express": "5.2.1"
+  }
+}

@@ -37,6 +37,20 @@ const MIN_TERM_LENGTH = 3;
 const BINARY_SNIFF_BYTES = 8000;
 const WALK_SKIPPED_DIRS = new Set(['.git', 'node_modules', 'coverage']);
 
+/**
+ * Extensions this repository only ever uses for text. A file with one of these that still sniffs as
+ * binary is reported rather than skipped: the sniff is a NUL in the first 8000 bytes, so a raw control
+ * byte written into a source file takes it out of this scan silently, and whether any given file is
+ * checked would depend on the byte offset of that NUL - which is not a property anyone reviews. Git
+ * uses the same window, so such a file also stops rendering as a diff and stops being normalized by
+ * `.gitattributes`.
+ * @type {ReadonlySet<string>}
+ */
+const TEXT_EXTENSIONS = new Set([
+  '.js', '.mjs', '.cjs', '.ts', '.mts', '.cts', '.json', '.jsonc', '.md', '.txt', '.yml', '.yaml',
+  '.html', '.css', '.sh', '.ps1', '.example',
+]);
+
 // Fictional or well-known generic account names that may appear in docs and fixtures.
 export const PLACEHOLDER_NAMES = new Set([
   'user', 'username', 'user1', 'user2', 'you', 'yourname', 'your-name', 'me', 'name', 'someone',
@@ -238,6 +252,18 @@ export function isBinary(buffer) {
 }
 
 /**
+ * Whether this repository only ever writes text at this path, so a binary sniff there is a defect in
+ * the file rather than a genuine asset.
+ * @param {string} file  Relative path with `/`.
+ * @returns {boolean}
+ */
+export function hasTextExtension(file) {
+  const name = file.slice(file.lastIndexOf('/') + 1);
+  const dot = name.lastIndexOf('.');
+  return dot > 0 && TEXT_EXTENSIONS.has(name.slice(dot).toLowerCase());
+}
+
+/**
  * Files git would commit (tracked plus untracked, not ignored). Falls back to a directory walk
  * outside a git work tree.
  * @param {string} root
@@ -347,11 +373,39 @@ export function checkNoPersonalData({ root, env = {}, denylistPath, useGit = tru
     if (file === denylistRelative) continue;
     findings.push(...scanPath(file, denylist));
     const buffer = fs.readFileSync(path.join(absoluteRoot, file));
-    if (isBinary(buffer)) continue;
+    if (isBinary(buffer)) {
+      // A genuine asset is skipped; a text file that cannot be scanned is a finding, so the gate fails
+      // loudly instead of quietly subtracting the file from the run.
+      if (hasTextExtension(file)) {
+        findings.push({
+          file,
+          line: lineOfByte(buffer, buffer.indexOf(0)),
+          column: null,
+          rule: 'unscannable',
+          detail: 'contains a NUL byte, so this check would skip the file; write control characters as escape sequences such as \\x00',
+        });
+      }
+      continue;
+    }
     scannedFiles += 1;
     findings.push(...scanText(buffer.toString('utf8'), file, denylist));
   }
   return { scannedFiles, denylistTerms: denylist.terms.length, findings };
+}
+
+/**
+ * The 1-based line a byte offset falls on, so an unscannable file points at the offending line.
+ * @param {Buffer} buffer
+ * @param {number} offset
+ * @returns {number}
+ */
+function lineOfByte(buffer, offset) {
+  if (offset < 0) return 0;
+  let line = 1;
+  for (let index = 0; index < offset; index += 1) {
+    if (buffer[index] === 0x0a) line += 1;
+  }
+  return line;
 }
 
 /**

@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "com.unity.dedicated-server": "3.0.0",
+    "com.unity.multiplayer.playmode": "3.0.0",
+    "com.unity.netcode.gameobjects": "3.0.0"
+  }
+}

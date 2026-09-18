@@ -1,0 +1,4 @@
+{
+  "shape": "C",
+  "note": "Workspace-root marker plus apps/api, apps/match, packages/shared and a Unity client. The fact budget, not the walk, is the binding constraint here."
+}

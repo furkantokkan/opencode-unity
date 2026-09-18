@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "com.unity.netcode.gameobjects": "3.0.0",
+    "io.colyseus.sdk": "0.18.6"
+  }
+}

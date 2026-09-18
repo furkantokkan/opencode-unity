@@ -91,6 +91,8 @@ jobs:
           --test-coverage-include="src/opencode/permission-eval.js"
           --test-coverage-include="src/facts/**"
           --test-coverage-include="src/unity/**"
+          --test-coverage-include="src/project/**"
+          --test-coverage-include="src/ollama/guarded-chat.js"
           --test-coverage-lines=90
           "test/unit/**/*.test.mjs"
           "test/plugin/**/*.test.mjs"

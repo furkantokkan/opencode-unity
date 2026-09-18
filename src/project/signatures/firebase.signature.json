@@ -1,0 +1,106 @@
+{
+  "schemaVersion": 1,
+  "id": "firebase",
+  "title": "Firebase project: firebase.json, its codebases, runtimes, rules, indexes, emulator ports and .firebaserc alias keys",
+  "rows": [
+    {
+      "id": "firebase/overlay.firebase-json",
+      "fact": "overlay",
+      "value": "firebase-project",
+      "match": { "fileName": "firebase.json" },
+      "note": "firebase init creates firebase.json at the project root and it is required for deployment.",
+      "claim": "B11",
+      "evidence": "firebase-cli-reference-full.html",
+      "version": "Firebase CLI docs",
+      "retrieved": "2026-09-17"
+    },
+    {
+      "id": "firebase/signal.product-keys",
+      "fact": "signal",
+      "value": "products",
+      "match": { "fileName": "firebase.json", "jsonKey": "hosting" },
+      "note": "The documented comprehensive file contains hosting, apphosting, firestore, storage, database, dataconnect, functions, emulators, extensions, auth and remoteconfig.",
+      "claim": "B12",
+      "evidence": "firebase-cli-reference-full.html",
+      "version": "Firebase CLI docs",
+      "retrieved": "2026-09-17"
+    },
+    {
+      "id": "firebase/signal.rules-files",
+      "fact": "signal",
+      "value": "rules",
+      "match": { "fileName": "firebase.json", "jsonKey": "rules" },
+      "note": "firestore.rules, storage.rules and database.rules are named by a rules key under their product.",
+      "claim": "B12",
+      "evidence": "firebase-cli-reference-full.html",
+      "version": "Firebase CLI docs",
+      "retrieved": "2026-09-17"
+    },
+    {
+      "id": "firebase/signal.index-files",
+      "fact": "signal",
+      "value": "indexes",
+      "match": { "fileName": "firebase.json", "jsonKey": "indexes" },
+      "note": "firestore.indexes.json is named by the firestore indexes key.",
+      "claim": "B12",
+      "evidence": "firebase-cli-reference-full.html",
+      "version": "Firebase CLI docs",
+      "retrieved": "2026-09-17"
+    },
+    {
+      "id": "firebase/port.emulators",
+      "fact": "port",
+      "value": "emulator",
+      "match": { "fileName": "firebase.json", "jsonKey": "emulators" },
+      "note": "Per-product emulator objects carry a port, alongside the ui and singleProjectMode keys.",
+      "claim": "B12",
+      "evidence": "firebase-cli-reference-full.html",
+      "version": "Firebase CLI docs",
+      "retrieved": "2026-09-17"
+    },
+    {
+      "id": "firebase/signal.codebase",
+      "fact": "signal",
+      "value": "codebase",
+      "match": { "fileName": "firebase.json", "jsonKey": "codebase" },
+      "note": "The codebase property separates several functions sources in one project; functions may be an object or an array of them. Supported from Firebase CLI 10.7.1.",
+      "claim": "B13",
+      "evidence": "firebase-organize-functions-codebases.html",
+      "version": "Firebase docs",
+      "retrieved": "2026-09-17"
+    },
+    {
+      "id": "firebase/runtime.declared",
+      "fact": "runtime",
+      "value": "functions.runtime",
+      "match": { "fileName": "firebase.json", "jsonKey": "runtime" },
+      "note": "functions.runtime names the Cloud Functions Node runtime, for example nodejs20. Node 22 and 20 are supported and 18 is deprecated.",
+      "claim": "B14",
+      "evidence": "firebase-manage-functions-codebases.html",
+      "version": "Firebase docs",
+      "retrieved": "2026-09-17"
+    },
+    {
+      "id": "firebase/runtime.engines-node",
+      "fact": "runtime",
+      "value": "engines.node",
+      "match": { "fileName": "package.json", "jsonKey": "engines" },
+      "note": "The source package.json's engines.node sets the runtime when firebase.json does not.",
+      "claim": "B14",
+      "evidence": "firebase-manage-functions-codebases.html",
+      "version": "Firebase docs",
+      "retrieved": "2026-09-17"
+    },
+    {
+      "id": "firebase/signal.alias-keys",
+      "fact": "signal",
+      "value": "aliases",
+      "match": { "fileName": ".firebaserc", "jsonKey": "projects" },
+      "note": ".firebaserc stores project aliases and is normally committed. Only the alias keys are read; the values are project ids this product never needs.",
+      "claim": "B11",
+      "evidence": "firebase-cli-reference-full.html",
+      "version": "Firebase CLI docs",
+      "retrieved": "2026-09-17"
+    }
+  ]
+}

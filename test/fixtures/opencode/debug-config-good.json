@@ -1,0 +1,14 @@
+{
+  "$comment": "Shape of `opencode debug config` (OC cli/cmd/debug/config.ts) for a clean launch. Paths use the placeholder profile directory the tests pass in. Recorded by contract test C14.",
+  "model": "opencode-unity/ocu-qwen3-coder-30b-16k",
+  "small_model": "opencode-unity/ocu-qwen3-coder-30b-16k",
+  "enabled_providers": ["opencode-unity"],
+  "share": "disabled",
+  "autoupdate": false,
+  "default_agent": "unity-code",
+  "instructions": ["/profile/projects/sample-1a2b3c4d/facts.md"],
+  "plugin_origins": {
+    "opencode-unity": ["/profile/current/plugins/opencode-unity.js"]
+  },
+  "mcp": {}
+}

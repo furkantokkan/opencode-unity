@@ -1,0 +1,4 @@
+{
+  "shape": "B",
+  "note": "Standalone backend: one node anchor at the workspace root plus a database overlay. No Unity component."
+}

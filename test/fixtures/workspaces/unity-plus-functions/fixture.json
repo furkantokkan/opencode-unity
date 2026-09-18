@@ -1,0 +1,4 @@
+{
+  "shape": "A",
+  "note": "Unity client beside a Cloud Functions service. Three components: unity:client, node:functions, firebase:root."
+}

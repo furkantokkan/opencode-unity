@@ -1,0 +1,4 @@
+{
+  "shape": "D",
+  "note": "One Unity project in both roles. The workspace root is the Unity root, so its siblings are ordinary workspace paths."
+}

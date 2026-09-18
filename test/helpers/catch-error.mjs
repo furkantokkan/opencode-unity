@@ -15,3 +15,18 @@ export function catchError(action) {
   }
   throw new Error('expected the call to throw');
 }
+
+/**
+ * The same, for a call that rejects.
+ * @param {() => unknown} action
+ * @returns {Promise<any>}  The rejection value; typed loosely for the same reason.
+ * @throws {Error} When the call did not reject.
+ */
+export async function catchAsync(action) {
+  try {
+    await action();
+  } catch (error) {
+    return error;
+  }
+  throw new Error('expected the call to reject');
+}

@@ -1,0 +1,232 @@
+{
+  "schemaVersion": 1,
+  "id": "game-server",
+  "title": "Game-server overlay: Unity multiplayer packages, Mirror assemblies, dedicated-server signals, Node game servers, Agones",
+  "rows": [
+    {
+      "id": "game-server/signal.ngo",
+      "fact": "signal",
+      "value": "Netcode for GameObjects",
+      "match": { "unityPackage": "com.unity.netcode.gameobjects" },
+      "claim": "B21",
+      "evidence": "unity-multiplayer-package-versions.txt",
+      "version": "3.0.0",
+      "retrieved": "2026-09-17"
+    },
+    {
+      "id": "game-server/signal.netcode-entities",
+      "fact": "signal",
+      "value": "Netcode for Entities",
+      "match": { "unityPackage": "com.unity.netcode" },
+      "claim": "B21",
+      "evidence": "unity-multiplayer-package-versions.txt",
+      "version": "7.0.0",
+      "retrieved": "2026-09-17"
+    },
+    {
+      "id": "game-server/signal.transport",
+      "fact": "signal",
+      "value": "Unity Transport",
+      "match": { "unityPackage": "com.unity.transport" },
+      "claim": "B21",
+      "evidence": "unity-multiplayer-package-versions.txt",
+      "version": "6.6.0",
+      "retrieved": "2026-09-17"
+    },
+    {
+      "id": "game-server/signal.multiplayer-services",
+      "fact": "signal",
+      "value": "Multiplayer Services",
+      "match": { "unityPackage": "com.unity.services.multiplayer" },
+      "claim": "B21",
+      "evidence": "unity-multiplayer-package-versions.txt",
+      "version": "2.3.3",
+      "retrieved": "2026-09-17"
+    },
+    {
+      "id": "game-server/signal.relay",
+      "fact": "signal",
+      "value": "Relay",
+      "match": { "unityPackage": "com.unity.services.relay" },
+      "claim": "B21",
+      "evidence": "unity-multiplayer-package-versions.txt",
+      "version": "1.2.0",
+      "retrieved": "2026-09-17"
+    },
+    {
+      "id": "game-server/signal.lobby",
+      "fact": "signal",
+      "value": "Lobby",
+      "match": { "unityPackage": "com.unity.services.lobby" },
+      "claim": "B21",
+      "evidence": "unity-multiplayer-package-versions.txt",
+      "version": "1.3.0",
+      "retrieved": "2026-09-17"
+    },
+    {
+      "id": "game-server/signal.matchmaker",
+      "fact": "signal",
+      "value": "Matchmaker",
+      "match": { "unityPackage": "com.unity.services.matchmaker" },
+      "claim": "B21",
+      "evidence": "unity-multiplayer-package-versions.txt",
+      "version": "1.2.0",
+      "retrieved": "2026-09-17"
+    },
+    {
+      "id": "game-server/signal.multiplayer-tools",
+      "fact": "signal",
+      "value": "Multiplayer Tools",
+      "match": { "unityPackage": "com.unity.multiplayer.tools" },
+      "claim": "B21",
+      "evidence": "unity-multiplayer-package-versions.txt",
+      "version": "2.2.12",
+      "retrieved": "2026-09-17"
+    },
+    {
+      "id": "game-server/signal.playmode",
+      "fact": "signal",
+      "value": "Multiplayer Play Mode",
+      "match": { "unityPackage": "com.unity.multiplayer.playmode" },
+      "claim": "B21",
+      "evidence": "unity-multiplayer-package-versions.txt",
+      "version": "3.0.0",
+      "retrieved": "2026-09-17"
+    },
+    {
+      "id": "game-server/signal.dedicated-server",
+      "fact": "signal",
+      "value": "Dedicated Server package",
+      "match": { "unityPackage": "com.unity.dedicated-server" },
+      "note": "Used together with the Dedicated Server build target to switch one project between server and client roles.",
+      "claim": "B25",
+      "evidence": "unity-dedicated-server-package.html",
+      "version": "1.5.0 doc branch",
+      "retrieved": "2026-09-17"
+    },
+    {
+      "id": "game-server/signal.unity-server-define",
+      "fact": "signal",
+      "value": "UNITY_SERVER",
+      "match": { "contains": ["UNITY_SERVER", "StandaloneBuildSubtarget.Server", "-standaloneBuildSubtarget Server"] },
+      "note": "Unity defines UNITY_SERVER when building for the Dedicated Server platform; a scripted build sets the subtarget, and the command line uses the flag.",
+      "claim": "B26",
+      "evidence": "unity-dedicated-server-build.html",
+      "version": "Unity 6000.3 manual",
+      "retrieved": "2026-09-17"
+    },
+    {
+      "id": "game-server/signal.fishnet",
+      "fact": "signal",
+      "value": "FishNet",
+      "match": { "unityPackage": "com.firstgeargames.fishnet" },
+      "claim": "B27",
+      "evidence": "fishnet-upm-package-json.json",
+      "version": "4.7.3",
+      "retrieved": "2026-09-17"
+    },
+    {
+      "id": "game-server/signal.mirror-assembly",
+      "fact": "signal",
+      "value": "Mirror",
+      "match": { "assembly": "Mirror" },
+      "note": "Mirror publishes no UPM package.json, so a manifest-only detector would never see it; the asmdef enumeration sees it for free.",
+      "claim": "B28",
+      "evidence": "mirror-repo-layout.md",
+      "version": "default branch",
+      "retrieved": "2026-09-17"
+    },
+    {
+      "id": "game-server/signal.mirror-components",
+      "fact": "signal",
+      "value": "Mirror",
+      "match": { "assembly": "Mirror.Components" },
+      "claim": "B28",
+      "evidence": "mirror-repo-layout.md",
+      "version": "default branch",
+      "retrieved": "2026-09-17"
+    },
+    {
+      "id": "game-server/signal.mirror-symbols",
+      "fact": "signal",
+      "value": "Mirror",
+      "match": { "assembly": "Mirror.CompilerSymbols" },
+      "claim": "B28",
+      "evidence": "mirror-repo-layout.md",
+      "version": "default branch",
+      "retrieved": "2026-09-17"
+    },
+    {
+      "id": "game-server/signal.nakama-unity",
+      "fact": "signal",
+      "value": "Nakama",
+      "match": { "unityPackage": "com.heroiclabs.nakama-unity" },
+      "claim": "B29",
+      "evidence": "nakama-unity-package-json.json",
+      "version": "3.21.1",
+      "retrieved": "2026-09-17"
+    },
+    {
+      "id": "game-server/signal.colyseus-unity",
+      "fact": "signal",
+      "value": "Colyseus",
+      "match": { "unityPackage": "io.colyseus.sdk" },
+      "claim": "B30",
+      "evidence": "colyseus-unity-sdk-package-json.json",
+      "version": "0.18.6",
+      "retrieved": "2026-09-17"
+    },
+    {
+      "id": "game-server/signal.colyseus-node",
+      "fact": "signal",
+      "value": "Colyseus",
+      "match": { "dependency": "colyseus" },
+      "claim": "B30",
+      "evidence": "colyseus-package-json.json",
+      "version": "0.18.6",
+      "retrieved": "2026-09-17"
+    },
+    {
+      "id": "game-server/signal.colyseus-core",
+      "fact": "signal",
+      "value": "Colyseus",
+      "match": { "dependency": "@colyseus/core" },
+      "claim": "B30",
+      "evidence": "npm-registry-dist-tags.txt",
+      "version": "0.18.14",
+      "retrieved": "2026-09-17"
+    },
+    {
+      "id": "game-server/signal.socket-io",
+      "fact": "signal",
+      "value": "Socket.IO",
+      "match": { "dependency": "socket.io" },
+      "claim": "B10",
+      "evidence": "npm-registry-dist-tags.txt",
+      "version": "4.8.3",
+      "retrieved": "2026-09-17"
+    },
+    {
+      "id": "game-server/signal.agones",
+      "fact": "signal",
+      "value": "Agones",
+      "match": { "contains": ["kind: GameServer", "kind: Fleet", "kind: GameServerAllocation"] },
+      "note": "Agones defines the GameServer, Fleet and GameServerAllocation custom resources.",
+      "claim": "B31",
+      "evidence": "agones-overview.html",
+      "version": "1.60.0",
+      "retrieved": "2026-09-17"
+    },
+    {
+      "id": "game-server/port.compose",
+      "fact": "port",
+      "value": "compose",
+      "match": { "fileNames": ["compose.yaml", "compose.yml", "docker-compose.yaml", "docker-compose.yml"] },
+      "note": "compose.yaml is preferred and wins when both exist; only a published port is read, and only for --derive local-services.",
+      "claim": "B32",
+      "evidence": "docker-compose-application-model.html",
+      "version": "Docker docs",
+      "retrieved": "2026-09-17"
+    }
+  ]
+}

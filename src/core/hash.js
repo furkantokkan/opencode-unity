@@ -23,6 +23,18 @@ export async function sha256File(filePath) {
 }
 
 /**
+ * The `sha8` of spec 6.1: the short digest in a `<name>-<sha8>` project id. It is hashed over the
+ * *identity* path - the normalized absolute path, folded when the volume is case-insensitive
+ * (`resolveProjectIdentity` in `./case-sensitivity.js`) - so two spellings of one directory on an APFS
+ * or NTFS volume cannot produce two project folders.
+ * @param {string | Uint8Array} data  Strings are hashed as UTF-8.
+ * @returns {string} 8 lowercase hex characters.
+ */
+export function sha8(data) {
+  return sha256Hex(data).slice(0, 8);
+}
+
+/**
  * JSON with object keys sorted at every level, so equal values always hash equally.
  * @param {unknown} value
  * @returns {string}

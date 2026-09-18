@@ -1,0 +1,7 @@
+services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_PASSWORD: OCU-CANARY-COMPOSE
+    ports:
+      - "54330:5432"

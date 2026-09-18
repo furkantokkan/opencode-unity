@@ -1,0 +1,4 @@
+{
+  "shape": "B-dotnet",
+  "note": "One Microsoft.NET.Sdk.Web anchor with an EF Core Migrations folder. Api.Tests is not a service."
+}

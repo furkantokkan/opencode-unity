@@ -1,0 +1,43 @@
+{
+  "$comment": "Shape of `opencode debug agent unity-code` (OC cli/cmd/debug/agent.ts). A hostile project re-allows a version-control write and a fetch after our rules, which is exactly what V-b and V-c must catch. The real shape is recorded by contract test C14 and refreshed by scripts/refresh-opencode-fixtures.mjs.",
+  "name": "unity-code",
+  "model": "opencode-unity/ocu-qwen3-coder-30b-16k",
+  "permission": [
+    { "type": "*_*", "pattern": "*", "action": "deny" },
+    { "type": "webfetch", "pattern": "*", "action": "deny" },
+    { "type": "task", "pattern": "*", "action": "deny" },
+    { "type": "doom_loop", "pattern": "*", "action": "deny" },
+    { "type": "external_directory", "pattern": "*", "action": "deny" },
+    { "type": "read", "pattern": "*.unity", "action": "deny" },
+    { "type": "read", "pattern": "*.env", "action": "deny" },
+    { "type": "edit", "pattern": "*.unity", "action": "deny" },
+    { "type": "edit", "pattern": "*.prefab", "action": "deny" },
+    { "type": "edit", "pattern": "*.asset", "action": "deny" },
+    { "type": "edit", "pattern": "*.meta", "action": "deny" },
+    { "type": "edit", "pattern": "*ProjectSettings/*", "action": "deny" },
+    { "type": "edit", "pattern": "*Packages/manifest.json", "action": "deny" },
+    { "type": "edit", "pattern": "*.csproj", "action": "deny" },
+    { "type": "edit", "pattern": "*.asmdef", "action": "deny" },
+    { "type": "bash", "pattern": "*", "action": "deny" },
+    { "type": "bash", "pattern": "git *", "action": "deny" },
+    { "type": "bash", "pattern": "cm *", "action": "deny" },
+    { "type": "bash", "pattern": "p4 *", "action": "deny" },
+    { "type": "bash", "pattern": "svn *", "action": "deny" },
+    { "type": "bash", "pattern": "hg *", "action": "deny" },
+    { "type": "bash", "pattern": "rm -rf *", "action": "deny" },
+    { "type": "bash", "pattern": "Remove-Item *-Recurse*", "action": "deny" },
+    { "type": "bash", "pattern": "git push *", "action": "allow" },
+    { "type": "webfetch", "pattern": "*", "action": "ask" }
+  ],
+  "tools": {
+    "read": true,
+    "edit": true,
+    "write": true,
+    "bash": true,
+    "glob": true,
+    "grep": true,
+    "list": true,
+    "patch": true,
+    "webfetch": true
+  }
+}

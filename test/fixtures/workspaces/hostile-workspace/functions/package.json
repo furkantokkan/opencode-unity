@@ -1,0 +1,12 @@
+{
+  "name": "hostile-functions",
+  "engines": {
+    "node": "20"
+  },
+  "scripts": {
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "firebase-functions": "7.4.0"
+  }
+}

@@ -1,6 +1,7 @@
 // CLI entry: parse, route to the command module, print the result, return the exit code.
 // `main` never calls process.exit, so tests run it in-process with injected streams and commands.
 import tty from 'node:tty';
+import { coversCommand, describePlatform, detectPlatform, resolveTier } from '../core/platform.js';
 import { parseArgv, scanGlobalFlags } from './args.js';
 import { createConsent } from './consent.js';
 import { createEnvelope, createErrorEnvelope } from './envelope.js';
@@ -57,6 +58,9 @@ import { CLI_NAME, CLI_VERSION, DISCLAIMER, MIN_NODE_MAJOR, formatVersionLine, i
  * @property {Record<string, string | undefined>} [env]
  * @property {string} [cwd]
  * @property {NodeJS.Platform} [platform]
+ * @property {import('../core/platform.js').PlatformFacts} [platformFacts]  The machine the support
+ *   matrix judges. Detected from `platform` and `env` when absent; injected by tests, which must not
+ *   depend on the architecture or the virtualization of whatever runs them.
  * @property {string} [nodeVersion]
  * @property {readonly CommandSpec[]} [commands]
  * @property {(command: CommandSpec) => Promise<CommandModule>} [loadCommand]
@@ -109,6 +113,7 @@ function resolveDependencies(dependencies) {
     env: dependencies.env ?? process.env,
     cwd: dependencies.cwd ?? process.cwd(),
     platform: dependencies.platform ?? process.platform,
+    platformFacts: dependencies.platformFacts,
     nodeVersion: dependencies.nodeVersion ?? process.versions.node,
     commands: dependencies.commands ?? COMMANDS,
     loadCommand: dependencies.loadCommand ?? loadCommandModule,
@@ -138,7 +143,7 @@ async function runCommand(request, output, deps) {
   });
   const uninstallSignals = deps.installSignals ? interrupts.install() : undefined;
   try {
-    requireSupportedPlatform(request.command, deps.platform);
+    requireSupportedPlatform(request.command, deps);
     const module = await deps.loadCommand(request.command);
     /** @type {CommandContext} */
     const context = {
@@ -166,15 +171,33 @@ async function runCommand(request, output, deps) {
 }
 
 /**
+ * The support matrix decides (amendment 33.4): a `refused` tier exits 8 before the module is loaded,
+ * with the matrix's own sentence and the `data.platform` block of 33.9. An `experimental` tier is not
+ * refused here - acknowledging it is a consent item the commands own, so the gate never turns a
+ * platform the matrix calls usable into an exit 8.
+ *
+ * `command.platforms` remains for a command the matrix does not name, which in the shipped registry is
+ * none of them. Test doubles use it, and it keeps a command added without a matrix row from running
+ * everywhere by accident.
  * @param {CommandSpec} command
- * @param {NodeJS.Platform} platform
+ * @param {ResolvedDependencies} deps
  */
-function requireSupportedPlatform(command, platform) {
-  if (!command.platforms || command.platforms.includes(platform)) return;
-  throw new CliError(`'${command.name}' runs only on ${command.platforms.join(', ')} in this version (this is ${platform})`, {
+function requireSupportedPlatform(command, deps) {
+  if (!coversCommand(command.name)) {
+    if (!command.platforms || command.platforms.includes(deps.platform)) return;
+    throw new CliError(`'${command.name}' runs only on ${command.platforms.join(', ')} in this version (this is ${deps.platform})`, {
+      exitCode: EXIT.UNSUPPORTED,
+      code: 'unsupported_platform',
+      data: { platform: deps.platform, supported: [...command.platforms] },
+    });
+  }
+  const facts = deps.platformFacts ?? detectPlatform({ platform: deps.platform, env: deps.env });
+  const result = resolveTier(command.name, facts);
+  if (result.tier !== 'refused') return;
+  throw new CliError(result.message ?? `'${command.name}' is not supported on ${deps.platform} in this version`, {
     exitCode: EXIT.UNSUPPORTED,
-    code: 'unsupported_platform',
-    data: { platform, supported: [...command.platforms] },
+    code: command.platformRefusal?.code ?? 'unsupported_platform',
+    data: { ...command.platformRefusal?.data, platform: describePlatform(facts, result) },
   });
 }
 

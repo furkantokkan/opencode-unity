@@ -3,9 +3,16 @@ import { compareOrdinal, joinProjectPath } from './fs-view.js';
 
 export const MAX_WALK_ENTRIES = 50_000;
 
-// Only `Assets/` and `Packages/` are walked, so the root-level output folders (`Library`, `Temp`,
-// `Logs`, `UserSettings`, `Build*`) are never entered. A folder such as `Assets/Buildings` is source.
-const SKIPPED_DIRS = new Set(['obj', '.git', '.plastic', '.svn', '.hg', 'node_modules', '.opencode']);
+/**
+ * Folder names no walk enters (spec 9.1). Only `Assets/` and `Packages/` are walked here, so the
+ * root-level output folders (`Library`, `Temp`, `Logs`, `UserSettings`, `Build*`) are out of reach
+ * anyway; a folder such as `Assets/Buildings` is source. Component discovery walks a whole workspace
+ * and extends this list rather than restating it, so a name added here is skipped by both walks.
+ * @type {readonly string[]}
+ */
+export const SKIPPED_DIRS = Object.freeze(['obj', '.git', '.plastic', '.svn', '.hg', 'node_modules', '.opencode']);
+
+const SKIPPED_DIR_SET = new Set(SKIPPED_DIRS);
 
 export const WALKED_ROOTS = Object.freeze(['Assets', 'Packages']);
 
@@ -59,7 +66,7 @@ export function walkProject(view, root, { maxEntries = MAX_WALK_ENTRIES } = {}) 
 function walkDirectory(view, root, relativeDir, index, maxEntries) {
   for (const entry of view.readDir(joinProjectPath(root, relativeDir))) {
     if (index.truncated) return;
-    if (isUnityHidden(entry.name) || SKIPPED_DIRS.has(entry.name.toLowerCase())) continue;
+    if (isUnityHidden(entry.name) || SKIPPED_DIR_SET.has(entry.name.toLowerCase())) continue;
     if (!countEntry(index, maxEntries)) return;
     const relativePath = `${relativeDir}/${entry.name}`;
     if (entry.isDirectory) {

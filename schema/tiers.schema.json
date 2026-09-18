@@ -1,0 +1,229 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "opencode-unity platform support tiers",
+  "description": "src/core/tiers.json: the support matrix as data. Rows are platform configurations in precedence order and the first match wins; every row states a tier for every command, so a configuration the matrix has not thought about is a validation failure rather than a silent default.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "capabilities",
+    "commands",
+    "reasons",
+    "rows"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "capabilities": {
+      "description": "Capability ids a cell may name in notMeasured.",
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/capability"
+      }
+    },
+    "commands": {
+      "description": "Every command the matrix covers. A row must carry a cell for each one.",
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/commandId"
+      }
+    },
+    "reasons": {
+      "description": "Reason id to the verbatim sentence the CLI prints. A refusal never invents its own text.",
+      "type": "object",
+      "propertyNames": {
+        "$ref": "#/$defs/reasonId"
+      },
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "rows": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/row"
+      }
+    }
+  },
+  "$defs": {
+    "capability": {
+      "enum": [
+        "accelerator.memory",
+        "accelerator.utilization",
+        "accelerator.workingSetCap",
+        "process.enumerate",
+        "process.cpuTime",
+        "process.classify"
+      ]
+    },
+    "commandId": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$"
+    },
+    "reasonId": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$"
+    },
+    "row": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "label",
+        "match",
+        "tiers"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]*$"
+        },
+        "label": {
+          "description": "The column heading this row reproduces, for reports and the platform block.",
+          "type": "string",
+          "minLength": 1
+        },
+        "match": {
+          "$ref": "#/$defs/match"
+        },
+        "tiers": {
+          "type": "object",
+          "required": [
+            "doctor",
+            "init",
+            "host",
+            "setup",
+            "start",
+            "status",
+            "guard",
+            "warm",
+            "stop",
+            "bench",
+            "delegate",
+            "shape",
+            "shape-no-model",
+            "upgrade",
+            "uninstall"
+          ],
+          "propertyNames": {
+            "$ref": "#/$defs/commandId"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/cell"
+          }
+        }
+      }
+    },
+    "match": {
+      "description": "Every stated key must hold for the row to apply. An empty object is the fallback row and must come last.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "os": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "arch": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "backend": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "nvidia-smi",
+              "amdgpu-sysfs",
+              "darwin-unified",
+              "none",
+              "unknown"
+            ]
+          }
+        },
+        "virtualization": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "wsl",
+              "container"
+            ]
+          }
+        },
+        "osVersionSupported": {
+          "description": "Only an explicit false matches; an undetermined version is null and falls through to the platform rows.",
+          "type": "boolean"
+        }
+      }
+    },
+    "cell": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tier"
+      ],
+      "properties": {
+        "tier": {
+          "description": "full: every capability the command needs is measurable. degraded: an advisory capability is not. experimental: implemented and mock-tested, no hardware gate. refused: exit 8.",
+          "enum": [
+            "full",
+            "degraded",
+            "experimental",
+            "refused"
+          ]
+        },
+        "reason": {
+          "description": "Key into reasons. Required when the tier is refused; on a running tier it is the finding the command must disclose.",
+          "$ref": "#/$defs/reasonId"
+        },
+        "degraded": {
+          "description": "Composed with an experimental tier: the row runs under --experimental and still cannot measure everything.",
+          "type": "boolean"
+        },
+        "notMeasured": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/capability"
+          }
+        },
+        "noShippedPreset": {
+          "description": "setup on this row needs --preset custom; no measured preset applies.",
+          "type": "boolean"
+        },
+        "experimentalBackend": {
+          "description": "The command runs at this tier, but the accelerator backend behind it is experimental.",
+          "type": "boolean"
+        },
+        "errorFinding": {
+          "description": "doctor must report this row's reason as an ERROR finding even though the command runs.",
+          "type": "boolean"
+        },
+        "note": {
+          "description": "One sentence for a degraded row whose missing capability has no id.",
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

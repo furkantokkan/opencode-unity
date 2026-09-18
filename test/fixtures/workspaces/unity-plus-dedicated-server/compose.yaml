@@ -1,0 +1,5 @@
+services:
+  gameserver:
+    image: sample/gameserver:dev
+    ports:
+      - "7777:7777"

@@ -1,0 +1,12 @@
+{
+  "*": "deny",
+  "unityMCP_read_console": "allow",
+  "unityMCP_find_gameobjects": "allow",
+  "unityMCP_get_test_job": "allow",
+  "unityMCP_refresh_unity": "ask",
+  "unityMCP_run_tests": "ask",
+  "read": {
+    "*": "deny",
+    "mcp:unityMCP:*": "allow"
+  }
+}

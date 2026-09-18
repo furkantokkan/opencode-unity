@@ -1,0 +1,108 @@
+{
+  "instructions": [
+    "/home/user/.local/share/opencode-unity/projects/sample-1a2b3c4d/facts.md"
+  ],
+  "agent": {
+    "unity-code": {
+      "permission": {
+        "*_*": "deny",
+        "task": "deny",
+        "todowrite": "deny",
+        "webfetch": "deny",
+        "skill": "deny",
+        "question": "deny",
+        "doom_loop": "deny",
+        "external_directory": {
+          "*": "deny"
+        },
+        "read": {
+          "mcp:*": "deny",
+          "*.unity": "deny",
+          "*.prefab": "deny",
+          "*Library/*": "deny",
+          "*.env": "deny",
+          "*.env.*": "deny",
+          "*.pem": "deny",
+          "*.key": "deny",
+          "*.p8": "deny",
+          "*.p12": "deny",
+          "*.pfx": "deny",
+          "*.keystore": "deny",
+          "*.jks": "deny",
+          "*.mobileprovision": "deny",
+          "*.ppk": "deny",
+          "*id_rsa*": "deny",
+          "*id_ed25519*": "deny",
+          "*credentials*": "deny",
+          "*service-account*.json": "deny",
+          "*service_account*.json": "deny",
+          "*google-services*.json": "deny",
+          "*GoogleService-Info*.plist": "deny",
+          "*.npmrc": "deny",
+          "*.netrc": "deny",
+          "*.git-credentials": "deny",
+          "*.env.example": "allow"
+        },
+        "edit": {
+          "*.unity": "deny",
+          "*.prefab": "deny",
+          "*.asset": "deny",
+          "*.meta": "deny",
+          "*.mat": "deny",
+          "*.controller": "deny",
+          "*.overrideController": "deny",
+          "*.anim": "deny",
+          "*.mask": "deny",
+          "*.mixer": "deny",
+          "*.playable": "deny",
+          "*.signal": "deny",
+          "*.spriteatlas": "deny",
+          "*.spriteatlasv2": "deny",
+          "*.terrainlayer": "deny",
+          "*.lighting": "deny",
+          "*.renderTexture": "deny",
+          "*.physicMaterial": "deny",
+          "*.physicsMaterial2D": "deny",
+          "*.shadergraph": "deny",
+          "*.shadersubgraph": "deny",
+          "*.vfx": "deny",
+          "*.inputactions": "deny",
+          "*.asmdef": "deny",
+          "*.asmref": "deny",
+          "*.csproj": "deny",
+          "*.sln": "deny",
+          "*.slnx": "deny",
+          "*ProjectSettings/*": "deny",
+          "*Packages/manifest.json": "deny",
+          "*Packages/packages-lock.json": "deny",
+          "*Library/*": "deny",
+          "*Temp/*": "deny",
+          "*Logs/*": "deny",
+          "*UserSettings/*": "deny",
+          "*obj/*": "deny",
+          "*.opencode-unity/*": "deny"
+        },
+        "bash": {
+          "*": "deny",
+          "git *": "deny",
+          "cm *": "deny",
+          "p4 *": "deny",
+          "svn *": "deny",
+          "hg *": "deny",
+          "rm -r *": "deny",
+          "rm -rf *": "deny",
+          "rm -fr *": "deny",
+          "rmdir /s *": "deny",
+          "rd /s *": "deny",
+          "del /s *": "deny",
+          "Remove-Item *-Recurse*": "deny",
+          "format *": "deny",
+          "dotnet --version": "allow"
+        }
+      }
+    },
+    "unity-editor": {
+      "disable": true
+    }
+  }
+}

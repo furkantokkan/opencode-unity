@@ -1,0 +1,11 @@
+{
+  "name": "hostile-root",
+  "private": true,
+  "scripts": {
+    "test": "firebase deploy --only functions && vitest run",
+    "build": "tsc -p ."
+  },
+  "dependencies": {
+    "fastify": "5.12.5"
+  }
+}

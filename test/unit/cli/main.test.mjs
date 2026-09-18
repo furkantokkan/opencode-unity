@@ -4,7 +4,7 @@ import { describe, it } from 'node:test';
 import { parseEnvelope } from '../../../src/cli/envelope.js';
 import { CliError, EXIT } from '../../../src/cli/exit-codes.js';
 import { main } from '../../../src/cli/main.js';
-import { loadCommandModule } from '../../../src/cli/registry.js';
+import { COMMANDS as SHIPPED_COMMANDS, loadCommandModule } from '../../../src/cli/registry.js';
 import { formatVersionLine } from '../../../src/cli/version.js';
 
 /** @typedef {import('../../../src/cli/registry.js').CommandSpec} CommandSpec */
@@ -48,6 +48,24 @@ const COMMANDS = [
 function createStream() {
   const chunks = /** @type {string[]} */ ([]);
   return { isTTY: false, write: (/** @type {string} */ text) => chunks.push(text), text: () => chunks.join('') };
+}
+
+/**
+ * A machine the support matrix can judge, with every probe answered here rather than on the runner.
+ * @param {{ os: NodeJS.Platform, arch: string }} machine
+ * @returns {import('../../../src/core/platform.js').PlatformFacts}
+ */
+function makePlatformFacts({ os, arch }) {
+  return {
+    os,
+    arch,
+    release: '0.0.0',
+    osVersionSupported: null,
+    virtualization: null,
+    virtualizationSignals: [],
+    shellFamily: os === 'win32' ? 'powershell' : 'posix',
+    backend: 'unknown',
+  };
 }
 
 /**
@@ -175,13 +193,53 @@ describe('main: command execution', () => {
     assert.equal(parseEnvelope(result.stdout).code, 'command_not_available');
   });
 
-  it('exits 8 for a command on an unsupported platform before loading it', async () => {
+  it('exits 8 for a command the matrix does not cover on an unsupported platform, before loading it', async () => {
     const result = await runMain(['winonly', '--json'], () => assert.fail('must not run'), { platform: 'linux' });
     assert.equal(result.exitCode, EXIT.UNSUPPORTED);
     const envelope = parseEnvelope(result.stdout);
     assert.equal(envelope.code, 'unsupported_platform');
     assert.deepEqual(envelope.data, { platform: 'linux', supported: ['win32'] });
     assert.equal((await runMain(['winonly'])).exitCode, 0);
+  });
+
+  it('refuses a shipped command on a refused tier and carries data.platform (amendment 33.4, 33.9)', async () => {
+    const refused = await runMain(['start', '--json'], () => assert.fail('must not run'), {
+      commands: SHIPPED_COMMANDS,
+      isAvailable: () => true,
+      platformFacts: makePlatformFacts({ os: 'darwin', arch: 'x64' }),
+    });
+
+    assert.equal(refused.exitCode, EXIT.UNSUPPORTED);
+    const envelope = parseEnvelope(refused.stdout);
+    assert.equal(envelope.code, 'unsupported_platform');
+    assert.deepEqual(Object.keys(envelope.data.platform).sort(), ['arch', 'backend', 'notMeasured', 'os', 'reason', 'tier']);
+    assert.equal(envelope.data.platform.os, 'darwin');
+    assert.equal(envelope.data.platform.tier, 'refused');
+    assert.equal(envelope.data.platform.reason, 'darwin_intel');
+    assert.ok(envelope.message.length > 0, 'the matrix sentence is the message');
+  });
+
+  it('refuses delegate with the code and action an orchestrator branches on (amendment 36.6)', async () => {
+    const refused = await runMain(['delegate', 'health', '--json'], () => assert.fail('must not run'), {
+      commands: SHIPPED_COMMANDS,
+      isAvailable: () => true,
+      platformFacts: makePlatformFacts({ os: 'darwin', arch: 'x64' }),
+    });
+
+    assert.equal(refused.exitCode, EXIT.UNSUPPORTED);
+    const envelope = parseEnvelope(refused.stdout);
+    assert.equal(envelope.code, 'delegate_unsupported');
+    assert.equal(envelope.data.orchestratorAction, 'do_it_yourself');
+    assert.equal(envelope.data.platform.tier, 'refused');
+  });
+
+  it("lets an experimental tier through, because acknowledging it is the command's consent item", async () => {
+    const result = await runMain(['start', '--json'], () => ({ message: 'ran' }), {
+      commands: SHIPPED_COMMANDS,
+      isAvailable: () => true,
+      platformFacts: makePlatformFacts({ os: 'linux', arch: 'x64' }),
+    });
+    assert.equal(result.exitCode, EXIT.OK);
   });
 
   it('on interrupt runs cleanups, prints an interrupted envelope under --json and exits 130', async () => {

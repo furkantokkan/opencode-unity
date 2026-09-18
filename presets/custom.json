@@ -1,12 +1,17 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "id": "custom",
   "status": "experimental",
   "evidence": null,
-  "warning": "The custom preset runs a model and settings nobody has measured with opencode-unity. Supply every null field through config.json overrides, check the VRAM numbers against your Ollama load log, and run doctor --capture before relying on the budget.",
+  "warning": "The custom preset runs a model and settings nobody has measured with opencode-unity. Supply every null field through config.json overrides, check the VRAM numbers against your Ollama load log, and run doctor --capture before relying on the budget. It is also the only preset that applies on macOS, because the measured presets were taken on a 24 GB discrete card and their video-memory numbers mean something different on a unified memory pool.",
   "hardware": {
-    "os": ["win32"],
-    "gpuVendor": "nvidia",
+    "os": {
+      "win32": "experimental",
+      "linux": "experimental",
+      "darwin": "experimental"
+    },
+    "arch": ["x64", "arm64"],
+    "gpuVendor": null,
     "minTotalVramMiB": 0
   },
   "model": {

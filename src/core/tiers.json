@@ -1,0 +1,236 @@
+{
+  "schemaVersion": 1,
+  "capabilities": [
+    "accelerator.memory",
+    "accelerator.utilization",
+    "accelerator.workingSetCap",
+    "process.enumerate",
+    "process.cpuTime",
+    "process.classify"
+  ],
+  "commands": [
+    "doctor",
+    "init",
+    "host",
+    "setup",
+    "start",
+    "status",
+    "guard",
+    "warm",
+    "stop",
+    "bench",
+    "delegate",
+    "shape",
+    "shape-no-model",
+    "upgrade",
+    "uninstall"
+  ],
+  "reasons": {
+    "darwin_intel": "Ollama runs on CPU only on Intel Macs, so a 30B model is not usable for agent work. doctor and init still run.",
+    "linux_arm64": "The Unity Editor is not available for Linux on arm64, so there is no project for this command to act on. doctor and init still run.",
+    "virtualized_host": "The Unity Editor runs outside this environment, so the GPU guard cannot see it. Run opencode-unity on the host instead.",
+    "os_version": "Ollama does not support this OS version.",
+    "no_shipped_preset": "No shipped preset matches this hardware. Re-run with --experimental --preset custom, or open a hardware report.",
+    "unsupported_platform": "This platform is not a row in the support matrix, so the GPU guard has never been run on it. doctor and init still run."
+  },
+  "rows": [
+    {
+      "id": "virtualized",
+      "label": "WSL or container",
+      "match": { "virtualization": ["wsl", "container"] },
+      "tiers": {
+        "doctor": { "tier": "full", "reason": "virtualized_host", "errorFinding": true },
+        "init": { "tier": "full" },
+        "host": { "tier": "full" },
+        "setup": { "tier": "refused", "reason": "virtualized_host" },
+        "start": { "tier": "refused", "reason": "virtualized_host" },
+        "status": { "tier": "refused", "reason": "virtualized_host" },
+        "guard": { "tier": "refused", "reason": "virtualized_host" },
+        "warm": { "tier": "refused", "reason": "virtualized_host" },
+        "stop": { "tier": "refused", "reason": "virtualized_host" },
+        "bench": { "tier": "refused", "reason": "virtualized_host" },
+        "delegate": { "tier": "refused", "reason": "virtualized_host" },
+        "shape": { "tier": "refused", "reason": "virtualized_host" },
+        "shape-no-model": { "tier": "full" },
+        "upgrade": { "tier": "full" },
+        "uninstall": { "tier": "full" }
+      }
+    },
+    {
+      "id": "os-version-unsupported",
+      "label": "Unsupported OS version",
+      "match": { "osVersionSupported": false },
+      "tiers": {
+        "doctor": { "tier": "full", "reason": "os_version" },
+        "init": { "tier": "full" },
+        "host": { "tier": "full" },
+        "setup": { "tier": "refused", "reason": "os_version" },
+        "start": { "tier": "refused", "reason": "os_version" },
+        "status": { "tier": "refused", "reason": "os_version" },
+        "guard": { "tier": "refused", "reason": "os_version" },
+        "warm": { "tier": "refused", "reason": "os_version" },
+        "stop": { "tier": "refused", "reason": "os_version" },
+        "bench": { "tier": "refused", "reason": "os_version" },
+        "delegate": { "tier": "refused", "reason": "os_version" },
+        "shape": { "tier": "refused", "reason": "os_version" },
+        "shape-no-model": { "tier": "full" },
+        "upgrade": { "tier": "full" },
+        "uninstall": { "tier": "full" }
+      }
+    },
+    {
+      "id": "windows",
+      "label": "Windows 10/11",
+      "match": { "os": ["win32"], "arch": ["x64"] },
+      "tiers": {
+        "doctor": { "tier": "full" },
+        "init": { "tier": "full" },
+        "host": { "tier": "full" },
+        "setup": { "tier": "full" },
+        "start": { "tier": "full" },
+        "status": { "tier": "full" },
+        "guard": { "tier": "full" },
+        "warm": { "tier": "full" },
+        "stop": { "tier": "full" },
+        "bench": { "tier": "full" },
+        "delegate": { "tier": "full" },
+        "shape": { "tier": "full" },
+        "shape-no-model": { "tier": "full" },
+        "upgrade": { "tier": "full" },
+        "uninstall": { "tier": "full" }
+      }
+    },
+    {
+      "id": "linux-amdgpu",
+      "label": "Linux + amdgpu",
+      "match": { "os": ["linux"], "arch": ["x64"], "backend": ["amdgpu-sysfs"] },
+      "tiers": {
+        "doctor": { "tier": "full", "experimentalBackend": true },
+        "init": { "tier": "full" },
+        "host": { "tier": "full" },
+        "setup": { "tier": "experimental" },
+        "start": { "tier": "experimental" },
+        "status": { "tier": "experimental" },
+        "guard": { "tier": "experimental" },
+        "warm": { "tier": "experimental" },
+        "stop": { "tier": "experimental" },
+        "bench": { "tier": "experimental" },
+        "delegate": { "tier": "experimental" },
+        "shape": { "tier": "experimental" },
+        "shape-no-model": { "tier": "full" },
+        "upgrade": { "tier": "full" },
+        "uninstall": { "tier": "full" }
+      }
+    },
+    {
+      "id": "linux-nvidia",
+      "label": "Linux + NVIDIA",
+      "match": { "os": ["linux"], "arch": ["x64"] },
+      "tiers": {
+        "doctor": { "tier": "full" },
+        "init": { "tier": "full" },
+        "host": { "tier": "full" },
+        "setup": { "tier": "experimental" },
+        "start": { "tier": "experimental" },
+        "status": { "tier": "experimental" },
+        "guard": { "tier": "experimental" },
+        "warm": { "tier": "experimental" },
+        "stop": { "tier": "experimental" },
+        "bench": { "tier": "experimental" },
+        "delegate": { "tier": "experimental" },
+        "shape": { "tier": "experimental" },
+        "shape-no-model": { "tier": "full" },
+        "upgrade": { "tier": "full" },
+        "uninstall": { "tier": "full" }
+      }
+    },
+    {
+      "id": "linux-arm64",
+      "label": "Linux arm64",
+      "match": { "os": ["linux"], "arch": ["arm64"] },
+      "tiers": {
+        "doctor": { "tier": "degraded", "note": "No accelerator or Unity Editor path has been measured on this row, so doctor reports without a hardware-verified baseline." },
+        "init": { "tier": "full" },
+        "host": { "tier": "full" },
+        "setup": { "tier": "refused", "reason": "linux_arm64" },
+        "start": { "tier": "refused", "reason": "linux_arm64" },
+        "status": { "tier": "refused", "reason": "linux_arm64" },
+        "guard": { "tier": "refused", "reason": "linux_arm64" },
+        "warm": { "tier": "refused", "reason": "linux_arm64" },
+        "stop": { "tier": "refused", "reason": "linux_arm64" },
+        "bench": { "tier": "refused", "reason": "linux_arm64" },
+        "delegate": { "tier": "refused", "reason": "linux_arm64" },
+        "shape": { "tier": "refused", "reason": "linux_arm64" },
+        "shape-no-model": { "tier": "full" },
+        "upgrade": { "tier": "full" },
+        "uninstall": { "tier": "full" }
+      }
+    },
+    {
+      "id": "darwin-apple-silicon",
+      "label": "macOS 14+, Apple silicon",
+      "match": { "os": ["darwin"], "arch": ["arm64"] },
+      "tiers": {
+        "doctor": { "tier": "degraded", "notMeasured": ["accelerator.utilization"] },
+        "init": { "tier": "full" },
+        "host": { "tier": "full" },
+        "setup": { "tier": "experimental", "degraded": true, "notMeasured": ["accelerator.utilization"], "noShippedPreset": true },
+        "start": { "tier": "experimental", "degraded": true, "notMeasured": ["accelerator.utilization"] },
+        "status": { "tier": "experimental", "degraded": true, "notMeasured": ["accelerator.utilization"] },
+        "guard": { "tier": "experimental", "degraded": true, "notMeasured": ["accelerator.utilization"] },
+        "warm": { "tier": "experimental", "degraded": true, "notMeasured": ["accelerator.utilization"] },
+        "stop": { "tier": "experimental", "degraded": true, "notMeasured": ["accelerator.utilization"] },
+        "bench": { "tier": "experimental", "degraded": true, "notMeasured": ["accelerator.utilization"] },
+        "delegate": { "tier": "experimental", "degraded": true, "notMeasured": ["accelerator.utilization"] },
+        "shape": { "tier": "experimental", "degraded": true, "notMeasured": ["accelerator.utilization"] },
+        "shape-no-model": { "tier": "full" },
+        "upgrade": { "tier": "full" },
+        "uninstall": { "tier": "full" }
+      }
+    },
+    {
+      "id": "darwin-intel",
+      "label": "macOS Intel",
+      "match": { "os": ["darwin"], "arch": ["x64"] },
+      "tiers": {
+        "doctor": { "tier": "degraded", "notMeasured": ["accelerator.utilization"] },
+        "init": { "tier": "full" },
+        "host": { "tier": "full" },
+        "setup": { "tier": "refused", "reason": "darwin_intel" },
+        "start": { "tier": "refused", "reason": "darwin_intel" },
+        "status": { "tier": "refused", "reason": "darwin_intel" },
+        "guard": { "tier": "refused", "reason": "darwin_intel" },
+        "warm": { "tier": "refused", "reason": "darwin_intel" },
+        "stop": { "tier": "refused", "reason": "darwin_intel" },
+        "bench": { "tier": "refused", "reason": "darwin_intel" },
+        "delegate": { "tier": "refused", "reason": "darwin_intel" },
+        "shape": { "tier": "refused", "reason": "darwin_intel" },
+        "shape-no-model": { "tier": "full" },
+        "upgrade": { "tier": "full" },
+        "uninstall": { "tier": "full" }
+      }
+    },
+    {
+      "id": "unsupported",
+      "label": "Not in the support matrix",
+      "match": {},
+      "tiers": {
+        "doctor": { "tier": "degraded", "note": "This platform is not a row in the support matrix, so no capability on it has been measured." },
+        "init": { "tier": "full" },
+        "host": { "tier": "full" },
+        "setup": { "tier": "refused", "reason": "unsupported_platform" },
+        "start": { "tier": "refused", "reason": "unsupported_platform" },
+        "status": { "tier": "refused", "reason": "unsupported_platform" },
+        "guard": { "tier": "refused", "reason": "unsupported_platform" },
+        "warm": { "tier": "refused", "reason": "unsupported_platform" },
+        "stop": { "tier": "refused", "reason": "unsupported_platform" },
+        "bench": { "tier": "refused", "reason": "unsupported_platform" },
+        "delegate": { "tier": "refused", "reason": "unsupported_platform" },
+        "shape": { "tier": "refused", "reason": "unsupported_platform" },
+        "shape-no-model": { "tier": "full" },
+        "upgrade": { "tier": "full" },
+        "uninstall": { "tier": "full" }
+      }
+    }
+  ]
+}

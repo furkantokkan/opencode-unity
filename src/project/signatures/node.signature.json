@@ -1,0 +1,186 @@
+{
+  "schemaVersion": 1,
+  "id": "node",
+  "title": "Node service: declaring file, package managers, workspace markers, test runners and server frameworks",
+  "rows": [
+    {
+      "id": "node/anchor.package-json",
+      "fact": "anchor",
+      "value": "node-service",
+      "match": { "fileName": "package.json" },
+      "note": "A package is declared by package.json; name, type, engines, scripts, bin, main, exports and workspaces are the fields detection uses.",
+      "claim": "B1",
+      "evidence": "npm-package-json.html",
+      "version": "npm CLI v11 docs",
+      "retrieved": "2026-09-17"
+    },
+    {
+      "id": "node/workspace-marker.npm",
+      "fact": "workspace-marker",
+      "value": "npm",
+      "match": { "fileName": "package.json", "jsonKey": "workspaces" },
+      "note": "npm workspaces are declared by a workspaces array in the root package.json.",
+      "claim": "B2",
+      "evidence": "npm-workspaces.html",
+      "version": "npm CLI v11 docs",
+      "retrieved": "2026-09-17"
+    },
+    {
+      "id": "node/workspace-marker.pnpm",
+      "fact": "workspace-marker",
+      "value": "pnpm",
+      "match": { "fileName": "pnpm-workspace.yaml" },
+      "note": "A pnpm workspace must have pnpm-workspace.yaml in its root.",
+      "claim": "B3",
+      "evidence": "pnpm-workspaces.html",
+      "version": "pnpm docs",
+      "retrieved": "2026-09-17"
+    },
+    {
+      "id": "node/workspace-marker.yarn",
+      "fact": "workspace-marker",
+      "value": "yarn",
+      "match": { "fileName": "package.json", "jsonKey": "workspaces" },
+      "note": "Yarn uses the same workspaces field as npm, so the lock file is what tells them apart.",
+      "claim": "B4",
+      "evidence": "yarn-workspaces.html",
+      "version": "Yarn docs",
+      "retrieved": "2026-09-17"
+    },
+    {
+      "id": "node/package-manager.npm",
+      "fact": "package-manager",
+      "value": "npm",
+      "match": { "fileNames": ["package-lock.json", "npm-shrinkwrap.json"] },
+      "note": "Listed, never parsed: the file name is the evidence.",
+      "claim": "B5",
+      "evidence": "npm-package-json.html",
+      "version": "npm CLI v11 docs",
+      "retrieved": "2026-09-17"
+    },
+    {
+      "id": "node/package-manager.yarn",
+      "fact": "package-manager",
+      "value": "yarn",
+      "match": { "fileName": "yarn.lock" },
+      "claim": "B6",
+      "evidence": "yarn-lockfile.html",
+      "version": "Yarn classic docs",
+      "retrieved": "2026-09-17"
+    },
+    {
+      "id": "node/package-manager.pnpm",
+      "fact": "package-manager",
+      "value": "pnpm",
+      "match": { "fileName": "pnpm-lock.yaml" },
+      "claim": "B3",
+      "evidence": "pnpm-workspaces.html",
+      "version": "pnpm docs",
+      "retrieved": "2026-09-17"
+    },
+    {
+      "id": "node/package-manager.bun",
+      "fact": "package-manager",
+      "value": "bun",
+      "match": { "fileNames": ["bun.lock", "bun.lockb"] },
+      "note": "bun.lock is the text form from Bun 1.2; bun.lockb is the earlier binary form.",
+      "claim": "B7",
+      "evidence": "bun-lockfile.html",
+      "version": "Bun docs",
+      "retrieved": "2026-09-17"
+    },
+    {
+      "id": "node/package-manager.declared",
+      "fact": "package-manager",
+      "value": "declared",
+      "match": { "fileName": "package.json", "jsonKey": "packageManager" },
+      "note": "packageManager is a Corepack hint of the form <name>@<version>; the lock file is the evidence, and a disagreement is reportable rather than a coin flip.",
+      "claim": "B8",
+      "evidence": "nodejs-corepack-packagemanager.html",
+      "version": "Node.js Corepack readme",
+      "retrieved": "2026-09-17"
+    },
+    {
+      "id": "node/test-runner.node",
+      "fact": "test-runner",
+      "value": "node --test",
+      "match": { "contains": ["node --test"] },
+      "note": "The built-in runner; its default discovery patterns are documented, so a project using it needs no dependency.",
+      "claim": "B9",
+      "evidence": "nodejs-22-test-runner.html",
+      "version": "Node.js 22 docs",
+      "retrieved": "2026-09-17"
+    },
+    {
+      "id": "node/test-runner.vitest",
+      "fact": "test-runner",
+      "value": "vitest",
+      "match": { "dependency": "vitest" },
+      "claim": "B10",
+      "evidence": "npm-registry-dist-tags.txt",
+      "version": "vitest 5.0.1",
+      "retrieved": "2026-09-17"
+    },
+    {
+      "id": "node/test-runner.jest",
+      "fact": "test-runner",
+      "value": "jest",
+      "match": { "dependency": "jest" },
+      "claim": "B10",
+      "evidence": "npm-registry-dist-tags.txt",
+      "version": "jest 30.5.1",
+      "retrieved": "2026-09-17"
+    },
+    {
+      "id": "node/framework.express",
+      "fact": "framework",
+      "value": "express",
+      "match": { "dependency": "express" },
+      "claim": "B10",
+      "evidence": "npm-registry-dist-tags.txt",
+      "version": "express 5.2.1",
+      "retrieved": "2026-09-17"
+    },
+    {
+      "id": "node/framework.fastify",
+      "fact": "framework",
+      "value": "fastify",
+      "match": { "dependency": "fastify" },
+      "claim": "B10",
+      "evidence": "npm-registry-dist-tags.txt",
+      "version": "fastify 5.12.5",
+      "retrieved": "2026-09-17"
+    },
+    {
+      "id": "node/framework.firebase-functions",
+      "fact": "framework",
+      "value": "firebase-functions",
+      "match": { "dependency": "firebase-functions" },
+      "claim": "B10",
+      "evidence": "npm-registry-dist-tags.txt",
+      "version": "firebase-functions 7.4.0",
+      "retrieved": "2026-09-17"
+    },
+    {
+      "id": "node/framework.firebase-admin",
+      "fact": "framework",
+      "value": "firebase-admin",
+      "match": { "dependency": "firebase-admin" },
+      "claim": "B10",
+      "evidence": "npm-registry-dist-tags.txt",
+      "version": "firebase-admin 14.4.0",
+      "retrieved": "2026-09-17"
+    },
+    {
+      "id": "node/framework.typescript",
+      "fact": "framework",
+      "value": "typescript",
+      "match": { "fileName": "tsconfig.json", "contains": ["outDir", "rootDir"] },
+      "note": "outDir and rootDir are what make the compiled-entry to source mapping possible.",
+      "claim": "B35",
+      "evidence": "typescript-tsconfig-reference.html",
+      "version": "TypeScript tsconfig reference",
+      "retrieved": "2026-09-17"
+    }
+  ]
+}

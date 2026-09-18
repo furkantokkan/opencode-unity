@@ -1,0 +1,8 @@
+{
+  "name": "@sample/shared",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "node --test"
+  }
+}
