@@ -398,7 +398,8 @@ function buildFragmentStep(input, by) {
 
 /**
  * The `host` command group owns the host files, the settings merge and the permission printers. Until it
- * is installed, setup names the command instead of writing half of a host integration here.
+ * ships, setup names the planned command and points at the preview host files instead of writing half
+ * of a host integration here.
  * @param {SetupPlanInput} input
  * @returns {PlanStep}
  */
@@ -411,7 +412,10 @@ function buildHostStep(input) {
     recommended: false,
     accepted: true,
     operations: [],
-    lines: [`Run: opencode-unity host install --host ${input.hostTargets.join(',')}`, 'It asks per file, records what it writes, and is reverted by host uninstall.'],
+    lines: [
+      `Planned: opencode-unity host install --host ${input.hostTargets.join(',')}. The host command group is not in this preview.`,
+      'For now, copy the preview host files from the hosts/ folder of this package by hand; the README shows the command for each tool.',
+    ],
   };
 }
 

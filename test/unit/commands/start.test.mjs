@@ -5,6 +5,7 @@ import { describe, it } from 'node:test';
 import { ATTENTION_PAUSE_MS, buildOpencodeArgs, OLLAMA_START_TIMEOUT_MS, spawnOpencode, startDetached } from '../../../src/commands/start.js';
 import { createInterruptController } from '../../../src/cli/signals.js';
 import { CLI_VERSION } from '../../../src/cli/version.js';
+import { diffSnapshots, snapshotTree } from '../../helpers/fixture-fs.mjs';
 import { useSandbox } from '../../helpers/sandbox.mjs';
 import { loadCompat } from '../../../src/core/profile.js';
 import { BINARY_ENV_NAME } from '../../../src/opencode/locate.js';
@@ -12,6 +13,100 @@ import { buildUnityCodePermission } from '../../../src/opencode/render.js';
 import { createCommandHarness, createRunner, MODEL_TAG, NOW_MS } from './helpers.mjs';
 
 const TESTED_OPENCODE = loadCompat().opencode.tested;
+/** The hub MCP for Unity's configurator records; it is only read, never contacted. */
+const HUB_URL = 'http://127.0.0.1:8090/mcp';
+
+/** @type {Array<[string, import('./helpers.mjs').RunInput]>} The two flags that promise to write nothing. */
+const WRITE_FREE_RUNS = [
+  ['--print-env', { options: { printEnv: true } }],
+  ['--dry-run', { global: { dryRun: true } }],
+];
+
+/**
+ * Content and modification time of every entry below `root`: a rewrite with the same bytes, or a file
+ * created and removed again, changes a time even when it leaves the content as it was.
+ * @param {string} root
+ * @returns {Promise<{ tree: Awaited<ReturnType<typeof snapshotTree>>, times: Record<string, number> }>}
+ */
+async function snapshotWithTimes(root) {
+  const tree = await snapshotTree(root);
+  /** @type {Record<string, number>} */
+  const times = { '.': (await fs.stat(root)).mtimeMs };
+  for (const key of Object.keys(tree)) times[key] = (await fs.stat(path.join(root, ...key.split('/')))).mtimeMs;
+  return { tree, times };
+}
+
+/**
+ * The product home, the project, and the whole sandbox around them (user home, XDG directories, temp).
+ * @param {import('./helpers.mjs').CommandHarness} harness
+ */
+async function snapshotEverything(harness) {
+  return {
+    'product home': await snapshotWithTimes(harness.home),
+    project: await snapshotWithTimes(harness.projectRoot),
+    sandbox: await snapshotWithTimes(harness.sandbox.root),
+  };
+}
+
+/**
+ * Every difference between two snapshots, one line per path, so a failure names what was written.
+ * @param {Awaited<ReturnType<typeof snapshotEverything>>} before
+ * @param {Awaited<ReturnType<typeof snapshotEverything>>} after
+ * @returns {string[]}
+ */
+function listChanges(before, after) {
+  /** @type {string[]} */
+  const changes = [];
+  for (const [area, then] of Object.entries(before)) {
+    const now = after[/** @type {keyof typeof after} */ (area)];
+    const { added, removed, changed } = diffSnapshots(then.tree, now.tree);
+    for (const key of added) changes.push(`${area}: added ${key}`);
+    for (const key of removed) changes.push(`${area}: removed ${key}`);
+    for (const key of changed) changes.push(`${area}: changed ${key}`);
+    for (const [key, time] of Object.entries(then.times)) {
+      if (key in now.times && now.times[key] !== time) changes.push(`${area}: touched ${key}`);
+    }
+  }
+  return changes;
+}
+
+/**
+ * Enables the editor agent against a recorded hub, then changes a setting `local.json` mirrors, so a
+ * real start would write both launch.json and a refreshed local.json.
+ * @param {Awaited<ReturnType<typeof prepareStart>>} ready
+ * @returns {Promise<void>}
+ */
+async function enableEditorWithPendingRefresh(ready) {
+  const configDir = path.join(ready.harness.sandbox.env.XDG_CONFIG_HOME, 'opencode');
+  await fs.mkdir(configDir, { recursive: true });
+  await fs.writeFile(path.join(configDir, 'opencode.json'), JSON.stringify({ mcp: { unityMCP: { type: 'remote', url: HUB_URL } } }), 'utf8');
+  const enabled = await ready.harness.run('init', { options: { editor: true, refresh: true }, deps: { run: createRunner({}).run } });
+  assert.equal(enabled.data.editorAgent, true, enabled.message);
+  const userConfig = JSON.parse(await fs.readFile(ready.harness.paths.config, 'utf8'));
+  userConfig.projects[ready.projectId].editor.allowPlayMode = true;
+  await fs.writeFile(ready.harness.paths.config, JSON.stringify(userConfig), 'utf8');
+}
+
+/**
+ * Verification answers for a project whose editor agent points at `HUB_URL`.
+ * @param {Awaited<ReturnType<typeof prepareStart>>} ready
+ */
+function createEditorRunner(ready) {
+  const config = {
+    model: `opencode-unity/${MODEL_TAG}`,
+    enabled_providers: ['opencode-unity'],
+    share: 'disabled',
+    autoupdate: false,
+    instructions: [ready.projectPaths.facts],
+    plugin_origins: {},
+    mcp: { unityMCP: { type: 'remote', url: HUB_URL } },
+  };
+  return createRunner({
+    '--version': { stdout: `${TESTED_OPENCODE}\n` },
+    'debug agent unity-code': { stdout: JSON.stringify({ permission: buildUnityCodePermission({}) }) },
+    'debug config': { stdout: JSON.stringify(config) },
+  });
+}
 
 /**
  * Initializes the fixture project and lays out everything `start` touches, with doubles for every
@@ -90,10 +185,11 @@ describe('commands/start: preconditions', () => {
 
   it('offers init for a project without facts and continues once it has run', async (t) => {
     const ready = await prepareStart(t, { initialize: false });
-    const result = await ready.start({ options: { printEnv: true } });
+    const result = await ready.start();
     assert.equal(result.exitCode, 0, result.message);
     assert.match(result.output.join('\n'), /scanned/);
     await fs.access(ready.projectPaths.facts);
+    assert.equal(ready.spawned.length, 1);
   });
 
   it('exits 1 when OpenCode is not installed', async (t) => {
@@ -161,11 +257,11 @@ describe('commands/start: preconditions', () => {
       return new Response(JSON.stringify({ version: '0.34.1' }), { status: 200 });
     });
     const result = await ready.start({
-      options: { printEnv: true },
       deps: { fetchImpl, now: () => (clock += 1000), startApp: async (/** @type {string} */ app) => { startedApps.push(app); } },
     });
     assert.equal(result.exitCode, 0, result.message);
     assert.deepEqual(startedApps, [appPath]);
+    assert.equal(ready.spawned.length, 1);
     assert.equal(result.warnings.some((warning) => warning.includes('was started')), true);
   });
 
@@ -312,10 +408,11 @@ describe('commands/start: the OpenCode child', () => {
 });
 
 describe('commands/start: --print-env', () => {
-  it('prints the clean-room environment and the content, writes launch.json and starts nothing', async (t) => {
+  it('prints the clean-room environment and the content, and writes, verifies and starts nothing', async (t) => {
     const ready = await prepareStart(t);
     const result = await ready.start({ options: { printEnv: true }, env: { OPENAI_API_KEY: 'sk-planted-secret', OPENCODE_PERMISSION: '{"bash":"allow"}' } });
-    assert.equal(result.exitCode, 0);
+    assert.equal(result.exitCode, 0, result.message);
+    assert.match(result.message, /nothing was written or started/);
     assert.equal(ready.spawned.length, 0);
     assert.equal(ready.runner.calls.some((call) => call.args[0] === 'debug'), false, 'no verification probe runs for --print-env');
 
@@ -325,11 +422,13 @@ describe('commands/start: --print-env', () => {
     assert.match(printed, /OPENAI_API_KEY/);
     assert.match(printed, /OPENCODE_PERMISSION/);
     assert.equal(printed.includes('sk-planted-secret'), false, 'a removed value is never printed');
-    assert.match(printed, /"instructions"/);
+    const contentStart = result.output.indexOf('content (OPENCODE_CONFIG_CONTENT)');
+    assert.notEqual(contentStart, -1);
+    assert.deepEqual(JSON.parse(result.output.slice(contentStart + 1).join('\n')), result.data.content, 'the printed content is the content a real start uses');
 
-    const launch = JSON.parse(await fs.readFile(ready.projectPaths.launchJson, 'utf8'));
-    assert.deepEqual(launch, result.data.content);
-    assert.equal(launch.agent['unity-editor'].disable, true);
+    assert.equal(result.data.content.agent['unity-editor'].disable, true);
+    assert.equal(result.data.launchJson, ready.projectPaths.launchJson, 'names where a real start records the content');
+    assert.equal(await fs.access(ready.projectPaths.launchJson).then(() => true, () => false), false, 'launch.json is written only by a real start');
     assert.equal(result.warnings.some((warning) => warning.includes('OPENCODE_PERMISSION')), true);
   });
 
@@ -359,23 +458,56 @@ describe('commands/start: --dry-run (spec 5.1)', () => {
     assert.match(result.output.join('\n'), /nothing is written and OpenCode is not started/);
   });
 
-  it('does not scan a project that has no facts yet, because init writes', async (t) => {
-    const ready = await prepareStart(t, { initialize: false });
-    const result = await ready.start({ global: { dryRun: true } });
-    assert.equal(result.exitCode, 1);
-    assert.equal(result.code, 'project_not_initialized');
-    assert.equal(await fs.access(ready.projectPaths.facts).then(() => true, () => false), false);
-  });
+});
 
-  it('does not start the Ollama application; it says it would', async (t) => {
-    const ready = await prepareStart(t, { ollama: false, config: { ollama: { baseUrl: 'http://127.0.0.1:9', startAppIfDown: 'always', appPath: path.join('apps', 'ollama-app') } } });
-    /** @type {string[]} */
-    const startedApps = [];
-    const result = await ready.start({ global: { dryRun: true }, deps: { startApp: async (/** @type {string} */ app) => { startedApps.push(app); } } });
-    assert.equal(result.exitCode, 0, result.message);
-    assert.deepEqual(startedApps, []);
-    assert.equal(result.warnings.some((warning) => /Ollama is not running; a real start starts the application/.test(warning)), true);
-  });
+describe('commands/start: --print-env and --dry-run write nothing (spec 5.1, 5.4)', () => {
+  for (const [flag, input] of WRITE_FREE_RUNS) {
+    it(`${flag} leaves the product home, the project and the sandbox unchanged where a real start writes launch.json and local.json`, async (t) => {
+      const ready = await prepareStart(t, { fixture: 'mcp-for-unity-installed' });
+      await enableEditorWithPendingRefresh(ready);
+      const localBefore = await fs.readFile(ready.projectPaths.localJson, 'utf8');
+      const before = await snapshotEverything(ready.harness);
+
+      const result = await ready.start({ ...input, options: { ...input.options, agent: 'unity-editor' } });
+      assert.equal(result.exitCode, 0, result.message);
+      assert.deepEqual(listChanges(before, await snapshotEverything(ready.harness)), []);
+      assert.equal(ready.spawned.length, 0);
+      assert.equal(ready.runner.calls.some((call) => call.args[0] === 'debug'), false, 'no verification probe runs');
+
+      // The control: a real start from the same state writes both files the flag held back.
+      const real = await ready.start({ options: { agent: 'unity-editor' }, deps: { run: createEditorRunner(ready).run } });
+      assert.equal(real.exitCode, 0, real.message);
+      await fs.access(ready.projectPaths.launchJson);
+      assert.notEqual(await fs.readFile(ready.projectPaths.localJson, 'utf8'), localBefore, 'a real start refreshes local.json');
+    });
+
+    it(`${flag} does not scan a project that has no facts yet, because init writes`, async (t) => {
+      const ready = await prepareStart(t, { initialize: false });
+      const before = await snapshotEverything(ready.harness);
+      const result = await ready.start(input);
+      assert.equal(result.exitCode, 1);
+      assert.equal(result.code, 'project_not_initialized');
+      assert.match(result.error?.hint ?? '', /opencode-unity init/);
+      assert.deepEqual(listChanges(before, await snapshotEverything(ready.harness)), []);
+    });
+
+    it(`${flag} does not start the Ollama application; it says a real start would`, async (t) => {
+      const ready = await prepareStart(t, { ollama: false, config: { ollama: { baseUrl: 'http://127.0.0.1:9', startAppIfDown: 'always', appPath: path.join('apps', 'ollama-app') } } });
+      /** @type {string[]} */
+      const startedApps = [];
+      const before = await snapshotEverything(ready.harness);
+      // Throwing ends a regression at once as "Ollama down" instead of polling a clock that never moves.
+      const startApp = async (/** @type {string} */ app) => {
+        startedApps.push(app);
+        throw new Error('a write-free run started the Ollama application');
+      };
+      const result = await ready.start({ ...input, deps: { startApp } });
+      assert.equal(result.exitCode, 0, result.message);
+      assert.deepEqual(startedApps, []);
+      assert.equal(result.warnings.some((warning) => /Ollama is not running; a real start starts the application/.test(warning)), true);
+      assert.deepEqual(listChanges(before, await snapshotEverything(ready.harness)), []);
+    });
+  }
 });
 
 describe('commands/start: launch', () => {
@@ -417,28 +549,14 @@ describe('commands/start: launch', () => {
     // The entry MCP for Unity's configurator writes; the URL is only read, never contacted.
     const configDir = path.join(ready.harness.sandbox.env.XDG_CONFIG_HOME, 'opencode');
     await fs.mkdir(configDir, { recursive: true });
-    await fs.writeFile(path.join(configDir, 'opencode.json'), JSON.stringify({ mcp: { unityMCP: { type: 'remote', url: 'http://127.0.0.1:8090/mcp' } } }), 'utf8');
+    await fs.writeFile(path.join(configDir, 'opencode.json'), JSON.stringify({ mcp: { unityMCP: { type: 'remote', url: HUB_URL } } }), 'utf8');
     const enabled = await ready.harness.run('init', { options: { editor: true, refresh: true }, deps: { run: createRunner({}).run } });
     assert.equal(enabled.exitCode, 0, enabled.message);
     assert.equal(enabled.data.editorAgent, true);
     const hubUrl = JSON.parse(await fs.readFile(ready.projectPaths.localJson, 'utf8')).hubUrl;
-    assert.equal(hubUrl, 'http://127.0.0.1:8090/mcp');
+    assert.equal(hubUrl, HUB_URL);
 
-    const config = {
-      model: `opencode-unity/${MODEL_TAG}`,
-      enabled_providers: ['opencode-unity'],
-      share: 'disabled',
-      autoupdate: false,
-      instructions: [ready.projectPaths.facts],
-      plugin_origins: {},
-      mcp: { unityMCP: { type: 'remote', url: hubUrl } },
-    };
-    const runner = createRunner({
-      '--version': { stdout: `${TESTED_OPENCODE}\n` },
-      'debug agent unity-code': { stdout: JSON.stringify({ permission: buildUnityCodePermission({}) }) },
-      'debug config': { stdout: JSON.stringify(config) },
-    });
-    const result = await ready.start({ options: { agent: 'unity-editor' }, deps: { run: runner.run } });
+    const result = await ready.start({ options: { agent: 'unity-editor' }, deps: { run: createEditorRunner(ready).run } });
     assert.equal(result.exitCode, 0, result.message);
     assert.deepEqual(ready.spawned[0].args, ['--agent', 'unity-editor']);
     const content = JSON.parse(ready.spawned[0].env.OPENCODE_CONFIG_CONTENT);
@@ -450,7 +568,10 @@ describe('commands/start: launch', () => {
     const userConfig = JSON.parse(await fs.readFile(ready.harness.paths.config, 'utf8'));
     userConfig.projects[ready.projectId].editor.allowPlayMode = true;
     await fs.writeFile(ready.harness.paths.config, JSON.stringify(userConfig), 'utf8');
-    const again = await ready.start({ options: { agent: 'unity-editor', printEnv: true } });
+    const printed = await ready.start({ options: { agent: 'unity-editor', printEnv: true } });
+    assert.equal(printed.exitCode, 0, printed.message);
+    assert.equal(JSON.parse(await fs.readFile(ready.projectPaths.localJson, 'utf8')).editor.allowPlayMode, false, '--print-env leaves local.json alone');
+    const again = await ready.start({ options: { agent: 'unity-editor' }, deps: { run: createEditorRunner(ready).run } });
     assert.equal(again.exitCode, 0, again.message);
     const local = JSON.parse(await fs.readFile(ready.projectPaths.localJson, 'utf8'));
     assert.equal(local.editor.allowPlayMode, true);

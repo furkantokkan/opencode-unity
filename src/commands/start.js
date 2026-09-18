@@ -15,7 +15,8 @@
 //  10. session summary and the hint that frees video memory
 //
 // `--print-env` stops after step 4 and prints what would have been used, which is the honest way to
-// answer "what does this run with?" without running it.
+// answer "what does this run with?" without running it. Like `--dry-run` it writes nothing: no `init`
+// scan, no Ollama application started, no launch.json and no local.json refresh (see `isWriteFree`).
 //
 // Extension seams, in landing order: S38 inserts the tier line and its acknowledgement (33.4, 36.5),
 // S39 the network line and `--offline`, S41 the shaping step and `--prompt` forwarding, S58 the
@@ -115,17 +116,11 @@ export async function run(cliContext, dependencies = {}) {
   warnings.push(...launch.env.warnings);
   // `--dry-run` (spec 5.1): the launch as it would happen, with nothing written and nothing started.
   if (cliContext.global.dryRun === true) return describeStartPlan({ cliContext, project, agent, launch, binary, warnings });
+  // `--print-env` (spec 5.4): the environment and the content, printed. launch.json is a real start's
+  // record of what it ran with, so a run that only prints leaves it alone.
+  if (cliContext.options.printEnv === true) return describePrintEnv({ cliContext, project, agent, launch, warnings });
   await fs.writeFile(project.paths.launchJson, renderLaunchContentFile(launch.content), 'utf8');
   await refreshEditorRecord(project, editor);
-
-  if (cliContext.options.printEnv === true) {
-    for (const line of renderPrintEnv(launch)) cliContext.output.text(line);
-    return {
-      message: `${project.name} would start with agent ${agent} and ${Object.keys(launch.env.env).length} environment variables`,
-      data: { agent, projectId: project.id, launchJson: project.paths.launchJson, env: describeLaunchEnv(launch.env), content: launch.content },
-      warnings,
-    };
-  }
 
   // Step 5: what the merged configuration actually allows, not what we rendered.
   const verification = await verifyLaunch({ session, project, agent, launch, binary, versions, cliContext, dependencies });
@@ -225,6 +220,32 @@ function describeStartPlan({ cliContext, project, agent, launch, binary, warning
 }
 
 /**
+ * What `start --print-env` prints: the clean-room environment and the per-launch content. Nothing is
+ * written, OpenCode is not started and no verification probe runs; `launchJson` is where a real start
+ * records the same content.
+ * @param {{ cliContext: import('../cli/main.js').CommandContext, project: import('../project/session.js').ProjectContext, agent: string, launch: ReturnType<typeof buildLaunch>, warnings: string[] }} input
+ * @returns {import('../cli/main.js').CommandResult}
+ */
+function describePrintEnv({ cliContext, project, agent, launch, warnings }) {
+  for (const line of renderPrintEnv(launch)) cliContext.output.text(line);
+  return {
+    message: `${project.name} would start with agent ${agent} and ${Object.keys(launch.env.env).length} environment variables; nothing was written or started`,
+    data: { agent, projectId: project.id, launchJson: project.paths.launchJson, env: describeLaunchEnv(launch.env), content: launch.content },
+    warnings,
+  };
+}
+
+/**
+ * `--dry-run` and `--print-env` both promise that nothing is written, so both stop short of every side
+ * effect that comes before the launch content: the `init` scan and starting the Ollama application.
+ * @param {import('../cli/main.js').CommandContext} cliContext
+ * @returns {boolean}
+ */
+function isWriteFree(cliContext) {
+  return cliContext.global.dryRun === true || cliContext.options.printEnv === true;
+}
+
+/**
  * @param {import('../cli/main.js').CommandContext} cliContext
  * @returns {string | undefined}
  */
@@ -310,8 +331,8 @@ export async function requireOllama({ session, cliContext, dependencies }) {
   // `null` means "the platform default" (spec 6.2); only Windows has one, so elsewhere nothing is offered.
   const appPath = session.config.ollama.appPath ?? getOllamaDefaultPaths({ env: session.env, platform: session.platform }).appPath;
   if (policy === 'never' || appPath === null) throw ollamaDownError(session, appPath);
-  // Starting the application is a side effect; a dry run says it would happen and goes on planning.
-  if (cliContext.global.dryRun === true) {
+  // Starting the application is a side effect; a write-free run says it would happen and goes on.
+  if (isWriteFree(cliContext)) {
     return { reachable: false, warnings: [`Ollama is not running; a real start ${policy === 'ask' ? 'offers to start' : 'starts'} the application at ${appPath}.`] };
   }
   if (policy === 'ask') {
@@ -586,8 +607,8 @@ export function renderPrintEnv(launch) {
 export async function requireProjectFacts({ session, cliContext, dependencies }) {
   const project = await resolveProject(session, { path: readRequestedPath(cliContext) });
   if (project.initialized) return project;
-  // A dry run does not scan: `init` writes, so the plan stops at the same exit 1 a declined scan gives.
-  if (cliContext.global.dryRun === true) return requireInitializedProject(project);
+  // A write-free run does not scan: `init` writes, so it stops at the same exit 1 a declined scan gives.
+  if (isWriteFree(cliContext)) return requireInitializedProject(project);
   const accepted = await askOrDecline(cliContext, {
     id: RUN_INIT_CONSENT_ID,
     title: `Scan ${project.root} now (opencode-unity init)`,
