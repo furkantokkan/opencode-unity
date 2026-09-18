@@ -1,7 +1,15 @@
 # opencode-unity
 
-Code a Unity game and its C# with a local model, in OpenCode, with a GPU guard that keeps the model from
-loading while Unity needs the graphics card.
+**Your Unity project, a local model, and a GPU guard between them.**
+
+Code a Unity game and its C# with a local model in [OpenCode](https://opencode.ai) — the guard keeps
+the model off the graphics card while Unity is importing assets, so a model load cannot take the
+Editor down with it.
+
+[![ci](https://github.com/furkantokkan/opencode-unity/actions/workflows/ci.yml/badge.svg)](https://github.com/furkantokkan/opencode-unity/actions/workflows/ci.yml)
+[![license: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+[![node >= 22](https://img.shields.io/badge/node-%3E%3D%2022-brightgreen)](https://nodejs.org)
+[![release](https://img.shields.io/github/v/release/furkantokkan/opencode-unity?include_prereleases&label=preview)](https://github.com/furkantokkan/opencode-unity/releases)
 
 > **Preview 0.1.0-preview.1.** This is an early, usable preview for Windows with a 24 GB NVIDIA GPU. It
 > is installed from GitHub, not from npm. A first small measurement of the reference preset is included
@@ -9,6 +17,37 @@ loading while Unity needs the graphics card.
 > planned features are still ahead (see [Roadmap](#roadmap)).
 >
 > Unofficial. Not affiliated with OpenCode, Ollama or Unity Technologies.
+
+## Why it exists
+
+A 30B model and the Unity Editor share one graphics card. During development, one unguarded model load
+next to Unity Editors that were importing assets ended in a CUDA error, a display-driver reset and a
+crashed Editor. opencode-unity checks free video memory, GPU load and Unity's import workers before
+every load it controls — and refuses when the card has no room:
+
+```text
+$ opencode-unity doctor
+Platform support
+  machine      win32/x64
+  doctor tier  full (Windows 10/11)
+  ollama       http://127.0.0.1:11434 (0.34.1)
+  opencode     1.18.31
+Findings
+  WARN  vram.headroom  loading the model would leave -1405 MiB free, below the 1500 MiB minimum
+        the preset needs about 20000 MiB with a f16 cache; 18595 MiB is available
+```
+
+## Quick start (Windows, NVIDIA 24 GB)
+
+```powershell
+npm install -g "github:furkantokkan/opencode-unity#v0.1.0-preview.1"
+opencode-unity doctor
+opencode-unity setup --ollama-env
+opencode-unity start
+```
+
+macOS and Linux run `doctor` and `init` in this preview — the full install paths, including a prompt
+you can paste into your coding agent so it installs everything for you, are under [Install](#install).
 
 ## What it is
 
@@ -480,6 +519,9 @@ The full list of changes is in [CHANGELOG.md](CHANGELOG.md).
 No GPU, model, Ollama or Unity is needed: every test runs against mocks. See
 [CONTRIBUTING.md](CONTRIBUTING.md) for setup, conventions and the no-personal-data rule, and
 [SECURITY.md](SECURITY.md) to report a vulnerability privately.
+
+If opencode-unity helps your project, a star on GitHub helps other Unity developers find it — and
+tells us the guard story is worth a v0.1.
 
 ## License
 
