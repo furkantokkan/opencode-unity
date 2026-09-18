@@ -11,7 +11,9 @@ import { findExecutable, runProcess } from '../core/exec.js';
 
 export const ENV_NAME_PATTERN = /^[A-Za-z_][A-Za-z0-9_]{0,127}$/;
 export const MAX_ENV_VALUE_LENGTH = 2048;
-const DEFAULT_TIMEOUT_MS = 15000;
+// A busy or slow machine (a CI runner's first PowerShell start, antivirus) can take far longer than a
+// warm workstation to answer; setup and uninstall are interactive paths, so a minute is acceptable.
+const DEFAULT_TIMEOUT_MS = 60_000;
 
 /**
  * @typedef {object} UserEnvAdapter

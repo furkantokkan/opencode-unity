@@ -70,6 +70,26 @@ describe('setup consent', () => {
     assert.deepEqual(userEnv.writes, []);
   });
 
+  it('treats an environment read failure as unset, with a warning, instead of aborting setup', async (t) => {
+    const userEnv = createFakeUserEnv();
+    const failing = {
+      ...userEnv,
+      async read() {
+        throw new Error('Windows PowerShell did not answer within 60000 ms');
+      },
+    };
+    const harness = await createHarness(t, { userEnv: failing });
+
+    const { exitCode, envelope } = await harness.run(['setup', '--no-model', ...YES]);
+
+    assert.equal(exitCode, EXIT.OK);
+    assert.ok(
+      envelope?.warnings.some((warning) => warning.includes('Could not read the user environment variable OLLAMA_FLASH_ATTENTION')),
+      `warnings: ${JSON.stringify(envelope?.warnings)}`,
+    );
+    assert.deepEqual(userEnv.writes, [], 'nothing is written on a probe failure');
+  });
+
   it('writes the environment when --ollama-env preselects it, recording the previous value', async (t) => {
     const userEnv = createFakeUserEnv({ OLLAMA_KV_CACHE_TYPE: 'f16' });
     const harness = await createHarness(t, { userEnv });

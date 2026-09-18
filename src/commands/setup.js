@@ -128,7 +128,7 @@ export async function run(context, dependencies = {}) {
     hostTargets: flags.host,
   });
   warnings.push(...plan.warnings);
-  plan = await markSettledSteps(plan, createProbe({ userEnv, installed: new Set(preflight.models) }));
+  plan = await markSettledSteps(plan, createProbe({ userEnv, installed: new Set(preflight.models), warnings }));
 
   for (const line of renderPlanText({ ...plan, platformBlock: [] })) output.text(line);
   output.text();
@@ -277,14 +277,23 @@ async function readPreviousVersion(pointerPath, cliVersion) {
 }
 
 /**
- * @param {{ userEnv: import('../install/user-env.js').UserEnvAdapter, installed: Set<string> }} options
+ * @param {{ userEnv: import('../install/user-env.js').UserEnvAdapter, installed: Set<string>, warnings: string[] }} options
  * @returns {Parameters<typeof markSettledSteps>[1]}
  */
-function createProbe({ userEnv, installed }) {
+function createProbe({ userEnv, installed, warnings }) {
   return {
     fileDigest: async (target) => ((await pathExists(target)) ? sha256File(target) : null),
     hasModel: async (name) => hasModel(installed, name),
-    readEnv: (name) => userEnv.read(name),
+    // A probe that cannot read the user environment (a slow PowerShell start, a sandboxed shell) must
+    // not abort setup: the variables are treated as unset, and a real write would surface its own error.
+    readEnv: async (name) => {
+      try {
+        return await userEnv.read(name);
+      } catch (error) {
+        warnings.push(`Could not read the user environment variable ${name} (${error instanceof Error ? error.message : String(error)}); treating it as unset.`);
+        return null;
+      }
+    },
     digest: (content) => sha256Hex(typeof content === 'string' ? Buffer.from(content, 'utf8') : Buffer.from(content)),
   };
 }
