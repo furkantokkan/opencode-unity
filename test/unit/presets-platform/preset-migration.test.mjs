@@ -29,7 +29,7 @@ describe('preset schema @1 -> @2 (amendment 33.4, 38.8; D-M6)', () => {
     assert.equal(applied.length, 1);
     assert.equal(document.schemaVersion, 2);
     assert.deepEqual(document.hardware, {
-      os: { win32: 'reference-tested' },
+      os: { win32: 'verified' },
       arch: ['x64'],
       gpuVendor: 'nvidia',
       minTotalVramMiB: 24_000,

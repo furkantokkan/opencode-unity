@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "id": "nvidia-24gb-qwen3-coder-30b-32k",
   "status": "experimental",
-  "evidence": "docs/evidence/v0.1/32k-exploration.md",
+  "evidence": null,
   "warning": "This preset matches the configuration of the recorded driver hang: 32K context, q8_0 KV cache and flash attention on a 24 GB GPU while Unity editors were importing assets. The only full-series runs at 32K ended with a CUDA error and a driver hang. It is experimental, needs --experimental, is never chosen by default, and its guard is stricter (2.5 GiB free video memory after the load, at most one Unity editor). Do not use it while Unity is open.",
   "hardware": {
     "os": {

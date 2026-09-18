@@ -48,8 +48,8 @@ describe('shipped presets at schema version 2', () => {
     }
   });
 
-  it('keeps the reference preset reference-tested on Windows and experimental on Linux', () => {
-    assert.deepEqual(loadPreset(P1).hardware.os, { win32: 'reference-tested', linux: 'experimental' });
+  it('keeps the reference preset verified on Windows and experimental on Linux', () => {
+    assert.deepEqual(loadPreset(P1).hardware.os, { win32: 'verified', linux: 'experimental' });
     assert.deepEqual(loadPreset(P1).hardware.arch, ['x64']);
   });
 
@@ -115,7 +115,7 @@ describe('loadPreset with a version 1 file on disk', () => {
 
     const loaded = loadPreset(P1, { dir });
     assert.equal(loaded.schemaVersion, 2);
-    assert.deepEqual(loaded.hardware.os, { win32: 'reference-tested' });
+    assert.deepEqual(loaded.hardware.os, { win32: 'verified' });
     assert.deepEqual(loaded.hardware.arch, ['x64']);
 
     const onDisk = JSON.parse(await fs.readFile(new URL(`${P1}.json`, dir), 'utf8'));

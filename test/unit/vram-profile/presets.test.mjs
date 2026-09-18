@@ -28,11 +28,20 @@ describe('shipped presets (spec 10.2)', () => {
     for (const preset of loadAllPresets()) assert.deepEqual(validatePreset(preset), [], preset.id);
   });
 
-  it('labels P1 reference-tested with evidence, and P2 and custom experimental with a warning', () => {
+  it('labels P1 verified with evidence, and P2 and custom experimental with a warning', () => {
     const p1 = loadPreset(P1);
-    assert.equal(p1.status, 'reference-tested');
+    assert.equal(p1.status, 'verified');
     assert.match(/** @type {string} */ (p1.evidence), /^docs\/evidence\/v0\.1\//);
-    assert.equal(p1.reliability.toolCalls, null, 'tool-call reliability at 16K is not measured yet (spec 3.3)');
+    assert.deepEqual(p1.reliability.toolCalls, {
+      passed: 3,
+      runs: 10,
+      evidence: 'docs/evidence/v0.1/reference-rtx3090-16k.md',
+    }, 'tool-call reliability at 16K is the measured preview series (spec 3.3)');
+    assert.deepEqual(p1.reliability.edits, {
+      passed: 6,
+      runs: 6,
+      evidence: 'docs/evidence/v0.1/reference-rtx3090-16k.md',
+    });
 
     const p2 = loadPreset(P2);
     assert.equal(p2.status, 'experimental');
@@ -47,7 +56,7 @@ describe('shipped presets (spec 10.2)', () => {
     assert.equal(custom.evidence, null);
   });
 
-  it('keeps the reference-tested preset at the measured 16K configuration', () => {
+  it('keeps the reference preset at the measured 16K configuration', () => {
     const p1 = loadPreset(P1);
     assert.equal(p1.model.numCtx, 16_384);
     assert.equal(p1.model.numKeep, 4);

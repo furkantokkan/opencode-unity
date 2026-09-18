@@ -1,0 +1,231 @@
+{
+  "startedAt": "2026-09-18T13:31:39.629Z",
+  "finishedAt": "2026-09-18T13:31:47.177Z",
+  "model": "ocu-qwen3-coder-30b-16k",
+  "host": "http://127.0.0.1:11435",
+  "ollamaVersion": "ollama version is 0.34.1",
+  "os": "win32 x64",
+  "gpuBefore": {
+    "gpu": "NVIDIA GeForce RTX 3090",
+    "driver": "616.56",
+    "totalMiB": "24576",
+    "usedMiB": "24144",
+    "freeMiB": "182",
+    "gpuUtilPercent": "0"
+  },
+  "gpuAfterLoad": {
+    "gpu": "NVIDIA GeForce RTX 3090",
+    "driver": "616.56",
+    "totalMiB": "24576",
+    "usedMiB": "24144",
+    "freeMiB": "182",
+    "gpuUtilPercent": "2"
+  },
+  "loadMs": 224,
+  "serverEnv": {
+    "OLLAMA_FLASH_ATTENTION": "1",
+    "OLLAMA_KV_CACHE_TYPE": "q8_0",
+    "OLLAMA_NUM_PARALLEL": "1",
+    "OLLAMA_MAX_LOADED_MODELS": "1"
+  },
+  "toolCalls": {
+    "passed": 3,
+    "runs": 10,
+    "textMarker": 7
+  },
+  "edits": {
+    "passed": 6,
+    "runs": 6
+  },
+  "toolRuns": [
+    {
+      "index": 0,
+      "prompt": "The player moves too fast. Read Assets/Game/Player.cs so we can look at the speed field.",
+      "pass": false,
+      "why": "no tool call",
+      "textMarker": "<function=",
+      "snippet": "I'll read the Player.cs file to examine the speed field that's causing the player to move too fast.\n\n<function=unity_read_file>\n<parameter=path>\nAssets/Game/Player.cs\n</parameter>\n</function>\n</tool_c",
+      "promptTokens": 454,
+      "outputTokens": 47,
+      "evalMs": 321,
+      "totalMs": 724,
+      "tokPerSecond": 146.3
+    },
+    {
+      "index": 1,
+      "prompt": "Check whether the project compiles right now.",
+      "pass": false,
+      "why": "no tool call",
+      "textMarker": "<function=",
+      "snippet": "I'll check if the project compiles correctly right now.\n\n<function=run_compile_check>\n</function>\n</tool_call>",
+      "promptTokens": 442,
+      "outputTokens": 24,
+      "evalMs": 165,
+      "totalMs": 219,
+      "tokPerSecond": 145.6
+    },
+    {
+      "index": 2,
+      "prompt": "Read Assets/UI/MainMenu.cs; the start button does nothing and I want to see its handler.",
+      "pass": true,
+      "got": "unity_read_file",
+      "textMarker": null,
+      "promptTokens": 453,
+      "outputTokens": 51,
+      "evalMs": 344,
+      "totalMs": 402,
+      "tokPerSecond": 148.5
+    },
+    {
+      "index": 3,
+      "prompt": "Before we change anything, read Assets/Game/Enemy.cs and tell me what fields it has.",
+      "pass": false,
+      "why": "no tool call",
+      "textMarker": "<function=",
+      "snippet": "I'll read the Enemy.cs file to see what fields it contains.\n\n<function=unity_read_file>\n<parameter=path>\nAssets/Game/Enemy.cs\n</parameter>\n</function>\n</tool_call>",
+      "promptTokens": 452,
+      "outputTokens": 39,
+      "evalMs": 261,
+      "totalMs": 310,
+      "tokPerSecond": 149.4
+    },
+    {
+      "index": 4,
+      "prompt": "Run a compile check and report any errors.",
+      "pass": true,
+      "got": "run_compile_check",
+      "textMarker": null,
+      "promptTokens": 442,
+      "outputTokens": 14,
+      "evalMs": 105,
+      "totalMs": 150,
+      "tokPerSecond": 133.2
+    },
+    {
+      "index": 5,
+      "prompt": "Read Assets/Game/Player.cs so we can look at the speed field. The player moves too fast.",
+      "pass": false,
+      "why": "no tool call",
+      "textMarker": "<function=",
+      "snippet": "I'll help you look at the Player.cs file to examine the speed field and address the issue of the player moving too fast.\n\n<function=unity_read_file>\n<parameter=path>\nAssets/Game/Player.cs\n</parameter>",
+      "promptTokens": 454,
+      "outputTokens": 51,
+      "evalMs": 346,
+      "totalMs": 395,
+      "tokPerSecond": 147.6
+    },
+    {
+      "index": 6,
+      "prompt": "I want to see the inventory code. Read Assets/Game/Inventory.cs.",
+      "pass": false,
+      "why": "no tool call",
+      "textMarker": "<function=",
+      "snippet": "I'll help you retrieve the inventory code from the specified file.\n\n<function=unity_read_file>\n<parameter=path>\nAssets/Game/Inventory.cs\n</parameter>\n</function>\n</tool_call>",
+      "promptTokens": 448,
+      "outputTokens": 38,
+      "evalMs": 269,
+      "totalMs": 320,
+      "tokPerSecond": 141.2
+    },
+    {
+      "index": 7,
+      "prompt": "Compile the project and tell me if there are errors.",
+      "pass": true,
+      "got": "run_compile_check",
+      "textMarker": null,
+      "promptTokens": 444,
+      "outputTokens": 33,
+      "evalMs": 227,
+      "totalMs": 279,
+      "tokPerSecond": 145.3
+    },
+    {
+      "index": 8,
+      "prompt": "Read Assets/Audio/MusicPlayer.cs; the music restarts every scene.",
+      "pass": false,
+      "why": "no tool call",
+      "textMarker": "<function=",
+      "snippet": "I'll help you examine the MusicPlayer.cs file to understand why the music restarts every scene. Let me read that file first.\n\n<function=unity_read_file>\n<parameter=path>\nAssets/Audio/MusicPlayer.cs\n</",
+      "promptTokens": 449,
+      "outputTokens": 54,
+      "evalMs": 387,
+      "totalMs": 443,
+      "tokPerSecond": 139.6
+    },
+    {
+      "index": 9,
+      "prompt": "Check that everything still compiles after my last change.",
+      "pass": false,
+      "why": "no tool call",
+      "textMarker": "<function=",
+      "snippet": "I'll check if the Unity project still compiles correctly after your last change.\n\n<function=run_compile_check>\n</function>\n</tool_call>",
+      "promptTokens": 444,
+      "outputTokens": 28,
+      "evalMs": 211,
+      "totalMs": 256,
+      "tokPerSecond": 132.4
+    }
+  ],
+  "editRuns": [
+    {
+      "index": 0,
+      "instruction": "Rename the field moveSpeed to speed.",
+      "pass": true,
+      "promptTokens": 109,
+      "outputTokens": 56,
+      "evalMs": 434,
+      "totalMs": 562,
+      "tokPerSecond": 129.1
+    },
+    {
+      "index": 1,
+      "instruction": "Change the default speed from 5 to 7.",
+      "pass": true,
+      "promptTokens": 112,
+      "outputTokens": 58,
+      "evalMs": 524,
+      "totalMs": 614,
+      "tokPerSecond": 110.7
+    },
+    {
+      "index": 2,
+      "instruction": "Add vertical movement using Input.GetAxis(\"Vertical\") along Vector3.up, with the same speed field.",
+      "pass": true,
+      "promptTokens": 121,
+      "outputTokens": 82,
+      "evalMs": 687,
+      "totalMs": 776,
+      "tokPerSecond": 119.3
+    },
+    {
+      "index": 3,
+      "instruction": "Rename the class Player to PlayerController.",
+      "pass": true,
+      "promptTokens": 109,
+      "outputTokens": 59,
+      "evalMs": 431,
+      "totalMs": 515,
+      "tokPerSecond": 137
+    },
+    {
+      "index": 4,
+      "instruction": "Make moveSpeed public instead of serialized private, keeping the default.",
+      "pass": true,
+      "promptTokens": 114,
+      "outputTokens": 55,
+      "evalMs": 433,
+      "totalMs": 552,
+      "tokPerSecond": 127
+    },
+    {
+      "index": 5,
+      "instruction": "Add a SerializeField float jumpHeight with default 2, next to moveSpeed.",
+      "pass": true,
+      "promptTokens": 118,
+      "outputTokens": 71,
+      "evalMs": 543,
+      "totalMs": 655,
+      "tokPerSecond": 130.8
+    }
+  ]
+}

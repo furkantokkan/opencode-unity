@@ -4,8 +4,9 @@ Code a Unity game and its C# with a local model, in OpenCode, with a GPU guard t
 loading while Unity needs the graphics card.
 
 > **Preview 0.1.0-preview.1.** This is an early, usable preview for Windows with a 24 GB NVIDIA GPU. It
-> is installed from GitHub, not from npm. The measured results of the v0.1 release gate are not in it
-> yet, and several planned features are missing (see [Roadmap](#roadmap)).
+> is installed from GitHub, not from npm. A first small measurement of the reference preset is included
+> ([evidence](docs/evidence/v0.1/reference-rtx3090-16k.md)); the full v0.1 release gate and several
+> planned features are still ahead (see [Roadmap](#roadmap)).
 >
 > Unofficial. Not affiliated with OpenCode, Ollama or Unity Technologies.
 
@@ -65,6 +66,12 @@ preview, so it fails closed and refuses every model load. `start` still opens Op
 prompt is refused, and `delegate` answers `gpu_guard_blocked`. Use those platforms for `doctor` and
 `init` until the Linux and macOS probes land. The full matrix is in the
 [CLI reference](docs/cli-reference.md#support-tiers).
+
+The 16K reference preset is measured on the reference machine
+([evidence](docs/evidence/v0.1/reference-rtx3090-16k.md)). The model picked the right tool in all 10
+tool-call runs, but wrote 7 of them as text the Ollama parser did not execute — the plugin detects this
+and says so, and the step then does nothing, so expect that toast in sessions. Small edits passed 6 of
+6. Generation averaged 136 tok/s at 16K context over `/api/chat` with a q8_0 KV cache on the RTX 3090.
 
 ## Install
 
@@ -454,8 +461,8 @@ Planned, and not in this preview:
 - prompt shaping, which rewrites an unclear request once before it runs;
 - workspace components (backend services, databases, game servers) in the project facts;
 - `bench`, `doctor --capture` and `doctor --selftest`;
-- the v0.1 release gate: measured tool-call and edit reliability on reference hardware, with published
-  evidence, and an npm release.
+- the v0.1 release gate: a larger bench series on reference hardware (a first 16K measurement is in
+  [docs/evidence/v0.1/](docs/evidence/v0.1/reference-rtx3090-16k.md)), and an npm release.
 
 The full list of changes is in [CHANGELOG.md](CHANGELOG.md).
 

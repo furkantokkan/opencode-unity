@@ -9,8 +9,9 @@ may change the CLI or the config schema, with automatic migrations and a Breakin
 
 The first preview. It is installed from GitHub and is not published to npm. It is meant for Unity
 developers on Windows with a 24 GB NVIDIA GPU who want to try a guarded local-model OpenCode session and
-the delegate commands before the v0.1 release gate. The measured numbers the release gate publishes are
-not in this preview.
+the delegate commands before the v0.1 release gate. A first small measurement of the 16K reference
+preset (tool calls and edits on the reference machine) is in `docs/evidence/v0.1/`; the full
+release-gate series is not in this preview.
 
 ### Added
 
@@ -42,6 +43,10 @@ not in this preview.
   `docs/doctor-checks.md`.
 - The package round trip test: pack, install, `setup`, `init`, `start --print-env`, `doctor`,
   `uninstall`, and a residue check, all sandboxed against mocks.
+- First preset evidence: the 16K reference preset measured on the reference machine (tool calls 3 of 10
+  native, 7 of 10 written as text the plugin detects; edits 6 of 6), in
+  `docs/evidence/v0.1/reference-rtx3090-16k.md`. The 16K preset is now `verified` with that evidence; the
+  32K preset stays `experimental`.
 
 ### Compat
 

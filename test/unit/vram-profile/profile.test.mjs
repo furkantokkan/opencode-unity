@@ -45,7 +45,7 @@ describe('resolvePreset (spec 6.2 overrides)', () => {
     const resolved = resolvePreset(loadPreset(P1));
     assert.equal(resolved.custom, false);
     assert.deepEqual(resolved.overriddenPaths, []);
-    assert.equal(resolved.status, 'reference-tested');
+    assert.equal(resolved.status, 'verified');
   });
 
   it('marks the profile custom and experimental, and lists the changed paths', () => {
@@ -128,7 +128,7 @@ describe('buildRuntimeProfile (spec 6.3)', () => {
     const { profile, vram, warnings } = build();
     assert.deepEqual(validateRuntimeProfile(profile), []);
     assert.equal(profile.presetId, P1);
-    assert.equal(profile.presetStatus, 'reference-tested');
+    assert.equal(profile.presetStatus, 'verified');
     assert.equal(profile.custom, false);
     assert.deepEqual(profile.provider, {
       id: PROVIDER_ID,

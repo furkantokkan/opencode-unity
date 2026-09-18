@@ -1,11 +1,11 @@
 {
   "schemaVersion": 2,
   "id": "nvidia-24gb-qwen3-coder-30b-16k",
-  "status": "reference-tested",
+  "status": "verified",
   "evidence": "docs/evidence/v0.1/reference-rtx3090-16k.md",
   "hardware": {
     "os": {
-      "win32": "reference-tested",
+      "win32": "verified",
       "linux": "experimental"
     },
     "arch": ["x64"],
@@ -51,8 +51,8 @@
     "minFreeVramAfterLoadMiB": 1500
   },
   "reliability": {
-    "toolCalls": null,
-    "edits": null,
-    "note": "Not measured at 16K yet. Published by the v0.1 release gate."
+    "toolCalls": { "passed": 3, "runs": 10, "evidence": "docs/evidence/v0.1/reference-rtx3090-16k.md" },
+    "edits": { "passed": 6, "runs": 6, "evidence": "docs/evidence/v0.1/reference-rtx3090-16k.md" },
+    "note": "Measured 2026-09-18 on the reference machine. The model chose the right tool in all 10 tool-call runs, but wrote 7 of them as text the parser did not execute; the plugin detects and reports those. Small edits passed 6 of 6."
   }
 }
