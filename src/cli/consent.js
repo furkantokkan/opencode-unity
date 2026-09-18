@@ -12,6 +12,9 @@ import { CLI_NAME } from './version.js';
  * @property {string} [detail]        Size, duration, paths or how to undo it.
  * @property {boolean} recommended    The recommended answer from the setup table.
  * @property {boolean} [preselected]  An explicit flag asked for this item (for example --ollama-env).
+ * @property {boolean} [defaultAnswer] What Enter means at an interactive prompt, and the hint shown with
+ *   it. Defaults to whether --yes accepts the item. A deletion the command itself was asked for sets it
+ *   to false, so `uninstall --yes` still runs while an interactive Enter keeps the files (spec 5.1).
  */
 
 /**
@@ -104,7 +107,7 @@ export function parseAnswer(text, defaultAnswer) {
  */
 export function formatQuestion(item) {
   const detail = item.detail ? item.detail.split('\n').map((line) => `  ${line}\n`).join('') : '';
-  const choices = isAcceptedByDefault(item) ? '[Y/n]' : '[y/N]';
+  const choices = getDefaultAnswer(item) ? '[Y/n]' : '[y/N]';
   return `${item.title}\n${detail}Accept? ${choices} `;
 }
 
@@ -123,6 +126,14 @@ export function isAccepted(decisions, id) {
  */
 function isAcceptedByDefault(item) {
   return item.recommended || item.preselected === true;
+}
+
+/**
+ * @param {ConsentItem} item
+ * @returns {boolean}
+ */
+function getDefaultAnswer(item) {
+  return typeof item.defaultAnswer === 'boolean' ? item.defaultAnswer : isAcceptedByDefault(item);
 }
 
 /**
@@ -162,7 +173,7 @@ async function askEach(items, input, prompts) {
  * @returns {Promise<ConsentDecision>}
  */
 async function askOne(item, lines, prompts) {
-  const defaultAnswer = isAcceptedByDefault(item);
+  const defaultAnswer = getDefaultAnswer(item);
   for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt += 1) {
     prompts.write(attempt === 0 ? formatQuestion(item) : 'Please answer y or n: ');
     const next = await lines.next();
@@ -184,6 +195,7 @@ function validateItems(items) {
   for (const item of items) {
     if (!item.id || !item.title) throw new TypeError('Consent items need an id and a title');
     if (seen.has(item.id)) throw new TypeError(`Duplicate consent item '${item.id}'`);
+    if (item.defaultAnswer !== undefined && typeof item.defaultAnswer !== 'boolean') throw new TypeError(`Consent item '${item.id}' has a defaultAnswer that is not a boolean`);
     seen.add(item.id);
   }
 }

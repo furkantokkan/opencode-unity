@@ -11,7 +11,7 @@ import {
   isUncPath,
   normalizeWindowsPath,
   toPosix,
-} from '../../src/delegate/sensitive.js';
+} from '../../src/network/sensitive.js';
 import { useSandbox } from '../helpers/sandbox.mjs';
 
 const BASE = process.platform === 'win32' ? 'C:/project' : '/project';

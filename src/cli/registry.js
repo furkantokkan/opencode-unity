@@ -114,7 +114,8 @@ export const COMMANDS = Object.freeze([
       { name: 'strict', type: 'boolean', description: 'Warnings also fail' },
       { name: 'explain', type: 'string', valueName: 'check-id', description: "Print one check's rationale and fix" },
     ],
-    exitCodes: [EXIT.OK, EXIT.USAGE, EXIT.CHECK_FAILED, EXIT.RUNTIME],
+    // Exit 8 stays while --capture and --selftest report `prerequisite_missing`; it goes once they land.
+    exitCodes: [EXIT.OK, EXIT.USAGE, EXIT.CHECK_FAILED, EXIT.RUNTIME, EXIT.UNSUPPORTED],
   },
   {
     name: 'setup',
@@ -127,10 +128,11 @@ export const COMMANDS = Object.freeze([
       { name: 'no-model', type: 'boolean', description: 'Skip the model pull and create' },
       { name: 'ollama-env', type: 'boolean', description: 'Preselect the Ollama server environment item' },
       { name: 'terminal', type: 'boolean', description: 'Preselect the Windows Terminal fragment' },
-      { name: 'delegate', type: 'list', valueName: 'targets', choices: ['claude', 'codex'], description: 'Preselect delegate skill installs' },
+      { name: 'host', type: 'list', valueName: 'ids', choices: ['claude', 'codex', 'antigravity', 'auto'], description: 'Install the host integration for these tools (same as host install --host)' },
+      { name: 'delegate', type: 'list', valueName: 'targets', choices: ['claude', 'codex'], description: 'Deprecated alias of --host' },
       { name: 'migrate', type: 'boolean', description: 'Migrate an earlier installation (used by upgrade)' },
     ],
-    exitCodes: [EXIT.OK, EXIT.USAGE, EXIT.BLOCKED, EXIT.RUNTIME, EXIT.UNSUPPORTED, EXIT.CONSENT_REQUIRED],
+    exitCodes: [EXIT.OK, EXIT.USAGE, EXIT.BLOCKED, EXIT.VALIDATION, EXIT.RUNTIME, EXIT.UNSUPPORTED, EXIT.CONSENT_REQUIRED],
   },
   {
     name: 'init',
@@ -312,7 +314,7 @@ export const COMMANDS = Object.freeze([
       { name: 'remove-base-model', type: 'boolean', description: 'Also remove the base model if setup pulled it' },
       { name: 'projects', type: 'boolean', description: 'Also remove unchanged in-project folders' },
     ],
-    exitCodes: [EXIT.OK, EXIT.RUNTIME, EXIT.CONSENT_REQUIRED],
+    exitCodes: [EXIT.OK, EXIT.VALIDATION, EXIT.RUNTIME, EXIT.CONSENT_REQUIRED],
   },
 ]);
 

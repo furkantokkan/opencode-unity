@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: a3f5c1d9e7b2486fa0c4d8e21b6f3057
+TextScriptImporter:
+  externalObjects: {}
+  userData:
+  assetBundleName:
+  assetBundleVariant:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_Script: {fileID: 11500000, guid: 9f2c4b1ae8d3705623ac1f9e4db80c76, type: 3}
+  m_Name: PlayerMovementSettings
+  m_EditorClassIdentifier:
+  moveSpeed: 6.5
+  jumpHeight: 2.25

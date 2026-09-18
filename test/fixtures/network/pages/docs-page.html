@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Sample API reference</title>
+  <style>body { color: #222; }</style>
+  <script src="/assets/analytics.js"></script>
+</head>
+<body>
+  <h1>Sample API reference</h1>
+  <p>The <code>GET /v1/scores</code> endpoint returns the current leaderboard page.</p>
+  <ul>
+    <li><b>limit</b> &mdash; page size, 1 to 100.</li>
+    <li><b>cursor</b> &mdash; opaque cursor from the previous page.</li>
+  </ul>
+  <p>See the <a href="https://docs.example/guides/pagination">pagination guide</a> for cursors.</p>
+  <table>
+    <tr><th>Status</th><th>Meaning</th></tr>
+    <tr><td>200</td><td>Page returned.</td></tr>
+    <tr><td>429</td><td>Rate limited; retry after the header says so.</td></tr>
+  </table>
+  <noscript>Enable scripts to use the interactive console.</noscript>
+</body>
+</html>

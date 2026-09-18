@@ -1,0 +1,3 @@
+{"level":"info","msg":"emulator ready","port":5001}
+{"level":"warn","msg":"see https://docs.example/troubleshooting for the retry policy"}
+{"level":"error","msg":"handler threw","stack":"at Sample.Handler.Invoke()"}

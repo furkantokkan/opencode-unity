@@ -1,0 +1,63 @@
+{
+  "refused": [
+    {
+      "id": "denied-key-api-key",
+      "url": "https://api.example.test/v1/models?api_key=short",
+      "reason": "denied-key",
+      "key": "api_key",
+      "note": "the key is refused by its own name, whatever the value looks like"
+    },
+    {
+      "id": "denied-key-camel-case",
+      "url": "https://api.example.test/v1/models?apiKey=short",
+      "reason": "denied-key",
+      "key": "apiKey",
+      "note": "query keys compare lower case"
+    },
+    {
+      "id": "denied-key-access-token",
+      "url": "https://api.example.test/v1/me?access_token=x",
+      "reason": "denied-key",
+      "key": "access_token",
+      "note": "a token in a query string lands in the session log and the terminal scrollback"
+    },
+    {
+      "id": "credential-value-jwt",
+      "url": "https://api.example.test/v1/echo?q=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJleGFtcGxlIn0.QUJDREVGR0hJSktM",
+      "reason": "credential-value",
+      "key": "q",
+      "patternId": "cred.jwt",
+      "note": "an innocent key name does not make the value innocent"
+    },
+    {
+      "id": "credential-value-github",
+      "url": "https://api.example.test/search?query=ghp_EXAMPLEnotAREALtokenVALUE00000000000",
+      "reason": "credential-value",
+      "key": "query",
+      "patternId": "cred.github-token",
+      "note": "a token the model found in a file and retyped into a search"
+    }
+  ],
+  "allowed": [
+    {
+      "id": "unity-manual",
+      "url": "https://docs.unity3d.com/Manual/class-MonoBehaviour-and-scriptable-objects.html",
+      "note": "no query at all"
+    },
+    {
+      "id": "learn-moniker",
+      "url": "https://learn.microsoft.com/en-us/dotnet/api/system.string?view=net-8.0",
+      "note": "the moniker query every Microsoft Learn page carries"
+    },
+    {
+      "id": "nuget-search",
+      "url": "https://api.nuget.org/v3/index.json?semVerLevel=2.0.0",
+      "note": "a package query with an ordinary key and a short value"
+    },
+    {
+      "id": "unity-search",
+      "url": "https://docs.unity3d.com/ScriptReference/30_search.html?q=Rigidbody2D&tab=scripting",
+      "note": "a documentation search whose value is a type name"
+    }
+  ]
+}

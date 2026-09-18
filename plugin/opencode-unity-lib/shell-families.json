@@ -1,0 +1,143 @@
+{
+  "schemaVersion": 1,
+  "common": {
+    "unmodelled": [
+      { "pattern": "[*?]", "what": "a wildcard" },
+      { "pattern": "[\\[\\]]", "what": "a bracket expression" },
+      { "pattern": "~", "what": "a home directory expansion" },
+      { "pattern": "%", "what": "an expansion or job reference" },
+      { "pattern": "`", "what": "a backtick" },
+      { "pattern": "!", "what": "an expansion or negation operator" },
+      { "pattern": "\\$", "what": "a variable expansion" },
+      { "pattern": "[{}]", "what": "a brace expression" },
+      { "pattern": "\\^", "what": "an escape character" },
+      { "pattern": "::", "what": "a label or member operator" },
+      { "pattern": "<<|<>|[<>]&|&>|>\\||\\|&", "what": "a heredoc or descriptor redirection" },
+      { "pattern": "[\\r\\v\\f\\x00-\\x08\\x0e-\\x1f]", "what": "a control character" }
+    ],
+    "unmodelledArguments": [
+      { "pattern": "(?:^|:)(?:alias|function):", "flags": "i", "what": "a PowerShell alias or function drive path, which defines a name that runs another command" }
+    ]
+  },
+  "unmodelledCommandsNote": "First words that are not programs: shell reserved words and compound-statement keywords, whose body is a command the node reader never sees as a first word (if git push; then :; fi), and constructs that define a new name for a program or run a command later (alias, Set-Alias, hash -p, trap, sched, emulate -c, cmd's call). Every family refuses all of them, because the family itself can be wrong.",
+  "unmodelledCommands": [
+    "if", "then", "else", "elif", "elseif", "fi", "do", "done", "while", "until", "for", "foreach", "in",
+    "case", "esac", "select", "switch", "function", "filter", "workflow", "repeat", "begin", "end",
+    "and", "or", "not", "try", "catch", "finally", "trap",
+    "alias", "unalias", "hash", "fc", "sched", "emulate",
+    "set-alias", "sal", "new-alias", "nal", "import-alias", "ipal",
+    "call", "doskey"
+  ],
+  "commandPrefixes": [
+    "env",
+    "nohup",
+    "xargs",
+    "start",
+    "start-process",
+    "saps",
+    "sudo",
+    "doas",
+    "runas",
+    "su",
+    "command",
+    "builtin",
+    "noglob",
+    "nocorrect",
+    "exec",
+    "eval",
+    "source",
+    "time",
+    "coproc",
+    "nice",
+    "ionice",
+    "timeout",
+    "stdbuf",
+    "setsid",
+    "unshare",
+    "chroot",
+    "script",
+    "watch",
+    "flock",
+    "parallel",
+    "wsl",
+    "wsl2"
+  ],
+  "shells": {
+    "sh": "posix",
+    "bash": "posix",
+    "rbash": "posix",
+    "dash": "posix",
+    "ash": "posix",
+    "busybox": "posix",
+    "zsh": "posix",
+    "ksh": "posix",
+    "ksh93": "posix",
+    "mksh": "posix",
+    "fish": "posix",
+    "csh": "posix",
+    "tcsh": "posix",
+    "powershell": "powershell",
+    "pwsh": "powershell",
+    "cmd": "cmd"
+  },
+  "families": {
+    "posix": {
+      "label": "POSIX shell",
+      "note": "One grammar for every POSIX shell the agent can be given, so it denies what any one of them treats specially: a herestring is bash and zsh, a word-initial equals sign is zsh, and pipe-ampersand is bash and ksh.",
+      "separators": [";", "&&", "||", "|", "\n"],
+      "switchPrefixes": ["-"],
+      "quoting": {
+        "escape": "backslash",
+        "escapeInQuotes": ["\""],
+        "expands": { "\"": "$`", "'": "" }
+      },
+      "unmodelled": [
+        { "pattern": "\\$", "what": "a variable or command expansion" },
+        { "pattern": "\\\\", "what": "a backslash escape" },
+        { "pattern": "[()]", "what": "a subshell" },
+        { "pattern": "[{}]", "what": "a brace group or expansion" },
+        { "pattern": "(?:^|[^&|>])&(?!&)", "what": "a background job" },
+        { "pattern": "^\\s*#|\\s#", "what": "a comment" }
+      ]
+    },
+    "powershell": {
+      "label": "PowerShell",
+      "note": "Modelled so a command written for it can be denied on the platform where this classifier is the only boundary the permission layer cannot reach.",
+      "separators": [";", "&&", "||", "|", "\n"],
+      "switchPrefixes": ["-", "/"],
+      "quoting": {
+        "escape": "doubled",
+        "escapeInQuotes": ["\"", "'"],
+        "expands": { "\"": "$`", "'": "" }
+      },
+      "unmodelled": [
+        { "pattern": "\\[", "what": "a type literal" },
+        { "pattern": "::", "what": "the static member operator" },
+        { "pattern": "@[({]", "what": "an array or hashtable expression" },
+        { "pattern": "\\$", "what": "a variable or subexpression" },
+        { "pattern": "[()]", "what": "a grouping expression" },
+        { "pattern": "[{}]", "what": "a script block" },
+        { "pattern": "(?:^|\\s)\\.(?=\\s)", "what": "the dot-source operator" },
+        { "pattern": "(?:^|\\s)-(?:join|split|replace|as)(?=\\s|$)", "flags": "i", "what": "a string construction operator" },
+        { "pattern": "\\+", "what": "string concatenation" },
+        { "pattern": "(?:^|[^&|>])&(?!&)", "what": "a call operator" }
+      ]
+    },
+    "cmd": {
+      "label": "Command Prompt",
+      "note": "No v0.1 configuration starts the agent's shell as cmd, but a command string written for it still has to be denied rather than read with another family's rules.",
+      "separators": ["&&", "||", "&", "|", "\n"],
+      "switchPrefixes": ["-", "/"],
+      "quoting": {
+        "escape": "doubled",
+        "escapeInQuotes": ["\"", "'"],
+        "expands": { "\"": "%", "'": "%" }
+      },
+      "unmodelled": [
+        { "pattern": "%", "what": "an environment variable expansion" },
+        { "pattern": "\\^", "what": "a caret escape" },
+        { "pattern": "[()]", "what": "a command group" }
+      ]
+    }
+  }
+}

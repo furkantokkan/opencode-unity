@@ -7,7 +7,7 @@
 //   messages.transform      measure the history (read-only)
 //   system.transform        run the GPU guard, measure the system prompt (read-only)
 //   chat.params             reuse the guard verdict, fill sampling, cap output, run the budget preflight
-//   tool.execute.before     clamp `read`, classify every shell command
+//   tool.execute.before     clamp `read`, classify every shell command, hold `unityMCP_*` to the editor policy
 //   shell.env               restore XDG_CONFIG_HOME for agent commands, opt out of .NET telemetry
 //   event                   calibrate from real usage, detect a silently truncated prompt
 //   text.complete           detect a tool call the model wrote as text
@@ -26,6 +26,7 @@ import { findTextToolCallMarker, isTruncated, readAssistantUsage } from './openc
 import { createGuardCache } from './opencode-unity-lib/guard/cache.js';
 import { createGuardKey, evaluateGuard } from './opencode-unity-lib/guard/evaluate.js';
 import { createGuardError } from './opencode-unity-lib/guard/messages.js';
+import { createMcpArgsPolicy, isMcpTool, readEditorPolicyOptions } from './opencode-unity-lib/mcp-args.js';
 import { applyProvider, applySampling } from './opencode-unity-lib/provider.js';
 import { clampReadArgs, isReadTool } from './opencode-unity-lib/read-limit.js';
 import { createSessionLog } from './opencode-unity-lib/session-log.js';
@@ -46,6 +47,7 @@ export const PLUGIN_ID = 'opencode-unity';
  * @property {import('./opencode-unity-lib/toast.js').Toaster} toaster
  * @property {import('./opencode-unity-lib/budget.js').BudgetTracker | null} budget
  * @property {import('./opencode-unity-lib/shell-guard.js').ShellGuard} shell
+ * @property {import('./opencode-unity-lib/mcp-args.js').McpArgsPolicy} mcpArgs
  * @property {() => Promise<import('./opencode-unity-lib/guard/decide.js').GuardVerdict>} checkGuard  Throws on a block.
  */
 
@@ -76,7 +78,9 @@ export async function createPluginRuntime({ client, env = process.env, platform 
       log,
       toaster,
       budget: null,
-      shell: createShellGuard({ vcsKind: project.vcsKind, mcpHubUrl: project.hubUrl, platform }),
+      shell: createShellGuard({ vcsKind: project.vcsKind, mcpHubUrl: project.hubUrl, platform, shell: env.SHELL ?? null }),
+      // The editor policy holds even when the provider is not injected.
+      mcpArgs: createMcpArgsPolicy(project.editor),
       checkGuard: async () => {
         throw new Error('opencode-unity: the runtime profile is missing, so no request is prepared.');
       },
@@ -99,7 +103,9 @@ export async function createPluginRuntime({ client, env = process.env, platform 
       mcpHubUrl: project.hubUrl,
       extraProtectedEditGlobs: profile.safety.extraProtectedEditGlobs,
       platform,
+      shell: env.SHELL ?? null,
     }),
+    mcpArgs: createMcpArgsPolicy(project.editor),
     async checkGuard() {
       // One evaluation per request: `system.transform` measures and `chat.params` reuses the pass.
       const { verdict } = await cache.check(key);
@@ -119,7 +125,8 @@ export async function createPluginRuntime({ client, env = process.env, platform 
  * @returns {Record<string, Function>}
  */
 export function createHooks(runtime, { env = process.env, userHome = os.homedir() } = {}) {
-  const { log, toaster, shell } = runtime;
+  // A fake runtime in a test that carries no policy still gets the strictest one.
+  const { log, toaster, shell, mcpArgs = createMcpArgsPolicy() } = runtime;
 
   return {
     /** @param {{ provider?: Record<string, unknown>, enabled_providers?: string[] }} config */
@@ -180,12 +187,21 @@ export function createHooks(runtime, { env = process.env, userHome = os.homedir(
         try {
           shell.check(output.args);
         } catch (error) {
-          // The command text stays out of the log: it is model output and may quote a file (P5).
-          log.append({ event: 'shellBlocked', tool, family: shell.family, reason: describeError(error).slice(0, 80) });
+          // Only the deny code is logged. The message names the model's own arguments (a path, a URL),
+          // and the session log holds metadata only (P5); the model still reads the full reason.
+          log.append({ event: 'shellBlocked', tool, family: shell.family, code: readErrorCode(error) });
           throw error;
         }
       }
-      // S14 adds the MCP argument policy for `unityMCP_*` here.
+      if (isMcpTool(tool)) {
+        try {
+          const applied = mcpArgs.check(tool, output.args);
+          if (applied?.changes.length) log.append({ event: 'mcpArgs', tool, changes: applied.changes.join(',') });
+        } catch (error) {
+          log.append({ event: 'mcpBlocked', tool, code: readErrorCode(error) });
+          throw error;
+        }
+      }
     },
 
     'shell.env': async (/** @type {unknown} */ _input, /** @type {{ env: Record<string, string> }} */ output) => {
@@ -226,13 +242,14 @@ export function createHooks(runtime, { env = process.env, userHome = os.homedir(
 }
 
 /**
- * Reads the two per-project files the shell guard needs. Both are optional: a missing or unreadable
- * file leaves the guard in its strictest state (no VCS client allowed, hub calls blocked by default).
+ * Reads the two per-project files the shell guard and the editor policy need. Both are optional: a
+ * missing or unreadable file leaves both in their strictest state (no VCS client allowed, hub calls
+ * blocked by default, EditMode tests only).
  * @param {{ home: string | null, projectId: string | null, fsImpl: Pick<typeof fs, 'readFile'> }} options
- * @returns {Promise<{ vcsKind: string | null, hubUrl: string | null }>}
+ * @returns {Promise<{ vcsKind: string | null, hubUrl: string | null, editor: import('./opencode-unity-lib/mcp-args.js').McpArgsOptions }>}
  */
 export async function readProjectContext({ home, projectId, fsImpl }) {
-  if (!home || !projectId) return { vcsKind: null, hubUrl: null };
+  if (!home || !projectId) return { vcsKind: null, hubUrl: null, editor: readEditorPolicyOptions(null) };
   const directory = path.join(home, 'projects', projectId);
   const project = await readJsonFile(fsImpl, path.join(directory, 'project.json'));
   const local = await readJsonFile(fsImpl, path.join(directory, 'local.json'));
@@ -240,6 +257,7 @@ export async function readProjectContext({ home, projectId, fsImpl }) {
   return {
     vcsKind: typeof kind === 'string' && kind !== 'none' ? kind : null,
     hubUrl: readHubUrl(local),
+    editor: readEditorPolicyOptions(local),
   };
 }
 
@@ -292,6 +310,16 @@ function createNullLog() {
  */
 function describeError(error) {
   return error instanceof Error ? error.message : String(error);
+}
+
+/**
+ * The stable deny code a guard attached to its Error, or `unknown`.
+ * @param {unknown} error
+ * @returns {string}
+ */
+function readErrorCode(error) {
+  const code = /** @type {{ code?: unknown } | null} */ (error)?.code;
+  return typeof code === 'string' && code !== '' ? code : 'unknown';
 }
 
 /**

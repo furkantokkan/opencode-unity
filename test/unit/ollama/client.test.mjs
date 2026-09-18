@@ -12,6 +12,7 @@ import {
   buildWarmBody,
   compareVersions,
   createOllamaClient,
+  describeBaseUrlSafely,
   findModel,
   normalizeBaseUrl,
   normalizeModelName,
@@ -240,6 +241,21 @@ describe('name and version helpers', () => {
     assert.equal(normalizeBaseUrl('http://127.0.0.1:11434/v1'), 'http://127.0.0.1:11434');
     assert.throws(() => normalizeBaseUrl('ftp://127.0.0.1'), /Invalid Ollama base URL/);
     assert.throws(() => normalizeBaseUrl('http://user:pass@127.0.0.1:11434'), /Invalid Ollama base URL/);
+  });
+
+  it('never repeats a refused base URL, which is where a password or a key would be', () => {
+    const secret = 'PLANTEDSECRET0123';
+    for (const value of [`http://admin:${secret}@127.0.0.1:11434`, `http://127.0.0.1:11434/?key=${secret}`, `http://127.0.0.1:11434/#${secret}`, `ftp://u:${secret}@host`, `admin:${secret}@nowhere`, `not a url ${secret}`]) {
+      assert.throws(() => normalizeBaseUrl(value), (error) => {
+        assert.ok(error instanceof Error);
+        assert.equal(/** @type {{ code?: string }} */ (error).code, 'ollama_base_url_invalid');
+        assert.ok(!error.message.includes(secret), error.message);
+        return true;
+      }, value);
+      assert.ok(!describeBaseUrlSafely(value).includes(secret), value);
+    }
+    assert.equal(describeBaseUrlSafely(`http://admin:${secret}@127.0.0.1:9/x?y=1`), 'http://127.0.0.1:9');
+    assert.equal(describeBaseUrlSafely('nonsense'), '(an invalid URL)');
   });
 
   it('parses the padded parameter lines /api/show returns', () => {

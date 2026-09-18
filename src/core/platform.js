@@ -12,6 +12,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 
 import { compileSchema, formatSchemaErrors } from '../../plugin/opencode-unity-lib/json-schema.js';
+import { getDefaultFamily } from '../../plugin/opencode-unity-lib/shell-classify.js';
 
 export const TIERS_URL = new URL('./tiers.json', import.meta.url);
 export const TIERS_SCHEMA_URL = new URL('../../schema/tiers.schema.json', import.meta.url);
@@ -164,11 +165,13 @@ export function detectVirtualization({
 }
 
 /**
+ * The platform's default family. The classifier owns the rule, so the platform block and the shell
+ * guard can never name different families for one machine.
  * @param {{ platform?: NodeJS.Platform }} [options]
  * @returns {ShellFamily}
  */
 export function resolveShellFamily({ platform = process.platform } = {}) {
-  return platform === 'win32' ? 'powershell' : 'posix';
+  return getDefaultFamily(platform);
 }
 
 /**

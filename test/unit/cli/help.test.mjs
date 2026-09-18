@@ -92,7 +92,8 @@ describe('renderCommandHelp', () => {
     assert.deepEqual(getFirstWords(getSection(text, 'Arguments')), ['[path]']);
     assert.ok(getSection(text, 'Options').some((row) => /--logs <path>/.test(row)));
     const exitRows = getSection(text, 'Exit codes');
-    assert.deepEqual(getFirstWords(exitRows.filter((row) => /^\s*\d/.test(row))), ['0', '1', '5', '7']);
+    // 8 is --capture and --selftest reporting prerequisite_missing until they land.
+    assert.deepEqual(getFirstWords(exitRows.filter((row) => /^\s*\d/.test(row))), ['0', '1', '5', '7', '8']);
     // The command's own table never names every outcome, so help must not read as exhaustive.
     assert.ok(exitRows.some((row) => row.includes('Any command can also exit 130 (INTERRUPTED).')));
   });

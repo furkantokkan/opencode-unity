@@ -14,6 +14,7 @@ import { TEST_HOME, buildTestProfile } from '../helpers/profile.mjs';
 
 const PROFILE_PATH = '/opt/profile/opencode-unity.runtime.json';
 const PROJECT_ID = 'sample-1a2b3c4d';
+const STRICTEST_CONTEXT = Object.freeze({ vcsKind: null, hubUrl: null, editor: { allowPlayMode: false } });
 
 /**
  * A file system with a fixed set of files; everything else is ENOENT. Appends are recorded.
@@ -255,7 +256,33 @@ describe('tool hooks', () => {
     const record = run.appended.map((line) => JSON.parse(line)).find((entry) => entry.event === 'shellBlocked');
     assert.ok(record);
     assert.equal(record.family, 'posix');
+    assert.equal(record.code, 'shell_recursive_delete');
     assert.ok(!JSON.stringify(record).includes('Secret'));
+  });
+
+  it('logs a refused version control call by its code, never by the argument the model wrote (P5)', async () => {
+    const run = await createRuntime({
+      files: {
+        [PROFILE_PATH]: renderRuntimeProfile(buildTestProfile()),
+        [`${TEST_HOME}/projects/${PROJECT_ID}/project.json`]: JSON.stringify({ vcs: { kind: 'git' } }),
+      },
+      env: { OPENCODE_UNITY_PROJECT: PROJECT_ID },
+    });
+    const commands = ['git Work/ClientGame/Assets/secret-roadmap.txt', 'git https://token@example.invalid/repo'];
+    for (const command of commands) {
+      const error = await run.hooks['tool.execute.before']({ tool: 'bash' }, { args: { command } }).catch((value) => value);
+      assert.ok(error instanceof Error, command);
+      assert.match(error.message, /can change version control/, 'the model still reads the full reason');
+    }
+    await run.runtime.log.flush();
+    const records = run.appended.map((line) => JSON.parse(line)).filter((entry) => entry.event === 'shellBlocked');
+    assert.equal(records.length, commands.length);
+    for (const record of records) {
+      assert.equal(record.code, 'shell_vcs_write');
+      assert.equal(record.reason, undefined);
+      const text = JSON.stringify(record).toLowerCase();
+      for (const fragment of ['clientgame', 'roadmap', 'token', 'example.invalid']) assert.ok(!text.includes(fragment), fragment);
+    }
   });
 
   it('leaves every other tool alone', async () => {
@@ -265,6 +292,76 @@ describe('tool hooks', () => {
     assert.equal(output.args.limit, 5000);
   });
 
+  it('reads a command with the grammar of the shell OpenCode will run, not only the platform default', async () => {
+    const profileText = renderRuntimeProfile(buildTestProfile());
+    const fake = createFakeFs({ [PROFILE_PATH]: profileText });
+    const build = (/** @type {Record<string, string>} */ env) => createPluginRuntime({ env, platform: 'win32', profilePath: PROFILE_PATH, fsImpl: fake.fs, evaluate: async () => verdict() });
+    assert.equal((await build({})).shell.family, 'powershell');
+    assert.equal((await build({ SHELL: '/usr/bin/bash' })).shell.family, 'posix');
+    const degraded = await createPluginRuntime({ env: { SHELL: '/usr/bin/bash' }, platform: 'win32', profilePath: PROFILE_PATH, fsImpl: createFakeFs({}).fs });
+    assert.equal(degraded.shell.family, 'posix');
+  });
+});
+
+describe('editor policy hook (spec 11.3)', () => {
+  it('strips a model-supplied instance and fills in the read-only console action, and logs the argument names only', async () => {
+    const run = await createRuntime();
+    const output = { args: { unity_instance: 'Other@abc', types: ['error'] } };
+    await run.hooks['tool.execute.before']({ tool: 'unityMCP_read_console' }, output);
+    assert.deepEqual(output.args, { types: ['error'], action: 'get' });
+    await run.runtime.log.flush();
+    const record = run.appended.map((line) => JSON.parse(line)).find((entry) => entry.event === 'mcpArgs');
+    assert.equal(record?.changes, 'unity_instance,action');
+    assert.ok(!JSON.stringify(record).includes('Other@abc'));
+  });
+
+  it('refuses a tool outside the allow-list and a clearing console call, and logs the refusal', async () => {
+    const run = await createRuntime();
+    const denied = await run.hooks['tool.execute.before']({ tool: 'unityMCP_manage_scene' }, { args: {} }).catch((value) => value);
+    assert.equal(denied?.code, 'mcp_tool_denied');
+    const clearing = await run.hooks['tool.execute.before']({ tool: 'UNITYMCP_read_console' }, { args: { action: 'clear' } }).catch((value) => value);
+    assert.equal(clearing?.code, 'mcp_console_action');
+    await run.runtime.log.flush();
+    const blocked = run.appended.map((line) => JSON.parse(line)).filter((entry) => entry.event === 'mcpBlocked');
+    assert.deepEqual(blocked.map((entry) => entry.code), ['mcp_tool_denied', 'mcp_console_action']);
+    assert.ok(blocked.every((entry) => entry.reason === undefined), 'the code is logged, the message is not');
+  });
+
+  it('holds the policy even when the runtime profile is missing, because no provider is not the same as no hub', async () => {
+    const run = await createRuntime({ files: {} });
+    assert.equal(run.runtime.profile, null);
+    const error = await run.hooks['tool.execute.before']({ tool: 'unityMCP_run_tests' }, { args: { mode: 'EditMode' } }).catch((value) => value);
+    assert.equal(error?.code, 'mcp_test_filter');
+  });
+
+  it('allows PlayMode only for a project whose local.json turned it on', async () => {
+    const args = () => ({ mode: 'PlayMode', test_names: ['Game.Tests.Smoke'] });
+    const strict = await createRuntime();
+    const refused = await strict.hooks['tool.execute.before']({ tool: 'unityMCP_run_tests' }, { args: args() }).catch((value) => value);
+    assert.equal(refused?.code, 'mcp_test_mode');
+
+    const trusted = await createRuntime({
+      files: {
+        [PROFILE_PATH]: renderRuntimeProfile(buildTestProfile()),
+        [`${TEST_HOME}/projects/${PROJECT_ID}/local.json`]: JSON.stringify({ editor: { allowPlayMode: true } }),
+      },
+      env: { OPENCODE_UNITY_PROJECT: PROJECT_ID },
+    });
+    const output = { args: args() };
+    await trusted.hooks['tool.execute.before']({ tool: 'unityMCP_run_tests' }, output);
+    assert.equal(output.args.mode, 'PlayMode');
+  });
+
+  it('gives a runtime that carries no policy the strictest one', async () => {
+    const run = await createRuntime();
+    const { mcpArgs: _dropped, ...bare } = run.runtime;
+    const hooks = createHooks(/** @type {any} */ (bare), { env: {}, userHome: '/opt/home' });
+    const error = await hooks['tool.execute.before']({ tool: 'unityMCP_execute_code' }, { args: {} }).catch((value) => value);
+    assert.equal(error?.code, 'mcp_tool_denied');
+  });
+});
+
+describe('shell environment hook', () => {
   it('restores the shell environment for agent commands', async () => {
     const { runtime } = await createRuntime();
     const hooks = createHooks(runtime, { env: { OPENCODE_UNITY_ORIGINAL_XDG_CONFIG_HOME: '/opt/config' }, userHome: '/opt/home' });
@@ -320,7 +417,7 @@ describe('project context', () => {
     };
     const { fs } = createFakeFs(files);
     const context = await readProjectContext({ home: TEST_HOME, projectId: PROJECT_ID, fsImpl: fs });
-    assert.deepEqual(context, { vcsKind: 'plastic', hubUrl: 'http://127.0.0.1:8080/mcp' });
+    assert.deepEqual(context, { vcsKind: 'plastic', hubUrl: 'http://127.0.0.1:8080/mcp', editor: { allowPlayMode: false } });
   });
 
   it('accepts the flat hub spelling and a byte order mark', async () => {
@@ -332,13 +429,13 @@ describe('project context', () => {
 
   it('stays in its strictest state when the files are missing, broken or nameless', async () => {
     const broken = createFakeFs({ [`${TEST_HOME}/projects/${PROJECT_ID}/project.json`]: '{ not json' });
-    assert.deepEqual(await readProjectContext({ home: TEST_HOME, projectId: PROJECT_ID, fsImpl: broken.fs }), { vcsKind: null, hubUrl: null });
+    assert.deepEqual(await readProjectContext({ home: TEST_HOME, projectId: PROJECT_ID, fsImpl: broken.fs }), STRICTEST_CONTEXT);
 
     const none = createFakeFs({ [`${TEST_HOME}/projects/${PROJECT_ID}/project.json`]: JSON.stringify({ vcs: { kind: 'none' } }) });
-    assert.deepEqual(await readProjectContext({ home: TEST_HOME, projectId: PROJECT_ID, fsImpl: none.fs }), { vcsKind: null, hubUrl: null });
+    assert.deepEqual(await readProjectContext({ home: TEST_HOME, projectId: PROJECT_ID, fsImpl: none.fs }), STRICTEST_CONTEXT);
 
-    assert.deepEqual(await readProjectContext({ home: null, projectId: PROJECT_ID, fsImpl: none.fs }), { vcsKind: null, hubUrl: null });
-    assert.deepEqual(await readProjectContext({ home: TEST_HOME, projectId: null, fsImpl: none.fs }), { vcsKind: null, hubUrl: null });
+    assert.deepEqual(await readProjectContext({ home: null, projectId: PROJECT_ID, fsImpl: none.fs }), STRICTEST_CONTEXT);
+    assert.deepEqual(await readProjectContext({ home: TEST_HOME, projectId: null, fsImpl: none.fs }), STRICTEST_CONTEXT);
   });
 
   it('writes no log at all when there is no home to write into', async () => {

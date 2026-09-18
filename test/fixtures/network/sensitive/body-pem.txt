@@ -1,0 +1,5 @@
+{
+  "note": "an outbound POST body a model assembled after reading a key file into context",
+  "project": "demo-app",
+  "key": "-----BEGIN RSA PRIVATE KEY-----\nRXhhbXBsZU5vdEFSZWFsS2V5RXhhbXBsZU5vdEFSZWFsS2V5\nRXhhbXBsZU5vdEFSZWFsS2V5RXhhbXBsZU5vdEFSZWFsS2V5\n-----END RSA PRIVATE KEY-----"
+}

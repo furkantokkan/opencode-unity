@@ -36,6 +36,7 @@ describe('getHomePaths (spec 6.1 layout)', () => {
     assert.equal(paths.xdgConfig, 'C:\\home\\opencode-unity\\xdg-config');
     assert.equal(paths.projectsIndex, 'C:\\home\\opencode-unity\\projects\\index.json');
     assert.equal(paths.installManifest, 'C:\\home\\opencode-unity\\state\\install-manifest.json');
+    assert.equal(paths.consentLedger, 'C:\\home\\opencode-unity\\state\\consent.jsonl');
     assert.equal(paths.gpuLock, 'C:\\home\\opencode-unity\\state\\gpu.lock');
     assert.equal(paths.sessionsDir, 'C:\\home\\opencode-unity\\state\\sessions');
     assert.equal(paths.delegateLedger, 'C:\\home\\opencode-unity\\state\\delegate\\ledger.jsonl');

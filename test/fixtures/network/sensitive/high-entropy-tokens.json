@@ -1,0 +1,68 @@
+[
+  {
+    "id": "unity-guid",
+    "token": "a3f5c1d9e7b2486fa0c4d8e21b6f3057",
+    "excludedBy": "hexadecimal",
+    "note": "the shape in every .meta file; 32 hex characters clear 3.5 bits on their own"
+  },
+  {
+    "id": "unity-guid-dashed",
+    "token": "123e4567-e89b-12d3-a456-426614174000",
+    "excludedBy": "hexadecimal",
+    "note": "dashes are part of the run, so they are removed before the hex test"
+  },
+  {
+    "id": "asset-hash",
+    "token": "9f2c4b1ae8d3705623ac1f9e4db80c76",
+    "excludedBy": "hexadecimal",
+    "note": "a 32-character asset hash"
+  },
+  {
+    "id": "git-sha",
+    "token": "4f9a2c1b7e3d8065a1cf4b2e9d70a63c85fe12ab",
+    "excludedBy": "hexadecimal",
+    "note": "a 40-character git object id"
+  },
+  {
+    "id": "base64-sprite-name",
+    "token": "U3ByaXRlX0NoYXJhY3Rlcl9JZGxlXzAx",
+    "excludedBy": "encoded-text",
+    "note": "decodes to readable text, which a generated secret does not"
+  },
+  {
+    "id": "hyphenated-manual-page",
+    "token": "class-MonoBehaviour-and-scriptable-objects",
+    "excludedBy": "no-digit",
+    "note": "a documentation path segment"
+  },
+  {
+    "id": "pascal-case-identifier",
+    "token": "PlayerControllerMovementInputHandler2DScript01",
+    "excludedBy": "word-case",
+    "note": "upper case clustered at word starts rather than spread at random"
+  },
+  {
+    "id": "screaming-snake-constant",
+    "token": "MAX_CONCURRENT_BACKGROUND_DOWNLOADS_2024",
+    "excludedBy": "word-case",
+    "note": "all upper case is the other end of the same rule"
+  },
+  {
+    "id": "generated-token",
+    "token": "hT3kQ9zR1mWpX7vL2bN8cF4jY6sD0gA5",
+    "excludedBy": null,
+    "note": "32 base64url characters with case mixed at random"
+  },
+  {
+    "id": "generated-token-long",
+    "token": "Qm4xZ7tR2wYs9KdP5vHn3LcB8fJ6gXaT0uEi4pOwZ",
+    "excludedBy": null,
+    "note": "the same shape at 41 characters"
+  },
+  {
+    "id": "encoded-payload",
+    "token": "eyJwcm9qZWN0IjoiZGVtby1hcHAiLCJyZWdpb24iOiJ1cy1jZW50cmFsMSIsIm5vdGUiOiJsb25nIHByaW50YWJsZSBwYXlsb2FkIn0",
+    "excludedBy": null,
+    "note": "printable text is only excused up to 64 characters; beyond that an encoded blob is a payload leaving the machine"
+  }
+]

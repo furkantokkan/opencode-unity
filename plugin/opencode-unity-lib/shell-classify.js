@@ -5,14 +5,24 @@
 // Three layers, in this order (D-M26):
 //   1. deny-unmodelled, on every family including powershell and cmd: a string whose family grammar
 //      we do not model is denied, and so is a string that yields zero command nodes, because that is
-//      exactly the shape the permission layer never evaluates.
+//      exactly the shape the permission layer never evaluates. A command whose first token does not
+//      reduce to a plain program name is denied here too, and so is one whose first token is a shell
+//      keyword or an alias-defining construct: `if git push; then :; fi` and `Set-Alias g git; g push`
+//      run git under a first word that is not git.
 //   2. blocked first tokens, matched after basename normalisation (path segment, case-fold, trailing
 //      .exe/.cmd/.bat/.ps1/.com removed). The wrappers, the VCS clients and the caller-supplied list
 //      (the network tokens of S36) are checked here.
 //   3. blocked substrings anywhere in the text, for constructs that defeat token matching.
 //
+// The families are data: `shell-families.json` holds the separators, the quoting rules, the switch
+// prefixes and the metacharacter sets of each one, so a family is described rather than branched on.
+// Every rule that used to ask "is this posix?" now asks the family for its own answer, which is what
+// lets one tokenizer read three grammars without a second family silently inheriting the first one's
+// quote handling.
+//
 // It is a guardrail, not a sandbox: an allowed command is still a program that can do anything.
-// Everything here is pure, so it imports nothing but the VCS tables.
+import fs from 'node:fs';
+
 import { VCS_BINARIES, VCS_TABLES, isVcsKind } from './vcs-tables.js';
 
 /**
@@ -44,8 +54,43 @@ import { VCS_BINARIES, VCS_TABLES, isVcsKind } from './vcs-tables.js';
  * @property {ShellCommandNode[]} commands
  */
 
-/** Interpreter wrappers: whatever they run is not visible to the permission layer. */
-export const WRAPPER_PROGRAMS = Object.freeze(['cmd', 'powershell', 'pwsh', 'bash', 'sh', 'zsh', 'wsl', 'wsl2', 'busybox', 'env', 'nohup', 'xargs', 'start', 'sudo', 'doas', 'runas']);
+/**
+ * @typedef {object} ShellQuoting
+ * @property {'backslash' | 'doubled'} escape        How a quote is escaped inside its own run.
+ * @property {ReadonlyArray<string>} escapeInQuotes  The quote kinds that escape applies to.
+ * @property {Readonly<Record<string, string>>} expands  Per quote kind, what still expands inside it.
+ */
+
+/**
+ * @typedef {object} ShellGrammar
+ * @property {string} id
+ * @property {string} label
+ * @property {ReadonlyArray<string>} separators
+ * @property {ReadonlyArray<string>} switchPrefixes
+ * @property {ReadonlyArray<string>} quoteChars
+ * @property {ShellQuoting} quoting
+ * @property {ReadonlyArray<{ pattern: RegExp, what: string }>} unmodelled
+ */
+
+export const SHELL_FAMILIES_URL = new URL('./shell-families.json', import.meta.url);
+
+/** Executable suffixes removed before a first token is matched against a list. */
+const PROGRAM_SUFFIXES = Object.freeze(['.exe', '.cmd', '.bat', '.ps1', '.com', '.msc']);
+
+/**
+ * What a first token has to look like once it is reduced to a basename. Anything else - a zsh
+ * `=command` expansion, a leftover operator - is a way of naming a program this classifier cannot
+ * follow, so it is denied in layer 1 rather than matched against lists it was never going to match
+ * (amendment 35.8, layer 1 rule 3).
+ */
+const PLAIN_PROGRAM = /^[A-Za-z0-9][A-Za-z0-9._+-]*$/;
+
+/**
+ * What the same token has to look like *before* it is reduced: a path and nothing else. The basename
+ * on its own is not enough, because taking the last segment of `VAR=/tmp git push` leaves the plain
+ * word `tmp` and hides an assignment prefix that makes the shell run the second word instead.
+ */
+const PLAIN_PROGRAM_NAME = /^[A-Za-z0-9 ._+:/\\-]+$/;
 
 /** Recursive-delete forms, per family, matched on the normalised program plus its flags. */
 const DELETE_PROGRAMS = Object.freeze(['rm', 'rmdir', 'rd', 'del', 'erase', 'remove-item', 'ri', 'rmi', 'format', 'mkfs', 'diskpart']);
@@ -57,92 +102,66 @@ const WRITE_PROGRAMS = Object.freeze(['set-content', 'sc', 'out-file', 'add-cont
 /** Programs that speak HTTP; blocked when the target names the local MCP hub (spec 8.7.1). */
 const HTTP_PROGRAMS = Object.freeze(['curl', 'wget', 'invoke-webrequest', 'iwr', 'invoke-restmethod', 'irm', 'httpie', 'http', 'aria2c']);
 
-/** Executable suffixes removed before a first token is matched against a list. */
-const PROGRAM_SUFFIXES = Object.freeze(['.exe', '.cmd', '.bat', '.ps1', '.com', '.msc']);
-
 /**
- * @typedef {{ separators: ReadonlyArray<string>, unmodelled: ReadonlyArray<{ pattern: RegExp, what: string }> }} ShellGrammar
+ * The shipped family table. A file that does not describe a usable grammar is a build error rather
+ * than a user error, so this throws: a plugin that cannot classify must fail to load, and the plugin
+ * then injects nothing (spec 8.7, failure rule).
+ * @param {URL} [url]
+ * @returns {{ families: Readonly<Record<string, ShellGrammar>>, shells: Readonly<Record<string, string>>, commandPrefixes: ReadonlyArray<string>, unmodelledCommands: ReadonlyArray<string>, unmodelledArguments: ReadonlyArray<{ pattern: RegExp, what: string }> }}
  */
+export function loadShellFamilies(url = SHELL_FAMILIES_URL) {
+  const data = JSON.parse(fs.readFileSync(url, 'utf8'));
+  if (data?.schemaVersion !== 1) throw new TypeError('shell-families.json: unsupported schemaVersion');
+  const common = readUnmodelled(data.common?.unmodelled, 'common');
+  const ids = Object.keys(data.families ?? {});
+  if (ids.length === 0) throw new TypeError('shell-families.json: no families');
 
-/**
- * Every metacharacter that means something in at least one of the three families and is not one of
- * that family's separators. One list for all of them, because a character that is inert on cmd has no
- * business in a plain command either, and a single list cannot drift per family. It is checked after
- * the family's own entries, so a family keeps its own wording for the shapes that matter most.
- * A wildcard is here because the command the classifier reads is not the command that runs once the
- * wildcard has expanded into file names it never saw.
- * @type {ReadonlyArray<{ pattern: RegExp, what: string }>}
- */
-const COMMON_UNMODELLED = Object.freeze([
-  { pattern: /[*?]/, what: 'a wildcard' },
-  { pattern: /[[\]]/, what: 'a bracket expression' },
-  { pattern: /~/, what: 'a home directory expansion' },
-  // `%` is a variable on cmd, the ForEach-Object alias on PowerShell and a job reference on posix.
-  { pattern: /%/, what: 'an expansion or job reference' },
-  { pattern: /`/, what: 'a backtick' },
-  { pattern: /!/, what: 'an expansion or negation operator' },
-  { pattern: /\$/, what: 'a variable expansion' },
-  { pattern: /[{}]/, what: 'a brace expression' },
-  { pattern: /\^/, what: 'an escape character' },
-  { pattern: /::/, what: 'a label or member operator' },
-  { pattern: /[\r\v\f\x00-\x08\x0e-\x1f]/, what: 'a control character' },
-]);
+  /** @type {Record<string, ShellGrammar>} */
+  const families = {};
+  for (const id of ids) families[id] = compileFamily(id, data.families[id], common);
+  return {
+    families: Object.freeze(families),
+    shells: Object.freeze(readShells(data.shells, families)),
+    commandPrefixes: Object.freeze(readStrings(data.commandPrefixes, 'commandPrefixes')),
+    unmodelledCommands: Object.freeze(readStrings(data.unmodelledCommands, 'unmodelledCommands').map((name) => name.toLowerCase())),
+    unmodelledArguments: Object.freeze(readUnmodelled(data.common?.unmodelledArguments, 'common.unmodelledArguments')),
+  };
+}
 
-/**
- * What still expands inside a double-quoted run, per family. Double quotes suppress word splitting,
- * not expansion: `$(...)`, `${...}` and a backtick all still run inside them on posix and powershell,
- * and cmd has no literal quote at all, so `%VAR%` expands inside either of its quote characters.
- * These characters stay visible to the layer-1 scan while the rest of the run becomes filler, because
- * blanking a whole double-quoted run would let two characters step around the primary rule: 35.8's
- * `"$(git push)"` and `"$([Net.WebClient]::new())"` would read as a plain word.
- * @type {Readonly<Record<ShellFamily, string>>}
- */
-const EXPANDS_INSIDE_QUOTES = Object.freeze({ posix: '$`', powershell: '$`', cmd: '%' });
+const shipped = loadShellFamilies();
 
 /**
  * Per-family grammar: `unmodelled` is everything the tokenizer refuses to read, and a string that
- * trips none of it is parsed with the separators below. Kept as data so a family can be added without
- * touching the algorithm.
- * @type {Readonly<Record<ShellFamily, ShellGrammar>>}
+ * trips none of it is parsed with the separators and the quoting of the same entry.
+ * @type {Readonly<Record<string, ShellGrammar>>}
  */
-export const SHELL_FAMILIES = Object.freeze({
-  posix: freezeFamily({
-    separators: [';', '&&', '||', '|', '\n'],
-    unmodelled: [
-      { pattern: /\$/, what: 'a variable or command expansion' },
-      // Every unquoted backslash: outside quotes it escapes the next character, which would join two
-      // words this tokenizer reads as two.
-      { pattern: /\\/, what: 'a backslash escape' },
-      { pattern: /[()]/, what: 'a subshell' },
-      { pattern: /[{}]/, what: 'a brace group or expansion' },
-      { pattern: /(?:^|[^&|>])&(?!&)/, what: 'a background job' },
-      { pattern: /^\s*#|\s#/, what: 'a comment' },
-    ],
-  }),
-  powershell: freezeFamily({
-    separators: [';', '&&', '||', '|', '\n'],
-    unmodelled: [
-      { pattern: /\[/, what: 'a type literal' },
-      { pattern: /::/, what: 'the static member operator' },
-      { pattern: /@[({]/, what: 'an array or hashtable expression' },
-      { pattern: /\$/, what: 'a variable or subexpression' },
-      { pattern: /[()]/, what: 'a grouping expression' },
-      { pattern: /[{}]/, what: 'a script block' },
-      { pattern: /(?:^|\s)\.(?=\s)/, what: 'the dot-source operator' },
-      { pattern: /(?:^|\s)-(?:join|split|replace|as)(?=\s|$)/i, what: 'a string construction operator' },
-      { pattern: /\+/, what: 'string concatenation' },
-      { pattern: /(?:^|[^&|>])&(?!&)/, what: 'a call operator' },
-    ],
-  }),
-  cmd: freezeFamily({
-    separators: ['&&', '||', '&', '|', '\n'],
-    unmodelled: [
-      { pattern: /%/, what: 'an environment variable expansion' },
-      { pattern: /\^/, what: 'a caret escape' },
-      { pattern: /[()]/, what: 'a command group' },
-    ],
-  }),
-});
+export const SHELL_FAMILIES = shipped.families;
+
+/** @type {ReadonlyArray<string>} */
+export const SHELL_FAMILY_IDS = Object.freeze(Object.keys(SHELL_FAMILIES));
+
+/**
+ * Shell program name to the family whose grammar reads its command strings. Family selection resolves
+ * a configured shell against this map, and it is also why every one of these names is a wrapper: a
+ * shell invoked as a program runs a command the permission rules never see.
+ * @type {Readonly<Record<string, string>>}
+ */
+export const SHELL_PROGRAM_FAMILIES = shipped.shells;
+
+/** Programs that run another program named in their arguments, on every family. */
+export const COMMAND_PREFIXES = shipped.commandPrefixes;
+
+/** Interpreter wrappers: whatever they run is not visible to the permission layer. */
+export const WRAPPER_PROGRAMS = Object.freeze([...new Set([...Object.keys(SHELL_PROGRAM_FAMILIES), ...COMMAND_PREFIXES])]);
+
+/**
+ * First words that are not programs - reserved words, and constructs that bind a name to a program or
+ * run a command later - so the command they carry never becomes a first word any list can see.
+ */
+export const UNMODELLED_COMMANDS = shipped.unmodelledCommands;
+
+/** Argument shapes that do the same from inside an ordinary command, such as `New-Item alias:g`. */
+export const UNMODELLED_ARGUMENTS = shipped.unmodelledArguments;
 
 /** Substrings that defeat token-level matching, checked over the whole text (layer 3). */
 export const BLOCKED_TEXT = Object.freeze([
@@ -171,6 +190,28 @@ export function getDefaultFamily(platform) {
 }
 
 /**
+ * The family whose grammar reads command strings for a shell program, or null when the name is not
+ * one this product models. What an unknown shell means is the caller's decision; nothing is guessed
+ * here, because guessing it wrong is how a bash command gets read with PowerShell's rules.
+ * @param {string | null | undefined} shell  A shell name or path, optionally with arguments.
+ * @returns {ShellFamily | null}
+ */
+export function familyForShell(shell) {
+  if (typeof shell !== 'string') return null;
+  const value = shell.trim();
+  if (value.length === 0) return null;
+  // A shell arrives as a bare name, as a path that may itself contain spaces, or as a path followed
+  // by arguments, so the whole string is tried before its first word. A login shell is spelled with a
+  // leading dash by convention, and it is the same program.
+  for (const candidate of [value, value.split(/\s+/)[0]]) {
+    const program = normalizeProgram(candidate.replace(/^["']|["']$/g, '').replace(/^-+/, ''));
+    const family = SHELL_PROGRAM_FAMILIES[program];
+    if (family) return /** @type {ShellFamily} */ (family);
+  }
+  return null;
+}
+
+/**
  * The whole decision for one shell tool call.
  * @param {string} command
  * @param {ClassifyOptions} [options]
@@ -192,7 +233,7 @@ export function classifyShellCommand(command, options = {}) {
   if (blockedText) return deny(family, 'shell_blocked_text', `the command contains ${blockedText.what}`, parsed.commands);
 
   for (const node of parsed.commands) {
-    const verdict = checkCommandNode(node, { ...options, family, exact });
+    const verdict = checkCommandNode(node, { ...options, grammar: SHELL_FAMILIES[family], exact });
     if (verdict) return deny(family, verdict.code, verdict.reason, parsed.commands);
   }
   return { decision: 'allow', family, code: null, reason: null, commands: parsed.commands };
@@ -209,15 +250,25 @@ export function parseShellCommand(text, family) {
   if (!grammar) return { ok: false, code: 'shell_unmodelled', reason: `shell family ${family} is not modelled` };
   if (text.includes('\0')) return { ok: false, code: 'shell_unmodelled', reason: 'the command contains a null byte' };
 
-  const stripped = stripQuoted(text, family);
+  const stripped = stripQuoted(text, grammar);
   if (!stripped.ok) return { ok: false, code: 'shell_unparsable', reason: 'the command has an unbalanced quote' };
   if (stripped.newlineInQuote) return { ok: false, code: 'shell_unmodelled', reason: 'the command contains a newline inside a quoted argument' };
   const unmodelled = grammar.unmodelled.find((entry) => entry.pattern.test(stripped.text));
   if (unmodelled) return { ok: false, code: 'shell_unmodelled', reason: `the command contains ${unmodelled.what}` };
 
-  const tokens = tokenize(text, family);
+  const tokens = tokenize(text, grammar);
   if (!tokens.ok) return { ok: false, code: 'shell_unparsable', reason: 'the command has an unbalanced quote' };
-  return { ok: true, commands: buildNodes(tokens.tokens, grammar.separators) };
+  const commands = buildNodes(tokens.tokens, grammar.separators);
+  if (commands.some((node) => !PLAIN_PROGRAM_NAME.test(node.name) || !PLAIN_PROGRAM.test(node.program))) {
+    return { ok: false, code: 'shell_unmodelled', reason: 'the command names a program in a form that cannot be checked' };
+  }
+  const keyword = commands.find((node) => UNMODELLED_COMMANDS.includes(node.program));
+  if (keyword) {
+    return { ok: false, code: 'shell_unmodelled', reason: `the command starts with ${keyword.program}, a shell keyword or alias construct whose command the rules cannot see` };
+  }
+  const argument = UNMODELLED_ARGUMENTS.find((entry) => commands.some((node) => node.args.some((arg) => entry.pattern.test(arg))));
+  if (argument) return { ok: false, code: 'shell_unmodelled', reason: `the command contains ${argument.what}` };
+  return { ok: true, commands };
 }
 
 /**
@@ -250,7 +301,7 @@ export function matchesGlob(value, glob) {
 
 /**
  * @param {ShellCommandNode} node
- * @param {ClassifyOptions & { family: ShellFamily, exact: boolean }} options
+ * @param {ClassifyOptions & { grammar: ShellGrammar, exact: boolean }} options
  * @returns {{ code: ShellDenyCode, reason: string } | null}
  */
 function checkCommandNode(node, options) {
@@ -265,7 +316,7 @@ function checkCommandNode(node, options) {
   if (isRecursiveDelete(program, args)) {
     return { code: 'shell_recursive_delete', reason: `${program} would delete a directory tree` };
   }
-  const protectedTarget = findProtectedTarget(node, options.protectedWriteGlobs ?? [], options.family);
+  const protectedTarget = findProtectedTarget(node, options.protectedWriteGlobs ?? [], options.grammar);
   if (protectedTarget) {
     return { code: 'shell_protected_write', reason: 'the command would write a protected Unity or project file' };
   }
@@ -317,13 +368,13 @@ function isRecursiveDelete(program, args) {
  * Redirections and copying programs both write; both targets are checked against the protected globs.
  * @param {ShellCommandNode} node
  * @param {string[]} globs
- * @param {ShellFamily} family
+ * @param {ShellGrammar} grammar
  * @returns {string | null}
  */
-function findProtectedTarget(node, globs, family) {
+function findProtectedTarget(node, globs, grammar) {
   if (globs.length === 0) return null;
   const candidates = [...node.writeTargets];
-  if (WRITE_PROGRAMS.includes(node.program)) candidates.push(...node.args.filter((arg) => !isSwitchArgument(arg, family)));
+  if (WRITE_PROGRAMS.includes(node.program)) candidates.push(...node.args.filter((arg) => !isSwitchArgument(arg, grammar)));
   return candidates.find((target) => globs.some((glob) => matchesGlob(target, glob))) ?? null;
 }
 
@@ -332,73 +383,132 @@ const WINDOWS_SWITCH = /^\/[A-Za-z?][A-Za-z0-9]{0,7}(?::[^/\\]*)?$/;
 
 /**
  * An argument that names a switch rather than a file, so it is not a write target. A leading `-` is a
- * switch on every family. A leading `/` is one on the Windows families only: on posix it is how an
- * absolute path starts, and dropping those let `cp blank.txt /project/Assets/Scenes/Main.unity` past
- * the check that the same write with a relative destination failed.
+ * switch on every family. A leading `/` is one only on the families whose `switchPrefixes` say so: on
+ * posix it is how an absolute path starts, and dropping those let
+ * `cp blank.txt /project/Assets/Scenes/Main.unity` past the check that the same write with a relative
+ * destination failed.
  * @param {string} arg
- * @param {ShellFamily} family
+ * @param {ShellGrammar} grammar
  * @returns {boolean}
  */
-function isSwitchArgument(arg, family) {
+function isSwitchArgument(arg, grammar) {
   if (arg.startsWith('-')) return true;
-  return family !== 'posix' && WINDOWS_SWITCH.test(arg);
+  return grammar.switchPrefixes.includes('/') && WINDOWS_SWITCH.test(arg);
 }
 
+/** The port a URL goes to when it names none. */
+const DEFAULT_PORTS = Object.freeze({ 'http:': '80', 'https:': '443', 'ws:': '80', 'wss:': '443' });
+
 /**
+ * Whether any argument addresses the hub. Hosts are compared after the WHATWG URL parser has reduced
+ * them, because an HTTP client resolves `127.1`, `2130706433` and `0x7f.1` to the same loopback address
+ * a textual comparison would miss. A loopback hub is reached by every loopback spelling on its port.
+ * Arguments that carry a host and a port outside a URL - curl's `--resolve` and `--connect-to` - are
+ * read field by field, so a name pinned to the hub's address is refused too.
  * @param {string[]} args
  * @param {{ host: string, port: string }} hub
  * @returns {boolean}
  */
 function argsReachHub(args, hub) {
-  const host = hub.host.toLowerCase();
-  const loopback = host === '127.0.0.1' || host === 'localhost' || host === '::1' || host === '0.0.0.0';
+  const hubHost = normalizeHost(hub.host) ?? hub.host.toLowerCase();
+  const port = String(hub.port);
+  const isHub = (/** @type {string | null} */ host) => host !== null && (isLoopbackHost(hubHost) ? isLoopbackHost(host) : host === hubHost);
   return args.some((arg) => {
-    const value = arg.toLowerCase();
-    if (!value.includes(`:${hub.port}`)) return false;
-    if (value.includes(host)) return true;
-    return loopback && /(?:^|\/\/|@)(?:127\.0\.0\.1|localhost|\[::1\]|0\.0\.0\.0):/.test(value);
+    const target = readUrlTarget(arg);
+    if (target) return target.port === port && isHub(target.host);
+    const fields = arg.split(/[:/@=,]+/);
+    return fields.includes(port) && fields.some((field) => field !== port && isHub(normalizeHost(field)));
   });
+}
+
+/**
+ * The host and port an argument names as a URL, or as a bare `host:port` the way curl accepts one.
+ * @param {string} arg
+ * @returns {{ host: string, port: string } | null}
+ */
+function readUrlTarget(arg) {
+  const scheme = /[a-z][a-z0-9+.-]*:\/\//i.exec(arg);
+  const candidate = scheme ? arg.slice(scheme.index) : /^[^\s/:@]+:\d+(?:[/?#]|$)/.test(arg) ? `http://${arg}` : null;
+  if (candidate === null) return null;
+  try {
+    const url = new URL(candidate);
+    const port = url.port || DEFAULT_PORTS[/** @type {keyof typeof DEFAULT_PORTS} */ (url.protocol)] || '';
+    const host = normalizeHost(url.hostname);
+    return host === null ? null : { host, port };
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * A host as an HTTP client would resolve it: lowercased, IPv4 shorthand expanded, trailing dot dropped.
+ * @param {string} value
+ * @returns {string | null}
+ */
+function normalizeHost(value) {
+  if (typeof value !== 'string' || value === '') return null;
+  try {
+    const hostname = new URL(`http://${value.includes(':') && !value.startsWith('[') ? `[${value}]` : value}`).hostname;
+    return hostname.replace(/\.$/, '');
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * @param {string} host  A host already reduced by `normalizeHost`.
+ * @returns {boolean}
+ */
+function isLoopbackHost(host) {
+  if (host === 'localhost' || host.endsWith('.localhost') || host === '0.0.0.0') return true;
+  if (/^127\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(host)) return true;
+  // IPv6 loopback, the unspecified address, and IPv4-mapped loopback, as the URL parser prints them.
+  return host === '[::1]' || host === '[::]' || /^\[::ffff:(?:7f[0-9a-f]{2}:[0-9a-f]{1,4}|0:0)\]$/.test(host);
 }
 
 /**
  * Replaces every quoted run with a placeholder so the unmodelled patterns only see shell syntax.
  * @param {string} text
- * @param {ShellFamily} family
+ * @param {ShellGrammar} grammar
  * @returns {{ ok: true, text: string, newlineInQuote: boolean } | { ok: false }}
  */
-function stripQuoted(text, family) {
+function stripQuoted(text, grammar) {
   let out = '';
   let index = 0;
   let newlineInQuote = false;
   while (index < text.length) {
     const char = text[index];
-    if (char !== '"' && char !== "'") {
+    if (!grammar.quoteChars.includes(char)) {
       out += char;
       index += 1;
       continue;
     }
-    const end = findQuoteEnd(text, index, family);
+    const end = findQuoteEnd(text, index, grammar);
     if (end < 0) return { ok: false };
     if (text.slice(index, end).includes('\n')) newlineInQuote = true;
-    out += maskQuotedRun(text.slice(index + 1, end), char, family);
+    out += maskQuotedRun(text.slice(index + 1, end), char, grammar);
     index = end + 1;
   }
   return { ok: true, text: out, newlineInQuote };
 }
 
 /**
- * The filler one quoted run leaves behind for the layer-1 scan. A single-quoted run is literal on
- * posix and powershell, so none of it survives; every other run keeps the characters its family still
- * expands and turns the rest - spaces and separators included - into one filler letter each, so a
- * quoted word can never read as syntax and an expansion inside one can never read as a word.
+ * The filler one quoted run leaves behind for the layer-1 scan. A run keeps the characters its family
+ * still expands inside that quote kind and turns the rest - spaces and separators included - into one
+ * filler letter each, so a quoted word can never read as syntax and an expansion inside one can never
+ * read as a word. A quote kind that expands nothing is therefore masked completely, and cmd, which has
+ * no literal quote at all, keeps `%` visible inside both of its quote characters. Blanking a run
+ * outright would let two characters step around the primary rule: 35.8's `"$(git push)"` and
+ * `"$([Net.WebClient]::new())"` would read as plain words.
  * @param {string} body       The run without its quotes.
  * @param {string} quote      The quote character that opened it.
- * @param {ShellFamily} family
+ * @param {ShellGrammar} grammar
  * @returns {string}
  */
-function maskQuotedRun(body, quote, family) {
-  if (body === '' || (quote === "'" && family !== 'cmd')) return 'Q';
-  const expanding = EXPANDS_INSIDE_QUOTES[family];
+function maskQuotedRun(body, quote, grammar) {
+  // An empty run still leaves one filler behind, so `&''&` cannot read as the separator `&&`.
+  if (body === '') return 'Q';
+  const expanding = grammar.quoting.expands[quote] ?? '';
   let out = '';
   for (const char of body) out += expanding.includes(char) ? char : 'Q';
   return out;
@@ -407,20 +517,21 @@ function maskQuotedRun(body, quote, family) {
 /**
  * @param {string} text
  * @param {number} start   Index of the opening quote.
- * @param {ShellFamily} family
+ * @param {ShellGrammar} grammar
  * @returns {number} Index of the closing quote, or -1.
  */
-function findQuoteEnd(text, start, family) {
+function findQuoteEnd(text, start, grammar) {
   const quote = text[start];
+  const escapes = grammar.quoting.escapeInQuotes.includes(quote);
   for (let index = start + 1; index < text.length; index += 1) {
     const char = text[index];
-    if (char === '\\' && family === 'posix' && quote === '"') {
+    if (escapes && grammar.quoting.escape === 'backslash' && char === '\\') {
       index += 1;
       continue;
     }
     if (char !== quote) continue;
     // PowerShell and cmd double a quote to escape it inside the same kind of quoting.
-    if (family !== 'posix' && text[index + 1] === quote) {
+    if (escapes && grammar.quoting.escape === 'doubled' && text[index + 1] === quote) {
       index += 1;
       continue;
     }
@@ -435,11 +546,11 @@ function findQuoteEnd(text, start, family) {
 
 /**
  * @param {string} text
- * @param {ShellFamily} family
+ * @param {ShellGrammar} grammar
  * @returns {{ ok: true, tokens: ShellToken[] } | { ok: false }}
  */
-function tokenize(text, family) {
-  const separators = SHELL_FAMILIES[family].separators;
+function tokenize(text, grammar) {
+  const separators = grammar.separators;
   /** @type {ShellToken[]} */
   const tokens = [];
   let word = '';
@@ -450,10 +561,10 @@ function tokenize(text, family) {
   };
   while (index < text.length) {
     const char = text[index];
-    if (char === '"' || char === "'") {
-      const end = findQuoteEnd(text, index, family);
+    if (grammar.quoteChars.includes(char)) {
+      const end = findQuoteEnd(text, index, grammar);
       if (end < 0) return { ok: false };
-      word += unquote(text.slice(index, end + 1), family);
+      word += unquote(text.slice(index, end + 1), grammar);
       index = end + 1;
       continue;
     }
@@ -495,13 +606,14 @@ function matchRedirect(text, index) {
 
 /**
  * @param {string} token
- * @param {ShellFamily} family
+ * @param {ShellGrammar} grammar
  * @returns {string}
  */
-function unquote(token, family) {
+function unquote(token, grammar) {
   const quote = token[0];
   const body = token.slice(1, -1);
-  if (family === 'posix') return quote === "'" ? body : body.replace(/\\(["\\$`])/g, '$1');
+  if (!grammar.quoting.escapeInQuotes.includes(quote)) return body;
+  if (grammar.quoting.escape === 'backslash') return body.replace(/\\(["\\$`])/g, '$1');
   return body.split(`${quote}${quote}`).join(quote);
 }
 
@@ -561,15 +673,103 @@ function deny(family, code, reason, commands) {
 }
 
 /**
- * @param {{ separators: string[], unmodelled: Array<{ pattern: RegExp, what: string }> }} family
+ * @param {string} id
+ * @param {any} entry
+ * @param {ReadonlyArray<{ pattern: RegExp, what: string }>} common
  * @returns {ShellGrammar}
  */
-function freezeFamily(family) {
+function compileFamily(id, entry, common) {
+  const separators = readStrings(entry?.separators, `${id}.separators`);
+  if (separators.length === 0) throw new TypeError(`shell-families.json: ${id} has no separators`);
+  const quoting = readQuoting(id, entry?.quoting);
   return Object.freeze({
+    id,
+    label: readLabel(id, entry?.label),
     // Longest first, so `&&` is never read as `&`.
-    separators: Object.freeze([...family.separators].sort((left, right) => right.length - left.length)),
-    unmodelled: Object.freeze([...family.unmodelled.map((entry) => Object.freeze(entry)), ...COMMON_UNMODELLED]),
+    separators: Object.freeze([...separators].sort((left, right) => right.length - left.length)),
+    switchPrefixes: Object.freeze(readStrings(entry?.switchPrefixes, `${id}.switchPrefixes`)),
+    quoteChars: Object.freeze(Object.keys(quoting.expands)),
+    quoting,
+    unmodelled: Object.freeze([...readUnmodelled(entry?.unmodelled, id), ...common]),
   });
+}
+
+/**
+ * @param {string} id
+ * @param {any} value
+ * @returns {ShellQuoting}
+ */
+function readQuoting(id, value) {
+  if (value?.escape !== 'backslash' && value?.escape !== 'doubled') {
+    throw new TypeError(`shell-families.json: ${id}.quoting.escape must be backslash or doubled`);
+  }
+  const expands = value.expands;
+  const quotes = Object.keys(expands ?? {});
+  if (quotes.length === 0 || quotes.some((quote) => typeof expands[quote] !== 'string')) {
+    throw new TypeError(`shell-families.json: ${id}.quoting.expands must map every quote to its expansions`);
+  }
+  return Object.freeze({
+    escape: value.escape,
+    escapeInQuotes: Object.freeze(readStrings(value.escapeInQuotes, `${id}.quoting.escapeInQuotes`)),
+    expands: Object.freeze({ ...expands }),
+  });
+}
+
+/**
+ * @param {any} value
+ * @param {string} where
+ * @returns {Array<{ pattern: RegExp, what: string }>}
+ */
+function readUnmodelled(value, where) {
+  if (!Array.isArray(value)) throw new TypeError(`shell-families.json: ${where}.unmodelled must be an array`);
+  return value.map((entry) => {
+    if (typeof entry?.pattern !== 'string' || typeof entry?.what !== 'string') {
+      throw new TypeError(`shell-families.json: ${where}.unmodelled needs a pattern and a description`);
+    }
+    return Object.freeze({ pattern: new RegExp(entry.pattern, entry.flags ?? ''), what: entry.what });
+  });
+}
+
+/**
+ * @param {any} value
+ * @param {Readonly<Record<string, ShellGrammar>>} families
+ * @returns {Record<string, string>}
+ */
+function readShells(value, families) {
+  if (value === null || typeof value !== 'object' || Array.isArray(value)) {
+    throw new TypeError('shell-families.json: shells must be an object');
+  }
+  /** @type {Record<string, string>} */
+  const shells = {};
+  for (const [name, id] of Object.entries(value)) {
+    if (typeof id !== 'string' || !Object.hasOwn(families, id)) {
+      throw new TypeError(`shell-families.json: shell ${name} names a family that does not exist`);
+    }
+    shells[name] = id;
+  }
+  return shells;
+}
+
+/**
+ * @param {any} value
+ * @param {string} where
+ * @returns {string[]}
+ */
+function readStrings(value, where) {
+  if (!Array.isArray(value) || value.some((entry) => typeof entry !== 'string')) {
+    throw new TypeError(`shell-families.json: ${where} must be an array of strings`);
+  }
+  return [...value];
+}
+
+/**
+ * @param {string} id
+ * @param {any} value
+ * @returns {string}
+ */
+function readLabel(id, value) {
+  if (typeof value !== 'string' || value.length === 0) throw new TypeError(`shell-families.json: ${id} has no label`);
+  return value;
 }
 
 /**

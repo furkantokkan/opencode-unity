@@ -24,7 +24,7 @@ import { runMap } from '../delegate/map.js';
 import { createModelTarget } from '../delegate/model.js';
 import { attachOrchestratorAction, buildJobResult, createJob, renderJobMeta, writeJobFile } from '../delegate/results.js';
 import { runRestore } from '../delegate/restore.js';
-import { createSensitiveMatcher } from '../delegate/sensitive.js';
+import { createSensitiveMatcher } from '../network/sensitive.js';
 
 /**
  * Everything a delegate subcommand needs. It is built once per invocation, and tests build it directly
@@ -44,7 +44,7 @@ import { createSensitiveMatcher } from '../delegate/sensitive.js';
  * @property {(cleanup: () => string | void) => () => void} addCleanup
  * @property {string} resultsDir
  * @property {string} ledgerPath
- * @property {import('../delegate/sensitive.js').SensitiveMatcher} matcher
+ * @property {import('../network/sensitive.js').SensitiveMatcher} matcher
  * @property {NodeJS.Platform} platform
  * @property {Record<string, string | undefined>} env
  * @property {AbortSignal} [signal]

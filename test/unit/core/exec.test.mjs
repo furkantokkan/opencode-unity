@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import path from 'node:path';
 import { describe, it } from 'node:test';
 
-import { DEFAULT_MAX_OUTPUT_BYTES, findExecutable, getFirstOutputLine, runProcess } from '../../../src/core/exec.js';
+import { DEFAULT_MAX_OUTPUT_BYTES, findExecutable, getFirstOutputLine, isRegularFile, runProcess } from '../../../src/core/exec.js';
 
 const NODE = process.execPath;
 // Killing our own child directly keeps the test off taskkill, which is covered by the signal tests.
@@ -143,5 +143,37 @@ describe('findExecutable', () => {
     const name = process.platform === 'win32' ? 'node.exe' : 'node';
     const found = findExecutable(name);
     assert.ok(found === null || found.length > 0);
+  });
+});
+
+describe('isRegularFile (the default PATH test)', () => {
+  const alias = 'C:\\Users\\user\\AppData\\Local\\Microsoft\\WindowsApps\\wt.exe';
+  /** What stat does with an App Execution Alias: it refuses the reparse point. */
+  const refusingStat = () => {
+    throw Object.assign(new Error('EACCES: permission denied'), { code: 'EACCES' });
+  };
+  const aliasLstat = () => ({ isFile: () => false, isSymbolicLink: () => true });
+  const missingLstat = () => {
+    throw Object.assign(new Error('ENOENT'), { code: 'ENOENT' });
+  };
+
+  it('counts a Windows App Execution Alias that stat refuses, as `where wt` does', () => {
+    assert.equal(isRegularFile(alias, { platform: 'win32', statSync: refusingStat, lstatSync: aliasLstat }), true);
+  });
+
+  it('counts nothing else that stat refuses', () => {
+    assert.equal(isRegularFile(alias, { platform: 'linux', statSync: refusingStat, lstatSync: aliasLstat }), false, 'EACCES off Windows is a real refusal');
+    assert.equal(isRegularFile(alias, { platform: 'win32', statSync: refusingStat, lstatSync: missingLstat }), false);
+    const missingStat = () => {
+      throw Object.assign(new Error('ENOENT'), { code: 'ENOENT' });
+    };
+    assert.equal(isRegularFile(alias, { platform: 'win32', statSync: missingStat, lstatSync: aliasLstat }), false);
+    const directory = () => ({ isFile: () => false });
+    assert.equal(isRegularFile(alias, { platform: 'win32', statSync: directory, lstatSync: aliasLstat }), false);
+  });
+
+  it('is what findExecutable uses when no test is injected', () => {
+    assert.equal(isRegularFile(process.execPath), true);
+    assert.equal(isRegularFile(path.join(path.dirname(process.execPath), 'no-such-program-here')), false);
   });
 });

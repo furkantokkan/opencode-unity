@@ -5,7 +5,7 @@ import fsSync from 'node:fs';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { CliError, EXIT, usageError } from '../cli/exit-codes.js';
-import { globToRegExp, isUncPath, normalizeWindowsPath, toPosix } from './sensitive.js';
+import { globToRegExp, isUncPath, normalizeWindowsPath, toPosix } from '../network/sensitive.js';
 
 // A quarter of a mebibyte: larger text never fits a 16K context anyway, and reading it only makes the
 // budget refusal slower.
@@ -138,7 +138,7 @@ export async function resolveFileArgs(fileArgs, cwd, { allowGlobs = true, platfo
 
 /**
  * @typedef {object} LoadFilesOptions
- * @property {import('./sensitive.js').SensitiveMatcher} matcher
+ * @property {import('../network/sensitive.js').SensitiveMatcher} matcher
  * @property {boolean} [allowSensitive]
  * @property {number} [maxFileBytes]
  * @property {boolean} [strict]   Edit inputs: a file that cannot be used is an error, not a warning.
@@ -200,7 +200,7 @@ export async function loadSourceFiles(absolutePaths, cwd, { matcher, allowSensit
  * @param {string | undefined} value
  * @param {object} context
  * @param {string} context.cwd
- * @param {import('./sensitive.js').SensitiveMatcher} context.matcher
+ * @param {import('../network/sensitive.js').SensitiveMatcher} context.matcher
  * @param {boolean} [context.allowSensitive]
  * @param {number} [context.maxFileBytes]
  * @param {string} [context.optionName]

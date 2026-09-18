@@ -183,6 +183,11 @@ describe('ci.yml jobs', () => {
       // machine, so an untested branch in either is exactly what this gate exists to catch.
       'src/project/**',
       'src/ollama/guarded-chat.js',
+      // Amendment 38.16: the network lane, whose every branch decides whether a request leaves.
+      'plugin/opencode-unity-lib/net/**',
+      'src/network/**',
+      // The editor argument policy is the one gate between the model and a mutating Editor tool.
+      'plugin/opencode-unity-lib/mcp-args.js',
     ];
     for (const gated of gatedPaths) {
       assert.ok(unit.includes(`--test-coverage-include="${gated}"`), `the coverage gate must include ${gated}`);

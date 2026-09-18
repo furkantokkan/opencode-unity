@@ -147,3 +147,25 @@ describe('answer parsing and questions', () => {
     assert.match(formatQuestion(ITEMS[3]), /\[y\/N\] $/);
   });
 });
+
+describe('a deletion the command was asked for (spec 5.1)', () => {
+  const REMOVE = { id: 'remove', title: 'Remove 3 recorded items', recommended: false, preselected: true, defaultAnswer: false };
+
+  it('is accepted by --yes, because running the command is the request', async () => {
+    const decisions = await createConsent({ interactive: false, yes: true }).request([REMOVE]);
+    assert.deepEqual(decisions, [{ id: 'remove', accepted: true, source: 'yes_flag' }]);
+  });
+
+  it('still defaults to No at the prompt, and says so', async () => {
+    assert.match(formatQuestion(REMOVE), /\[y\/N\] $/);
+    const declined = await ask([REMOVE], '\n');
+    assert.deepEqual(declined.decisions, [{ id: 'remove', accepted: false, source: 'default' }]);
+    const accepted = await ask([REMOVE], 'y\n');
+    assert.deepEqual(accepted.decisions, [{ id: 'remove', accepted: true, source: 'answer' }]);
+  });
+
+  it('refuses a default answer that is not a boolean', async () => {
+    const consent = createConsent({ interactive: false, yes: true });
+    await assert.rejects(consent.request([{ ...REMOVE, defaultAnswer: /** @type {any} */ ('no') }]), /defaultAnswer that is not a boolean/);
+  });
+});

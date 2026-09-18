@@ -4,8 +4,13 @@
 //
 // It is defense in depth behind the permission rules, not a replacement for them: an allowed command
 // still runs a program that can do anything (S14).
+//
+// It also picks the shell family the classifier reads the command with (amendment 33.7). The platform
+// alone is not enough: OpenCode prefers pwsh, then powershell, then bash on Windows (claim 146), and
+// bash read with PowerShell's rules is weaker than either - a backslash escape joins two words there,
+// so `g\it push` would reach the shell as a version control write that the classifier never saw.
 import { PROTECTED_EDIT_GLOBS } from './protected-paths.js';
-import { classifyShellCommand, getDefaultFamily } from './shell-classify.js';
+import { classifyShellCommand, familyForShell, getDefaultFamily } from './shell-classify.js';
 
 export const SHELL_GUARD_PREFIX = 'opencode-unity shell guard:';
 
@@ -25,6 +30,7 @@ export { PROTECTED_EDIT_GLOBS };
  * @property {string[]} [blockedPrograms]           Extra denied first tokens (the network list of S36).
  * @property {string[]} [allowExactCommands]        Verify commands, allowed by full-string equality only.
  * @property {import('./shell-classify.js').ShellFamily} [family]
+ * @property {string | null} [shell]                The shell OpenCode runs the command with, when it is known.
  * @property {string} [platform]
  */
 
@@ -46,9 +52,10 @@ export function createShellGuard({
   blockedPrograms = [],
   allowExactCommands = [],
   family,
+  shell = null,
   platform = process.platform,
 } = {}) {
-  const resolvedFamily = family ?? getDefaultFamily(platform);
+  const resolvedFamily = selectShellFamily({ family, shell, platform });
   const classifyOptions = {
     family: resolvedFamily,
     vcsKind,
@@ -70,14 +77,30 @@ export function createShellGuard({
 }
 
 /**
+ * The family the classifier reads a command with. A caller that states the family outright wins,
+ * because a test and a rendered profile both mean exactly what they say; a shell this product models
+ * picks its own family next; and only then does the platform decide. An unrecognised shell falls back
+ * to the platform rather than to a guess, and the POSIX family is already the union of the POSIX
+ * shells, so the fallback never reads a command with rules looser than the shell's own.
+ * @param {{ family?: import('./shell-classify.js').ShellFamily, shell?: string | null, platform?: string }} [input]
+ * @returns {import('./shell-classify.js').ShellFamily}
+ */
+export function selectShellFamily({ family, shell = null, platform = process.platform } = {}) {
+  return family ?? familyForShell(shell) ?? getDefaultFamily(platform);
+}
+
+/**
  * The tool result the model reads. It never repeats the command, because the session log and the
- * model transcript both stay free of file content (P5).
+ * model transcript both stay free of file content (P5). The deny code rides on the Error, so a caller
+ * that logs the refusal logs the code rather than a message that can name the model's own arguments.
  * @param {import('./shell-classify.js').ShellClassification} result
- * @returns {Error}
+ * @returns {Error & { code: import('./shell-classify.js').ShellDenyCode | null }}
  */
 export function createShellGuardError(result) {
   const reason = result.reason ?? 'the command is not allowed';
-  return new Error(`${SHELL_GUARD_PREFIX} ${reason}. ${describeNextStep(result.code)}`);
+  const error = /** @type {Error & { code: import('./shell-classify.js').ShellDenyCode | null }} */ (new Error(`${SHELL_GUARD_PREFIX} ${reason}. ${describeNextStep(result.code)}`));
+  error.code = result.code;
+  return error;
 }
 
 /**

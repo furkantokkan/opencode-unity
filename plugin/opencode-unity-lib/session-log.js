@@ -14,8 +14,11 @@ import path from 'node:path';
 export const SESSION_LOG_RETENTION_DAYS = 14;
 export const SESSION_LOG_MAX_STRING = 120;
 
-/** Field names whose value may be a free string; everything else must be a number or a boolean. */
-const TEXT_FIELDS = Object.freeze(['event', 'sessionId', 'agent', 'reason', 'code', 'verdict', 'mode', 'family', 'source', 'model', 'at', 'tool']);
+/**
+ * Field names whose value may be a free string; everything else must be a number or a boolean.
+ * `changes` holds the comma-joined argument names the editor policy rewrote, never their values.
+ */
+const TEXT_FIELDS = Object.freeze(['event', 'sessionId', 'agent', 'reason', 'code', 'verdict', 'mode', 'family', 'source', 'model', 'at', 'tool', 'changes']);
 
 /**
  * @typedef {object} SessionLog

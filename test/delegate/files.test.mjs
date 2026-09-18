@@ -18,7 +18,7 @@ import {
   resolveFileArgs,
   stripBom,
 } from '../../src/delegate/files.js';
-import { createSensitiveMatcher } from '../../src/delegate/sensitive.js';
+import { createSensitiveMatcher } from '../../src/network/sensitive.js';
 import { catchAsync } from '../helpers/catch-error.mjs';
 import { useSandbox } from '../helpers/sandbox.mjs';
 

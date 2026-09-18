@@ -7,7 +7,7 @@
 import path from 'node:path';
 import { pathKey } from './files.js';
 import { describeProtectedEdit, findProtectedEditGlob } from './protected-files.js';
-import { toPosix } from './sensitive.js';
+import { toPosix } from '../network/sensitive.js';
 
 export const SEARCH_MARKER = '<<<<<<< SEARCH';
 export const DIVIDER_MARKER = '=======';

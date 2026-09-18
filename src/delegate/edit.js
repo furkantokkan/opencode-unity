@@ -14,7 +14,7 @@ import { decodeTextFile, parseEditBlocks, validateEditBlocks } from './edit-bloc
 import { isInsideDirectory, loadSourceFiles, pathKey, readTaskText, realPathOrSelf, resolveFileArgs } from './files.js';
 import { requestChat, withDelegateLock } from './model.js';
 import { describeProtectedEdit, findProtectedEditGlob } from './protected-files.js';
-import { toPosix } from './sensitive.js';
+import { toPosix } from '../network/sensitive.js';
 import { assertPromptBudget, buildEditMessages, estimateMessageTokens, getDelegatePromptBudget, takeTail, truncateText } from './prompts.js';
 import { addUsage, createReviewKey, readReview, SUMMARY_LIMIT, writeJobFile, writeReview } from './results.js';
 

@@ -1,0 +1,18 @@
+using UnityEngine;
+
+namespace Game.Progression
+{
+    public sealed class SaveKeyResolver
+    {
+        const string k_saveKeyPrefix = "progression.slot.";
+
+        public string GetKey(int slot)
+        {
+            var key = k_saveKeyPrefix + slot.ToString();
+            var secretHandshakeValue = ComputeHandshakeForSlot(slot);
+            return key + ":" + secretHandshakeValue;
+        }
+
+        static string ComputeHandshakeForSlot(int slot) => slot.ToString("X8");
+    }
+}

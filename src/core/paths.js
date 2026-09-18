@@ -18,6 +18,9 @@ const LINUX_OLLAMA_HOME = '/usr/share/ollama';
 /** The systemd unit Ollama installs on Linux; its output goes to the journal, not to a file (claim 117). */
 const LINUX_OLLAMA_UNIT = 'ollama';
 
+/** journalctl's output mode that prints each message and nothing else. */
+export const JOURNAL_OUTPUT_CAT = '--output=cat';
+
 /**
  * @typedef {object} PlatformContext
  * @property {Record<string, string | undefined>} [env]
@@ -76,6 +79,7 @@ export function resolveHome(context) {
  * @property {(projectId: string) => ProjectPaths} project
  * @property {string} state
  * @property {string} installManifest
+ * @property {string} consentLedger
  * @property {string} sessionsDir
  * @property {string} gpuLock
  * @property {string} selftestDir
@@ -150,6 +154,8 @@ export function getHomePaths(home, { platform = process.platform } = {}) {
     },
     state,
     installManifest: api.join(state, 'install-manifest.json'),
+    // The append-only network consent ledger (amendment 35.9, 38.4); uninstall asks about it on its own.
+    consentLedger: api.join(state, 'consent.jsonl'),
     sessionsDir: api.join(state, 'sessions'),
     gpuLock: api.join(state, 'gpu.lock'),
     selftestDir: api.join(state, 'selftest'),
@@ -282,7 +288,9 @@ export function resolveLogSource({
   // A configured path is the user's statement about their own install, so it is not existence-checked here.
   if (configured !== undefined) return { kind: 'file', path: api.resolve(configured), rotation: 'server-*.log' };
   if (platform === 'linux') {
-    const command = ['journalctl', '-u', LINUX_OLLAMA_UNIT, '--no-pager'];
+    // The message text only: journalctl's default `short` output puts a date, host and unit prefix in
+    // front of every line, and the server-log parser's patterns are anchored at the start of a line.
+    const command = ['journalctl', '-u', LINUX_OLLAMA_UNIT, '--no-pager', JOURNAL_OUTPUT_CAT];
     if (lines !== undefined) command.push('-n', String(lines));
     return { kind: 'journal', unit: LINUX_OLLAMA_UNIT, command };
   }

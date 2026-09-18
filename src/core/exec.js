@@ -240,13 +240,23 @@ function getEnvValue(env, name, platform) {
 }
 
 /**
+ * Whether a PATH candidate is a file a process can be started from. On Windows that includes an App
+ * Execution Alias - how the Store and winget put `wt.exe`, `winget.exe` or a Store `pwsh.exe` on PATH:
+ * it is a reparse point that `stat` refuses with EACCES, yet CreateProcess starts it like any program.
  * @param {string} candidate
+ * @param {{ platform?: NodeJS.Platform, statSync?: (file: string) => { isFile(): boolean }, lstatSync?: (file: string) => { isFile(): boolean, isSymbolicLink(): boolean } }} [options]
  * @returns {boolean}
  */
-function isRegularFile(candidate) {
+export function isRegularFile(candidate, { platform = process.platform, statSync = fs.statSync, lstatSync = fs.lstatSync } = {}) {
   try {
-    return fs.statSync(candidate).isFile();
-  } catch {
-    return false;
+    return statSync(candidate).isFile();
+  } catch (error) {
+    if (platform !== 'win32' || /** @type {{ code?: unknown }} */ (error)?.code !== 'EACCES') return false;
+    try {
+      const link = lstatSync(candidate);
+      return link.isSymbolicLink() || link.isFile();
+    } catch {
+      return false;
+    }
   }
 }

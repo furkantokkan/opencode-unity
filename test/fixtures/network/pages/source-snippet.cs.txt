@@ -1,0 +1,25 @@
+// A repository file the model is about to edit. Preserving mode must return it unchanged except
+// for the character classes that cannot appear legitimately in source.
+using System;
+
+namespace Sample.Gameplay
+{
+    public sealed class ScoreBoard
+    {
+        private readonly int[] m_scores = new int[4];
+
+        public int Total()
+        {
+            var total = 0;
+            foreach (var score in m_scores)
+            {
+                total += score;
+            }
+
+            return total;
+        }
+
+        // Markdown-looking text that preserving mode must not rewrite:
+        // see [the guide](https://docs.example/guides/scores) and run `dotnet build`.
+    }
+}

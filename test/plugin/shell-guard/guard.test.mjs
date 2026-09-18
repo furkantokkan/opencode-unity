@@ -97,6 +97,7 @@ describe('shell guard', () => {
       const error = createShellGuardError({ decision: 'deny', family: 'posix', code, reason: null, commands: [] });
       assert.match(error.message, /[.]$/);
       assert.ok(error.message.length > SHELL_GUARD_PREFIX.length + 10, String(code));
+      assert.equal(error.code, code, 'the code rides on the Error so a log can record it instead of the message');
     }
   });
 });

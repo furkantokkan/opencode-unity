@@ -322,7 +322,8 @@ export function compareVersions(a, b) {
 
 /**
  * Normalizes a base URL: no trailing slash and no `/v1` suffix, so OpenAI-style URLs from a runtime
- * profile work too.
+ * profile work too. A refusal never repeats the value: the reason to refuse it is most often a password
+ * or a key in it, and this message reaches `doctor --markdown`, which users paste into public issues.
  * @param {string} baseUrl
  * @returns {string}
  */
@@ -331,13 +332,31 @@ export function normalizeBaseUrl(baseUrl) {
   try {
     url = new URL(String(baseUrl).trim());
   } catch {
-    throw new CliError(`Invalid Ollama base URL '${baseUrl}'`, { exitCode: EXIT.USAGE, code: 'ollama_base_url_invalid' });
+    throw new CliError('Invalid Ollama base URL: it is not a URL; use http(s)://host:port', { exitCode: EXIT.USAGE, code: 'ollama_base_url_invalid' });
   }
-  if ((url.protocol !== 'http:' && url.protocol !== 'https:') || url.username || url.password || url.search || url.hash) {
-    throw new CliError(`Invalid Ollama base URL '${baseUrl}': use http(s)://host:port`, { exitCode: EXIT.USAGE, code: 'ollama_base_url_invalid' });
+  if (url.protocol !== 'http:' && url.protocol !== 'https:') {
+    throw new CliError(`Invalid Ollama base URL: the scheme '${url.protocol}' is not http or https; use http(s)://host:port`, { exitCode: EXIT.USAGE, code: 'ollama_base_url_invalid' });
+  }
+  if (url.username || url.password || url.search || url.hash) {
+    throw new CliError(`Invalid Ollama base URL for ${url.origin}: a user name, password, query or fragment is not allowed; use http(s)://host:port`, { exitCode: EXIT.USAGE, code: 'ollama_base_url_invalid' });
   }
   const path = url.pathname.replace(/\/+$/, '').replace(/\/v1$/i, '').replace(/\/+$/, '');
   return `${url.origin}${path}`;
+}
+
+/**
+ * A base URL as far as it is safe to print: the origin only, without a user, a password, a path, a
+ * query or a fragment; or a placeholder when it does not parse at all.
+ * @param {unknown} baseUrl
+ * @returns {string}
+ */
+export function describeBaseUrlSafely(baseUrl) {
+  try {
+    const url = new URL(String(baseUrl).trim());
+    return url.origin === 'null' ? '(an invalid URL)' : url.origin;
+  } catch {
+    return '(an invalid URL)';
+  }
 }
 
 const NOT_FOUND = Symbol('not-found');

@@ -7,7 +7,7 @@ import path from 'node:path';
 import { usageError } from '../cli/exit-codes.js';
 import { runProcess } from '../core/exec.js';
 import { lookupCompileRow } from '../facts/compile-map.js';
-import { toPosix } from './sensitive.js';
+import { toPosix } from '../network/sensitive.js';
 
 // Outside double quotes these start a second command, a pipe or a redirect in every shell family.
 const SHELL_OPERATORS = /[&|<>;()]/;

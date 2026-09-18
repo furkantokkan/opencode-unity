@@ -91,17 +91,17 @@ describe('resolveLogSource (amendment 33.8)', () => {
     });
   });
 
-  it('is the journal on Linux, where Ollama runs as a systemd unit', () => {
+  it('is the journal on Linux, where Ollama runs as a systemd unit, read as bare message text', () => {
     assert.deepEqual(resolveLogSource({ ...LINUX, env: {}, exists: never }), {
       kind: 'journal',
       unit: 'ollama',
-      command: ['journalctl', '-u', 'ollama', '--no-pager'],
+      command: ['journalctl', '-u', 'ollama', '--no-pager', '--output=cat'],
     });
   });
 
   it('adds -n only when a caller asks for a line count', () => {
     const source = resolveLogSource({ ...LINUX, env: {}, lines: 400 });
-    assert.deepEqual(source.kind === 'journal' ? source.command : [], ['journalctl', '-u', 'ollama', '--no-pager', '-n', '400']);
+    assert.deepEqual(source.kind === 'journal' ? source.command : [], ['journalctl', '-u', 'ollama', '--no-pager', '--output=cat', '-n', '400']);
   });
 
   it('is none when nothing resolves, which is what a hand-started `ollama serve` looks like', () => {
