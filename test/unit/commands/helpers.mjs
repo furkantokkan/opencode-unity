@@ -12,7 +12,7 @@ import { getHomePaths } from '../../../src/core/paths.js';
 import { loadPreset } from '../../../src/core/presets.js';
 import { buildRuntimeProfile, renderRuntimeProfile } from '../../../src/core/profile.js';
 import { startMockOllama } from '../../../src/selftest/mock-ollama.js';
-import { useSandbox } from '../../helpers/sandbox.mjs';
+import { mergeEnv, useSandbox } from '../../helpers/sandbox.mjs';
 import { materializeFixtureProject } from '../unity/fixture-projects.mjs';
 
 export const MODEL_TAG = 'ocu-qwen3-coder-30b-16k';
@@ -121,7 +121,7 @@ export async function createCommandHarness(t, { config = {}, renderProfile = tru
         json: input.json ?? false,
         sink: output,
         signal: input.signal,
-        env: { ...sandbox.env, ...input.env },
+        env: mergeEnv(sandbox.env, input.env),
       });
       const deps = { probes: createProbes({ blocked: input.guardBlocked, ...input.probes }), ...input.deps };
       try {

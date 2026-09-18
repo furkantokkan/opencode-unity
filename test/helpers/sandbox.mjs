@@ -147,6 +147,23 @@ export function buildSandboxEnv(dirs, parentEnv) {
 }
 
 /**
+ * Lays test overrides over an environment the way the target platform would. Windows names are
+ * case-insensitive, and a Windows runner hands down `Path` rather than `PATH`: spreading `{ PATH }` over
+ * it leaves both names, and a lookup that finds `Path` first never sees the override. So on win32 an
+ * override replaces every spelling of its name.
+ * @param {Record<string, string | undefined>} base
+ * @param {Record<string, string | undefined>} [overrides]
+ * @param {NodeJS.Platform} [platform]
+ * @returns {Record<string, string | undefined>}
+ */
+export function mergeEnv(base, overrides = {}, platform = process.platform) {
+  if (platform !== 'win32') return { ...base, ...overrides };
+  const replaced = new Set(Object.keys(overrides).map((name) => name.toUpperCase()));
+  const kept = Object.fromEntries(Object.entries(base).filter(([name]) => !replaced.has(name.toUpperCase())));
+  return { ...kept, ...overrides };
+}
+
+/**
  * Throws when an environment could reach the real Ollama server or the real Unity MCP hub.
  * @param {Record<string, string | undefined>} env
  */

@@ -12,7 +12,7 @@ import { main } from '../../src/cli/main.js';
 import { loadCommandModule } from '../../src/cli/registry.js';
 import { CLI_VERSION } from '../../src/cli/version.js';
 import { getHomePaths } from '../../src/core/paths.js';
-import { useSandbox } from '../helpers/sandbox.mjs';
+import { mergeEnv, useSandbox } from '../helpers/sandbox.mjs';
 
 export const PRESET_ID = 'nvidia-24gb-qwen3-coder-30b-16k';
 export const BASE_MODEL = 'qwen3-coder:30b';
@@ -235,7 +235,7 @@ export async function createHarness(t, options = {}) {
         stderr,
         stdin,
         interactive: runOptions.interactive ?? false,
-        env: { ...sandbox.env, OPENCODE_UNITY_HOME: home, ...runOptions.env },
+        env: /** @type {Record<string, string>} */ (mergeEnv({ ...sandbox.env, OPENCODE_UNITY_HOME: home }, runOptions.env)),
         cwd: sandbox.root,
         platform: process.platform,
         platformFacts: state.facts,

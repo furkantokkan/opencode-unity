@@ -3,7 +3,19 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { describe, it } from 'node:test';
 import { runProcess } from '../../helpers/run-cli.mjs';
-import { CLOSED_PORT_URL, SANDBOX_PARENT, assertSafeEnv, buildSandboxEnv, createSandbox, useSandbox } from '../../helpers/sandbox.mjs';
+import { CLOSED_PORT_URL, SANDBOX_PARENT, assertSafeEnv, buildSandboxEnv, createSandbox, mergeEnv, useSandbox } from '../../helpers/sandbox.mjs';
+
+describe('mergeEnv', () => {
+  it('replaces every spelling of an overridden name on Windows, where names are case-insensitive', () => {
+    // A Windows runner hands down `Path`; an override spelled `PATH` has to win, not sit beside it.
+    assert.deepEqual(mergeEnv({ Path: 'C:\\system', HOME: 'h' }, { PATH: 'C:\\sandbox\\bin' }, 'win32'), { HOME: 'h', PATH: 'C:\\sandbox\\bin' });
+  });
+
+  it('keeps distinct names distinct off Windows', () => {
+    assert.deepEqual(mergeEnv({ Path: 'a', PATH: 'b' }, { PATH: 'c' }, 'linux'), { Path: 'a', PATH: 'c' });
+    assert.deepEqual(mergeEnv({ PATH: 'b' }, undefined, 'win32'), { PATH: 'b' });
+  });
+});
 
 describe('sandbox', () => {
   it('creates every home directory inside its root and removes it on cleanup', async () => {
