@@ -206,7 +206,9 @@ describe('fall-through: every row passes the original text on, byte for byte', (
     assert.deepEqual([result.status, result.reason, result.request], ['passthrough', 'lock_timeout', text]);
   });
 
-  it('timeout', async () => {
+  it('timeout', async (t) => {
+    const transportHandle = setInterval(() => {}, 1000);
+    t.after(() => clearInterval(transportHandle));
     const hanging = /** @type {typeof fetch} */ (
       (_url, init) => new Promise((_resolve, reject) => init?.signal?.addEventListener('abort', () => reject(init.signal?.reason)))
     );

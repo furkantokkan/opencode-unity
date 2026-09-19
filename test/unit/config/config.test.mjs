@@ -6,6 +6,7 @@ import { EXIT } from '../../../src/cli/exit-codes.js';
 import {
   DEFAULT_CONFIG,
   DEFAULT_PRESET_ID,
+  getDefaultConfig,
   applyConfigDefaults,
   getConfigWarnings,
   loadConfig,
@@ -64,7 +65,7 @@ describe('defaults (spec 6.2)', () => {
   it('fills only what the file leaves out', () => {
     const merged = /** @type {any} */ (applyConfigDefaults({ schemaVersion: 1, guard: { maxUnityEditors: 1 }, projects: { 'demo-0a1b2c3d': { editor: { enabled: true } } } }));
     assert.equal(merged.guard.maxUnityEditors, 1);
-    assert.equal(merged.guard.minFreeVramAfterLoadMiB, 1500);
+    assert.equal(merged.guard.minFreeVramAfterLoadMiB, getDefaultConfig().guard.minFreeVramAfterLoadMiB);
     assert.deepEqual(merged.projects['demo-0a1b2c3d'], { editor: { enabled: true, trust: false, allowPlayMode: false }, bashMode: null });
   });
 });
@@ -136,7 +137,7 @@ describe('loadConfig and writeConfigFile', () => {
     assert.equal(loaded.exists, false);
     assert.equal(loaded.fileVersion, null);
     assert.deepEqual(loaded.user, {});
-    assert.deepEqual(loaded.config, DEFAULT_CONFIG);
+    assert.deepEqual(loaded.config, getDefaultConfig());
   });
 
   it('writes what setup writes, and reads it back', async (t) => {
@@ -148,7 +149,7 @@ describe('loadConfig and writeConfigFile', () => {
     const loaded = await loadConfig(file);
     assert.equal(loaded.exists, true);
     assert.equal(loaded.config.preset, 'nvidia-24gb-qwen3-coder-30b-32k');
-    assert.equal(loaded.config.guard.minFreeVramAfterLoadMiB, 1500, 'the file holds user choices only, not preset values');
+    assert.equal(loaded.config.guard.minFreeVramAfterLoadMiB, getDefaultConfig().guard.minFreeVramAfterLoadMiB, 'the file holds user choices only, not preset values');
     assert.deepEqual(await fs.readdir(sandbox.path('product-home')), ['config.json'], 'no temp file is left behind');
   });
 

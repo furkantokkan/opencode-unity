@@ -5,7 +5,9 @@ All notable changes to this project are documented here. The format follows
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html). While the version is `0.y.z`, a minor release
 may change the CLI or the config schema, with automatic migrations and a Breaking section.
 
-## [0.1.0-preview.6] - 2026-09-19
+## [0.1.0-preview.7] - 2026-09-19
+
+The preview.6 tag was not published: CI found platform-dependent test defaults, a missing isolated OpenCode fixture and unreferenced mock timeout handles. Preview.7 fixes those test harness assumptions and includes the integrations below. Runtime protections and platform restrictions remain unchanged.
 
 ### Added
 

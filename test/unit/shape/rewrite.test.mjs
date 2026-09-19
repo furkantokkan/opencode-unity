@@ -143,7 +143,10 @@ describe('every failure is an outcome, never an error', () => {
     }
   });
 
-  it('no answer within shape.timeoutSec: timeout', async () => {
+  it('no answer within shape.timeoutSec: timeout', async (t) => {
+    // A pending mock promise has no socket to keep AbortSignal.timeout's unref'ed timer alive.
+    const transportHandle = setInterval(() => {}, 1000);
+    t.after(() => clearInterval(transportHandle));
     const hanging = /** @type {typeof fetch} */ (
       (_url, init) =>
         new Promise((_resolve, reject) => {

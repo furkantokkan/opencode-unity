@@ -6,7 +6,7 @@ allowed-tools: Bash(opencode-unity delegate health:*), Bash(opencode-unity deleg
 
 # opencode-unity delegate (preview)
 
-This is a preview host file for opencode-unity 0.1.0-preview.6. It tells you, the host agent, when and
+This is a preview host file for opencode-unity 0.1.0-preview.7. It tells you, the host agent, when and
 how to hand work to a local model through `opencode-unity delegate`, and how to read what comes back.
 opencode-unity is MIT licensed and runs on this machine. It is unofficial and not affiliated with
 OpenCode, Ollama or Unity Technologies.

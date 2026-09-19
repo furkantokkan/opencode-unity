@@ -1,6 +1,6 @@
 {
   "name": "opencode-unity",
-  "version": "0.1.0-preview.6",
+  "version": "0.1.0-preview.7",
   "description": "Local AI coding for Unity with OpenCode + Ollama. Run Qwen on your GPU with VRAM guards, Unity project context, and local task delegation. Unofficial; not affiliated with OpenCode, Ollama or Unity Technologies.",
   "keywords": [
     "opencode",
