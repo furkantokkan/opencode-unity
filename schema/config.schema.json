@@ -1,15 +1,15 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "opencode-unity config.json",
-  "description": "User settings in <home>/config.json. Keys left out take their defaults; unknown keys are rejected. The schema describes the file after defaults are applied.",
+  "description": "User settings in <home>/config.json. Keys left out take their defaults, and a few defaults differ per platform; unknown keys are rejected. The schema describes the file after defaults are applied. Network policy, the standalone shape command and workspace discovery are active in preview.6. project.verify and safety.multiplayerProtectedGlobs are reserved configuration and do not add execution or protection beyond the existing checks in this preview.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schemaVersion", "preset", "overrides", "ollama", "guard", "budget", "safety", "start", "delegate", "projects", "experimental"],
+  "required": ["schemaVersion", "preset", "overrides", "ollama", "guard", "budget", "safety", "start", "delegate", "network", "shape", "project", "projects", "experimental"],
   "properties": {
     "schemaVersion": {
-      "description": "Config format version. Older files are migrated forward automatically.",
-      "const": 1,
-      "default": 1
+      "description": "Config format version. An older file is migrated forward in memory every time it is read, and is rewritten only by an explicit write such as upgrade.",
+      "const": 2,
+      "default": 2
     },
     "preset": {
       "description": "Model preset id from presets/. Experimental presets need --experimental.",
@@ -42,7 +42,7 @@
           "default": "http://127.0.0.1:11434"
         },
         "startAppIfDown": {
-          "description": "Start the installed Ollama app when the server is down.",
+          "description": "Start the installed Ollama app when the server is down. The Linux default is never: there Ollama is a systemd service, and starting it needs root.",
           "enum": ["ask", "always", "never"],
           "default": "ask"
         },
@@ -53,7 +53,7 @@
           "default": null
         },
         "serverLogPath": {
-          "description": "Path of the Ollama server log; null means the default location.",
+          "description": "Path of the Ollama server log; null means the platform's log source: the server log file on Windows and macOS, the systemd journal on Linux.",
           "type": ["string", "null"],
           "minLength": 1,
           "default": null
@@ -84,7 +84,11 @@
         "nvidiaSmiCommand"
       ],
       "properties": {
-        "minFreeVramAfterLoadMiB": { "$ref": "#/$defs/minFreeVramAfterLoadMiB", "default": 1500 },
+        "minFreeVramAfterLoadMiB": {
+          "$ref": "#/$defs/minFreeVramAfterLoadMiB",
+          "description": "Free video memory that must remain after the model loads. The macOS default is 4096, because the memory is shared with the rest of the system; that value is not calibrated on hardware.",
+          "default": 1500
+        },
         "allowOffload": {
           "description": "Let the model load when it does not fit in video memory alone; the rest runs from system RAM and replies are slower. The free-memory minimum still applies.",
           "type": "boolean",
@@ -205,7 +209,7 @@
     "safety": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["bashMode", "readLimitLines", "extraProtectedEditGlobs", "extraProtectedReadGlobs"],
+      "required": ["bashMode", "readLimitLines", "extraProtectedEditGlobs", "extraProtectedReadGlobs", "multiplayerProtectedGlobs"],
       "properties": {
         "bashMode": { "$ref": "#/$defs/bashMode", "default": "allowlist" },
         "readLimitLines": {
@@ -226,6 +230,13 @@
           "type": "array",
           "items": { "type": "string", "minLength": 1 },
           "default": []
+        },
+        "multiplayerProtectedGlobs": {
+          "description": "Paths where a multiplayer authority, economy or anti-cheat decision usually lives; they are read-only for the session when the workspace has a game server. A coarse net with known false positives: remove an entry to make those paths editable. doctor and the facts list what it protects.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 },
+          "default": ["*.rules", "*Economy/*", "*Purchas*/*", "*Entitlement*/*", "*Anticheat*/*", "*AntiCheat*/*", "*ServerAuthority*", "*Reconcil*", "*Rollback*"]
         }
       }
     },
@@ -235,7 +246,7 @@
       "required": ["warm", "pane", "agent", "projectConfig"],
       "properties": {
         "warm": { "description": "Load the model (through the guard) before the TUI opens.", "type": "boolean", "default": false },
-        "pane": { "description": "Open the status pane in Windows Terminal.", "enum": ["auto", "never"], "default": "auto" },
+        "pane": { "description": "Open the status pane in Windows Terminal. The Linux and macOS default is never: the pane is a Windows Terminal feature.", "enum": ["auto", "never"], "default": "auto" },
         "agent": { "description": "Agent the TUI opens with.", "enum": ["unity-code", "unity-editor"], "default": "unity-code" },
         "projectConfig": { "description": "Load project OpenCode config files, or disable them.", "enum": ["load", "disable"], "default": "load" }
       }
@@ -266,6 +277,159 @@
         }
       }
     },
+    "network": {
+      "description": "Outbound HTTP for the agent's unitynet tool (amendment 35). Everything fetched is data, never instructions.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["enabled", "profile", "allow", "limits", "bash", "extraDeniedQueryKeys", "extraDeniedHosts", "extraReservedPorts"],
+      "properties": {
+        "enabled": {
+          "description": "false removes the unitynet tool from every session.",
+          "type": "boolean",
+          "default": true
+        },
+        "profile": {
+          "description": "standard: the shipped read-only documentation hosts, loopback reads, what init derived and what you granted. none: no tool at all. custom: only your allow list.",
+          "enum": ["none", "standard", "custom"],
+          "default": "standard"
+        },
+        "allow": {
+          "description": "Your own entries, applied after the profile's. A non-loopback host requires a consentId label and an explicit permission ask on each request; the label does not grant access.",
+          "type": "array",
+          "items": { "$ref": "#/$defs/networkEntry" },
+          "default": []
+        },
+        "limits": {
+          "$ref": "#/$defs/networkLimits",
+          "required": [
+            "maxResponseBytes",
+            "maxOutputChars",
+            "maxRequestBodyBytes",
+            "maxUrlChars",
+            "connectTimeoutMs",
+            "firstByteTimeoutMs",
+            "totalTimeoutMs",
+            "maxRequestsPerSession",
+            "maxRequestsPerMinute"
+          ],
+          "default": {
+            "maxResponseBytes": 65536,
+            "maxOutputChars": 8192,
+            "maxRequestBodyBytes": 32768,
+            "maxUrlChars": 2048,
+            "connectTimeoutMs": 5000,
+            "firstByteTimeoutMs": 10000,
+            "totalTimeoutMs": 20000,
+            "maxRequestsPerSession": 40,
+            "maxRequestsPerMinute": 20
+          }
+        },
+        "bash": {
+          "description": "Network commands in the agent's shell: deny refuses them; ask prompts through OpenCode and startup verifies the effective shell permission rules.",
+          "enum": ["deny", "ask"],
+          "default": "deny"
+        },
+        "extraDeniedQueryKeys": { "$ref": "#/$defs/queryKeyList", "default": [] },
+        "extraDeniedHosts": { "$ref": "#/$defs/hostList", "default": [] },
+        "extraReservedPorts": { "$ref": "#/$defs/portList", "default": [] }
+      }
+    },
+    "shape": {
+      "description": "Prompt shaping (amendment 36): a clear request starts at once with no model call; an unclear one is rewritten once, shown, and the work continues.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "maxInputChars", "maxOutputTokens", "timeoutSec", "anchorCandidates", "grepTimeoutMs"],
+      "properties": {
+        "mode": {
+          "description": "auto rewrites only an unclear request; off never rewrites; always rewrites every request.",
+          "enum": ["auto", "off", "always"],
+          "default": "auto"
+        },
+        "maxInputChars": { "description": "Longest request that is shaped.", "type": "integer", "minimum": 100, "maximum": 20000, "default": 2000 },
+        "maxOutputTokens": { "description": "Output limit of the one rewrite call.", "type": "integer", "minimum": 16, "maximum": 4096, "default": 256 },
+        "timeoutSec": { "description": "Timeout of the rewrite call.", "type": "integer", "minimum": 1, "maximum": 600, "default": 60 },
+        "anchorCandidates": { "description": "Most project files offered to the rewrite as anchors.", "type": "integer", "minimum": 0, "maximum": 20, "default": 5 },
+        "grepTimeoutMs": { "description": "Time budget of the anchor search.", "type": "integer", "minimum": 100, "maximum": 60000, "default": 2000 }
+      }
+    },
+    "project": {
+      "description": "Workspace components (amendment 37): what init discovers beside the Unity project, and how much of it reaches the facts.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "components",
+        "maxComponents",
+        "factsBudgetChars",
+        "unityBlockChars",
+        "componentBlockChars",
+        "maxRenderedBlocks",
+        "walkEntryCap",
+        "readBudgetBytes",
+        "verify",
+        "database",
+        "multiplayer"
+      ],
+      "properties": {
+        "components": {
+          "description": "auto discovers every component; unity-only keeps the Unity project alone; a list keeps the named component ids.",
+          "anyOf": [
+            { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/componentId" } },
+            { "enum": ["auto", "unity-only"] }
+          ],
+          "default": "auto"
+        },
+        "maxComponents": { "description": "Most anchors and overlays; discovery stops beyond this and doctor warns.", "type": "integer", "minimum": 1, "maximum": 64, "default": 12 },
+        "factsBudgetChars": { "description": "Characters facts.md may spend on all fact blocks together.", "type": "integer", "minimum": 500, "maximum": 20000, "default": 2600 },
+        "unityBlockChars": { "description": "Characters of the Unity fact block.", "type": "integer", "minimum": 100, "maximum": 20000, "default": 1100 },
+        "componentBlockChars": { "description": "Characters of each other component's fact block.", "type": "integer", "minimum": 50, "maximum": 2000, "default": 200 },
+        "maxRenderedBlocks": { "description": "Most fact blocks rendered; the rest are dropped in the printed order.", "type": "integer", "minimum": 1, "maximum": 32, "default": 6 },
+        "walkEntryCap": { "description": "Most directory entries one discovery walk visits.", "type": "integer", "minimum": 1000, "maximum": 1000000, "default": 50000 },
+        "readBudgetBytes": { "description": "Most bytes discovery reads from project files.", "type": "integer", "minimum": 65536, "maximum": 67108864, "default": 6291456 },
+        "verify": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["enabled", "scriptOrder", "timeoutSec", "blockScriptBodies"],
+          "properties": {
+            "enabled": { "description": "Render a verify command for each component that has one.", "type": "boolean", "default": true },
+            "scriptOrder": {
+              "description": "package.json script names tried in order for a component's verify command.",
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9:._-]{0,63}$" },
+              "default": ["test", "build", "typecheck", "check"]
+            },
+            "timeoutSec": { "type": "integer", "minimum": 1, "maximum": 86400, "default": 900 },
+            "blockScriptBodies": {
+              "description": "Refuse a verify script whose body does more than build, test or type-check. false needs --experimental and a consent item.",
+              "type": "boolean",
+              "default": true
+            }
+          }
+        },
+        "database": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["readEnvExampleKeys", "maxEnvExampleKeys"],
+          "properties": {
+            "readEnvExampleKeys": { "description": "List the key names, never the values, of an .env.example file.", "type": "boolean", "default": true },
+            "maxEnvExampleKeys": { "type": "integer", "minimum": 0, "maximum": 100, "default": 12 }
+          }
+        },
+        "multiplayer": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["ruleBlock"],
+          "properties": {
+            "ruleBlock": {
+              "description": "The multiplayer rule block: auto renders it when a game server is found.",
+              "enum": ["auto", "always", "never"],
+              "default": "auto"
+            }
+          }
+        }
+      }
+    },
     "projects": {
       "description": "Per-project settings keyed by project id (<name>-<sha8>).",
       "type": "object",
@@ -278,7 +442,11 @@
       "additionalProperties": false,
       "required": ["platforms", "presets", "untestedVersions"],
       "properties": {
-        "platforms": { "type": "boolean", "default": false },
+        "platforms": {
+          "description": "Accepts an experimental platform tier for every command, the lasting form of --experimental. setup writes it when you accept the platform acknowledgement.",
+          "type": "boolean",
+          "default": false
+        },
         "presets": { "type": "boolean", "default": false },
         "untestedVersions": { "type": "boolean", "default": false }
       }
@@ -359,8 +527,104 @@
           "description": "Overrides safety.bashMode for this project; null uses the global value.",
           "anyOf": [{ "type": "null" }, { "$ref": "#/$defs/bashMode" }],
           "default": null
-        }
+        },
+        "network": { "$ref": "#/$defs/projectNetwork" }
       }
-    }
+    },
+    "projectNetwork": {
+      "description": "May only narrow the global network block. Projects cannot add hosts, increase budgets, change transport headers or widen methods and paths; invalid overrides make start refuse with exit 4.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "profile": { "enum": ["none", "standard", "custom"] },
+        "allow": { "type": "array", "items": { "$ref": "#/$defs/networkEntry" } },
+        "limits": { "$ref": "#/$defs/networkLimits" },
+        "extraDeniedQueryKeys": { "$ref": "#/$defs/queryKeyList" },
+        "extraDeniedHosts": { "$ref": "#/$defs/hostList" },
+        "extraReservedPorts": { "$ref": "#/$defs/portList" }
+      }
+    },
+    "networkLimits": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "maxResponseBytes": { "description": "Response bytes read before the socket is closed.", "type": "integer", "minimum": 1024, "maximum": 4194304 },
+        "maxOutputChars": { "description": "Characters handed to the model after sanitising.", "type": "integer", "minimum": 256, "maximum": 65536 },
+        "maxRequestBodyBytes": { "description": "Largest request body on any entry; an entry's own budget may be lower.", "type": "integer", "minimum": 0, "maximum": 1048576 },
+        "maxUrlChars": { "type": "integer", "minimum": 64, "maximum": 8192 },
+        "connectTimeoutMs": { "type": "integer", "minimum": 100, "maximum": 60000 },
+        "firstByteTimeoutMs": { "type": "integer", "minimum": 100, "maximum": 120000 },
+        "totalTimeoutMs": { "type": "integer", "minimum": 100, "maximum": 300000 },
+        "maxRequestsPerSession": { "type": "integer", "minimum": 0, "maximum": 1000 },
+        "maxRequestsPerMinute": { "type": "integer", "minimum": 0, "maximum": 600 }
+      }
+    },
+    "networkEntry": {
+      "description": "One allow-list entry. The fourteen render-time rules (exit 4, network_entry_*) check what a schema cannot; an unknown key here, including rejectUnauthorized, insecure or strictSSL, is an error rather than an ignored key.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "host", "ports", "scheme", "methods", "pathPrefix"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{0,31}$" },
+        "host": { "$ref": "#/$defs/host" },
+        "ports": {
+          "description": "Explicit ports; there is no default port. \"*\" is accepted on loopback only.",
+          "anyOf": [
+            { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/port" } },
+            { "const": "*" }
+          ]
+        },
+        "scheme": { "enum": ["http", "https"] },
+        "methods": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "enum": ["GET", "HEAD", "POST", "PUT", "PATCH", "DELETE"] }
+        },
+        "pathPrefix": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "pattern": "^/", "maxLength": 1024 }
+        },
+        "stripLocaleSegment": { "type": "boolean" },
+        "loopback": { "description": "Must agree with the host; it is checked, never trusted.", "type": "boolean" },
+        "destructive": { "type": "boolean" },
+        "firebaseEmulator": {
+          "anyOf": [
+            { "const": false },
+            { "type": "string", "pattern": "^[a-z][a-z0-9-]{0,31}$" }
+          ]
+        },
+        "headers": {
+          "description": "Literal request headers, loopback entries only.",
+          "type": "object",
+          "propertyNames": { "pattern": "^[A-Za-z0-9!#$%&'*+.^_`|~-]{1,64}$" },
+          "additionalProperties": { "type": "string", "maxLength": 1024 }
+        },
+        "caFile": { "description": "A certificate authority file for a loopback https entry.", "type": "string", "minLength": 1 },
+        "budget": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "maxPathChars": { "type": "integer", "minimum": 0, "maximum": 8192 },
+            "maxQueryChars": { "type": "integer", "minimum": 0, "maximum": 8192 },
+            "maxRequestBodyBytes": { "type": "integer", "minimum": 0, "maximum": 1048576 }
+          }
+        },
+        "consentId": { "description": "The consent ledger record that granted this entry.", "type": "string", "pattern": "^\\S{1,128}$" },
+        "note": { "type": "string", "maxLength": 500 }
+      }
+    },
+    "host": {
+      "description": "An exact host name or address, or one *. label-wise suffix.",
+      "type": "string",
+      "pattern": "^(?:\\*\\.)?[^\\s/@?#*]{1,253}$"
+    },
+    "hostList": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/host" } },
+    "port": { "type": "integer", "minimum": 1, "maximum": 65535 },
+    "portList": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/port" } },
+    "queryKeyList": { "type": "array", "uniqueItems": true, "items": { "type": "string", "minLength": 1, "maxLength": 64 } },
+    "componentId": { "type": "string", "pattern": "^[a-z][a-z0-9-]{0,15}:[a-z0-9][a-z0-9-]{0,31}$" }
   }
 }

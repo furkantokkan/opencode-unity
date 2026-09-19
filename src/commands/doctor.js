@@ -13,6 +13,7 @@ import { hasFailingFindings, runChecks, summarize } from '../doctor/engine.js';
 import { renderExplanation, renderTextReport } from '../doctor/report-text.js';
 import { buildJsonReport } from '../doctor/report-json.js';
 import { renderMarkdownReport } from '../doctor/report-markdown.js';
+import { DIAGNOSTIC_NOTICE, runDiagnostics, renderDiagnosticText } from '../selftest/diagnostics.js';
 
 /** @typedef {import('../cli/main.js').CommandContext} CommandContext */
 /** @typedef {import('../cli/main.js').CommandResult} CommandResult */
@@ -22,25 +23,31 @@ export const DEEP_NOTICE =
   'A deep run starts OpenCode twice. Every OpenCode start writes .gitignore files and installs its plugin package into its configuration directories, including a project .opencode folder.';
 
 /**
- * Modes that need a rendered profile and a launch environment this build does not have yet. Naming the
- * missing piece is more useful than a flag that half works.
- * @type {Readonly<Record<string, string>>}
- */
-const UNAVAILABLE_MODES = Object.freeze({
-  capture: 'recording the first request needs the rendered profile and the clean-room launch environment that opencode-unity setup writes',
-  selftest: 'the mock end-to-end scenarios need the rendered profile and the expected-tools list for the installed OpenCode version',
-});
-
-/**
  * @param {CommandContext} context
- * @param {{ deps?: import('../doctor/context.js').ContextDependencies, checks?: readonly import('../doctor/engine.js').CheckSpec[] }} [dependencies]
+ * @param {{ deps?: import('../doctor/context.js').ContextDependencies, checks?: readonly import('../doctor/engine.js').CheckSpec[], diagnostics?: typeof runDiagnostics }} [dependencies]
  * @returns {Promise<CommandResult>}
  */
 export async function run(context, dependencies = {}) {
   const checks = dependencies.checks ?? CHECKS;
   const explain = asString(context.options.explain);
   if (explain !== null) return explainCheck(context, explain, checks);
-  requireAvailableModes(context);
+  if (context.options.capture === true || context.options.selftest === true) {
+    if (context.global.dryRun === true) {
+      const message = `Would run ${context.options.selftest ? 'selftest' : 'capture'} with installed OpenCode and temporary mock endpoints; no process was started.`;
+      if (!context.output.json) context.output.text(message);
+      return { message, data: { dryRun: true, realModelLoaded: false } };
+    }
+    context.output.warn(DIAGNOSTIC_NOTICE);
+    const data = await (dependencies.diagnostics ?? runDiagnostics)({
+      cliVersion: context.version, env: context.env, platform: context.platform, signal: context.signal,
+      capture: context.options.capture === true, selftest: context.options.selftest === true,
+      experimental: context.global.experimental === true,
+      onScenarioStart: (scenario) => context.output.warn(`Checking ${scenario.id}: ${scenario.title}`),
+    });
+    const text = renderDiagnosticText(data);
+    if (!context.output.json) context.output.text(text);
+    return { exitCode: data.ok ? EXIT.OK : EXIT.CHECK_FAILED, code: data.ok ? undefined : 'check_failed', message: `OpenCode ${data.mode}: ${data.ok ? 'passed' : 'failed'}`, data };
+  }
 
   // Spec 5.4: --deep prints the notice and proceeds. Passing the flag is the decision; the notice is
   // there so the side effect is never a surprise, not to ask a second time.
@@ -92,21 +99,6 @@ function readOptions(context) {
     redact: context.options.redact === true || context.options.markdown === true,
     logsOverride: asString(context.options.logs),
   };
-}
-
-/**
- * @param {CommandContext} context
- */
-function requireAvailableModes(context) {
-  for (const [flag, reason] of Object.entries(UNAVAILABLE_MODES)) {
-    if (context.options[flag] !== true) continue;
-    throw new CliError(`--${flag} is not available in this build: ${reason}`, {
-      exitCode: EXIT.UNSUPPORTED,
-      code: 'prerequisite_missing',
-      data: { flag },
-      hint: 'Run doctor without the flag; the static checks do not need it.',
-    });
-  }
 }
 
 /**

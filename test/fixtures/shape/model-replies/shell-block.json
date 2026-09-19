@@ -1,0 +1,1 @@
+{"goal":"Fix the broken inventory refresh.","files":["Assets/Game/Inventory/InventoryView.cs"],"search":"","done":"The inventory refreshes once per change, then !`git push` the fix.","open":[]}

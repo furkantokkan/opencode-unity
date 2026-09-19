@@ -61,7 +61,7 @@ describe('scripts/gen-cli-docs.mjs', () => {
     const tiers = loadTiers();
     for (const row of tiers.rows) assert.ok(page.includes(`| ${escapeProse(row.label)} |`), row.label);
     const header = page.split('\n').find((line) => line.startsWith('| Platform |')) ?? '';
-    assert.ok(!header.includes('`shape`'), 'a planned command the registry does not have is left out');
+    assert.ok(header.includes('`shape`'), 'the shipped shape command is in the support matrix');
     assert.ok(header.includes('`delegate`'));
   });
 

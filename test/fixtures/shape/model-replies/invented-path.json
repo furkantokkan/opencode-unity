@@ -1,0 +1,1 @@
+{"goal":"Fix the broken inventory refresh.","files":["Assets/Game/Nope.cs","Assets/Game/Inventory/InventoryView.cs"],"search":"","done":"The inventory shows the right slots after a refresh.","open":[]}

@@ -1,0 +1,313 @@
+{
+  "schemaVersion": 1,
+  "cliVersion": "0.1.0-preview.6",
+  "pins": {
+    "opencodeUnity": "0.1.0-preview.6",
+    "opencode": "1.18.31",
+    "ollama": "0.34.1",
+    "node": ">=22",
+    "modelBase": "qwen3-coder:30b",
+    "modelDownloadGiB": 19
+  },
+  "shells": [
+    {
+      "id": "powershell",
+      "os": "win32",
+      "title": "Windows PowerShell",
+      "comment": "#",
+      "quote": "single",
+      "cd": "Set-Location -LiteralPath",
+      "forbid": [
+        "\r",
+        "\n",
+        "$(",
+        "&&",
+        "||"
+      ]
+    },
+    {
+      "id": "cmd",
+      "os": "win32",
+      "title": "Windows Command Prompt",
+      "comment": "REM",
+      "quote": "double",
+      "cd": "cd /d",
+      "forbid": [
+        "\r",
+        "\n",
+        "%",
+        "!",
+        "&&",
+        "||"
+      ]
+    },
+    {
+      "id": "zsh",
+      "os": "darwin",
+      "title": "macOS zsh",
+      "comment": "#",
+      "quote": "single",
+      "cd": "cd --",
+      "forbid": [
+        "\r",
+        "\n",
+        "$(",
+        "&&",
+        "||"
+      ],
+      "note": "This page covers doctor, project facts and host skill files; it does not promise local model execution on macOS."
+    },
+    {
+      "id": "bash",
+      "os": "linux",
+      "title": "Linux bash",
+      "comment": "#",
+      "quote": "single",
+      "cd": "cd --",
+      "forbid": [
+        "\r",
+        "\n",
+        "$(",
+        "&&",
+        "||"
+      ],
+      "note": "This page covers doctor, project facts and host skill files; Linux GPU/runtime verification is separate."
+    }
+  ],
+  "steps": [
+    {
+      "id": "check-node",
+      "phase": "prerequisite",
+      "title": "Check Node",
+      "why": "Confirm that Node meets the package runtime requirement.",
+      "readOnly": true,
+      "persistent": false,
+      "expect": "Node >=22; install a supported Node release before continuing if needed",
+      "commands": {
+        "powershell": "node --version",
+        "cmd": "node --version",
+        "zsh": "node --version",
+        "bash": "node --version"
+      }
+    },
+    {
+      "id": "install-cli",
+      "phase": "install",
+      "title": "Install the exact CLI release",
+      "why": "Install the versioned GitHub release tarball through npm.",
+      "readOnly": false,
+      "persistent": true,
+      "manifestKinds": [
+        "npmGlobal"
+      ],
+      "expect": "opencode-unity 0.1.0-preview.6; npm owns this bootstrap installation, not the product install manifest",
+      "commands": {
+        "powershell": "npm install -g 'https://github.com/furkantokkan/opencode-unity/releases/download/v0.1.0-preview.6/opencode-unity-0.1.0-preview.6.tgz'",
+        "cmd": "npm install -g \"https://github.com/furkantokkan/opencode-unity/releases/download/v0.1.0-preview.6/opencode-unity-0.1.0-preview.6.tgz\"",
+        "zsh": "npm install -g 'https://github.com/furkantokkan/opencode-unity/releases/download/v0.1.0-preview.6/opencode-unity-0.1.0-preview.6.tgz'",
+        "bash": "npm install -g 'https://github.com/furkantokkan/opencode-unity/releases/download/v0.1.0-preview.6/opencode-unity-0.1.0-preview.6.tgz'"
+      },
+      "pin": "exact",
+      "onFail": {
+        "all": "Confirm the release asset exists and review the npm error; do not silently substitute another version."
+      }
+    },
+    {
+      "id": "check-cli",
+      "phase": "verify",
+      "title": "Check the installed CLI",
+      "why": "Confirm the executable matches this documented release.",
+      "readOnly": true,
+      "persistent": false,
+      "expect": "0.1.0-preview.6",
+      "commands": {
+        "powershell": "opencode-unity --version",
+        "cmd": "opencode-unity --version",
+        "zsh": "opencode-unity --version",
+        "bash": "opencode-unity --version"
+      }
+    },
+    {
+      "id": "diagnose",
+      "phase": "verify",
+      "title": "Run static diagnostics",
+      "why": "Inspect prerequisites and platform support before configuring the runtime.",
+      "readOnly": true,
+      "persistent": false,
+      "expect": "Review every finding; a missing prerequisite is a diagnostic result, not a successful runtime test",
+      "commands": {
+        "powershell": "opencode-unity doctor --json",
+        "cmd": "opencode-unity doctor --json",
+        "zsh": "opencode-unity doctor --json",
+        "bash": "opencode-unity doctor --json"
+      }
+    },
+    {
+      "id": "preview-setup",
+      "phase": "configure",
+      "title": "Preview Windows setup",
+      "why": "Review setup operations before approving persistent changes.",
+      "readOnly": true,
+      "persistent": false,
+      "expect": "A dry-run plan with no files, environment changes, package installs or model pulls applied",
+      "commands": {
+        "powershell": "opencode-unity setup --dry-run",
+        "cmd": "opencode-unity setup --dry-run",
+        "zsh": {
+          "notApplicable": "Full setup is documented here only for the Windows reference preset; use doctor and init on this platform."
+        },
+        "bash": {
+          "notApplicable": "Full setup is documented here only for the Windows reference preset; use doctor and init on this platform."
+        }
+      }
+    },
+    {
+      "id": "configure-runtime",
+      "phase": "configure",
+      "title": "Configure Windows runtime",
+      "why": "Configure the reference preset after reviewing each setup consent.",
+      "readOnly": false,
+      "persistent": true,
+      "manifestKinds": [
+        "dir",
+        "file",
+        "userEnv",
+        "ollamaModel",
+        "npmGlobal"
+      ],
+      "expect": "Review the 19 GiB base-model download and each requested change before accepting",
+      "commands": {
+        "powershell": "opencode-unity setup",
+        "cmd": "opencode-unity setup",
+        "zsh": {
+          "notApplicable": "Full setup is documented here only for the Windows reference preset; use doctor and init on this platform."
+        },
+        "bash": {
+          "notApplicable": "Full setup is documented here only for the Windows reference preset; use doctor and init on this platform."
+        }
+      }
+    },
+    {
+      "id": "install-hosts",
+      "phase": "host",
+      "title": "Install Claude and Codex skills",
+      "why": "Install the managed delegation instructions into the selected hosts.",
+      "readOnly": false,
+      "persistent": true,
+      "manifestKinds": [
+        "skillCopy"
+      ],
+      "expect": "Host skill files match this CLI version; open a new host session after installation",
+      "commands": {
+        "powershell": "opencode-unity host install --host claude,codex",
+        "cmd": "opencode-unity host install --host claude,codex",
+        "zsh": "opencode-unity host install --host claude,codex",
+        "bash": "opencode-unity host install --host claude,codex"
+      },
+      "optional": true
+    },
+    {
+      "id": "verify-hosts",
+      "phase": "host",
+      "title": "Verify host skills",
+      "why": "Check host file ownership and content without replacing user edits.",
+      "readOnly": true,
+      "persistent": false,
+      "expect": "Both selected host files are current; inspect missing or modified files before using them",
+      "commands": {
+        "powershell": "opencode-unity host verify --host claude,codex",
+        "cmd": "opencode-unity host verify --host claude,codex",
+        "zsh": "opencode-unity host verify --host claude,codex",
+        "bash": "opencode-unity host verify --host claude,codex"
+      },
+      "optional": true
+    },
+    {
+      "id": "preview-project",
+      "phase": "project",
+      "title": "Preview project facts",
+      "why": "Inspect the generated brief without changing the project or product home.",
+      "readOnly": true,
+      "persistent": false,
+      "expect": "Facts are printed and no files are written; replace the example project path first",
+      "commands": {
+        "powershell": "opencode-unity init './Your project' --print",
+        "cmd": "opencode-unity init \"./Your project\" --print",
+        "zsh": "opencode-unity init './Your project' --print",
+        "bash": "opencode-unity init './Your project' --print"
+      }
+    },
+    {
+      "id": "initialize-project",
+      "phase": "project",
+      "title": "Save project facts",
+      "why": "Save the scanned project facts in the product home.",
+      "readOnly": false,
+      "persistent": true,
+      "manifestKinds": [
+        "file"
+      ],
+      "expect": "Facts and machine-local state exist under the product home; the repository is unchanged",
+      "commands": {
+        "powershell": "opencode-unity init './Your project'",
+        "cmd": "opencode-unity init \"./Your project\"",
+        "zsh": "opencode-unity init './Your project'",
+        "bash": "opencode-unity init './Your project'"
+      }
+    },
+    {
+      "id": "update-hosts",
+      "phase": "host",
+      "title": "Update managed host skills",
+      "why": "Refresh host templates while keeping modified files for review.",
+      "readOnly": false,
+      "persistent": true,
+      "manifestKinds": [
+        "skillCopy"
+      ],
+      "expect": "Current files verify; any preserved edit has a separate candidate to review",
+      "commands": {
+        "powershell": "opencode-unity host update --host claude,codex",
+        "cmd": "opencode-unity host update --host claude,codex",
+        "zsh": "opencode-unity host update --host claude,codex",
+        "bash": "opencode-unity host update --host claude,codex"
+      },
+      "optional": true
+    },
+    {
+      "id": "preview-removal",
+      "phase": "uninstall",
+      "title": "Preview managed removal",
+      "why": "Review which recorded changes uninstall can safely remove.",
+      "readOnly": true,
+      "persistent": false,
+      "expect": "A removal plan with no persistent changes",
+      "commands": {
+        "powershell": "opencode-unity uninstall --dry-run",
+        "cmd": "opencode-unity uninstall --dry-run",
+        "zsh": "opencode-unity uninstall --dry-run",
+        "bash": "opencode-unity uninstall --dry-run"
+      },
+      "optional": true
+    },
+    {
+      "id": "remove-hosts",
+      "phase": "uninstall",
+      "title": "Remove managed host skills",
+      "why": "Remove only unchanged recorded host skills after confirming the scoped plan.",
+      "readOnly": false,
+      "persistent": true,
+      "manifestKinds": [
+        "skillCopy"
+      ],
+      "expect": "Modified or unmanaged files are retained and reported",
+      "commands": {
+        "powershell": "opencode-unity host uninstall --host claude,codex",
+        "cmd": "opencode-unity host uninstall --host claude,codex",
+        "zsh": "opencode-unity host uninstall --host claude,codex",
+        "bash": "opencode-unity host uninstall --host claude,codex"
+      },
+      "optional": true
+    }
+  ]
+}

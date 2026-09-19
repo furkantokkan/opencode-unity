@@ -1,0 +1,1 @@
+Sure! Here is the rewritten request: fix the inventory in InventoryView.cs so it stops breaking.

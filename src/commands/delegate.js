@@ -102,7 +102,7 @@ export async function createDelegateContext(cliContext, dependencies = {}) {
   const platform = cliContext.platform;
   const home = getHomeDir({ env: cliContext.env, platform });
   const paths = getHomePaths(home, { platform });
-  const { config, warnings } = await loadConfig(paths.config);
+  const { config, warnings } = await loadConfig(paths.config, { platform });
   if (cliContext.subcommand !== 'restore') assertDelegationEnabled(config);
   const { profile, warnings: profileWarnings } = await loadDelegateProfile({ paths, config, cliVersion: cliContext.version, home, platform });
   const delegate = config.delegate;

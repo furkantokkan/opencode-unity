@@ -1,0 +1,6 @@
+Goal: Stop the inventory grid from re-allocating every frame.
+Files: Assets/Game/Inventory/InventoryView.cs, Assets/Game/Inventory/InventoryGrid.cs
+Search: "RefreshSlots"
+Done: No per-frame allocation in the grid refresh path; Game.Runtime builds.
+Keep: scenes, prefabs, assets, meta and project files unchanged; no new packages; no VCS writes; UI: uGUI (2 scripts). Follow the screen you edit; ask before a new screen; Input: Input System only (activeInputHandler 1). Never use UnityEngine.Input
+Open: should empty slots still be rebuilt, or reused?

@@ -397,9 +397,7 @@ function buildFragmentStep(input, by) {
 }
 
 /**
- * The `host` command group owns the host files, the settings merge and the permission printers. Until it
- * ships, setup names the planned command and points at the preview host files instead of writing half
- * of a host integration here.
+ * Setup replaces this selection note with the manifest-backed host install step after resolving paths.
  * @param {SetupPlanInput} input
  * @returns {PlanStep}
  */
@@ -413,8 +411,8 @@ function buildHostStep(input) {
     accepted: true,
     operations: [],
     lines: [
-      `Planned: opencode-unity host install --host ${input.hostTargets.join(',')}. The host command group is not in this preview.`,
-      'For now, copy the preview host files from the hosts/ folder of this package by hand; the README shows the command for each tool.',
+        `Host selection: ${input.hostTargets.join(',')}.`,
+        'Managed Claude/Codex installation is resolved by setup; Antigravity uses the files in hosts/antigravity manually.',
     ],
   };
 }
@@ -607,4 +605,3 @@ function describeOpencode(opencode) {
   if (opencode.state === 'unreadable') return 'installed, version unreadable';
   return opencode.state === 'tested' ? `${opencode.version} (tested)` : `${opencode.version} (tested is ${opencode.tested})`;
 }
-

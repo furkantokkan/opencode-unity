@@ -1,0 +1,1 @@
+{"goal":"Stop the inventory grid from re-allocating every frame.","files":["Assets/Game/Inventory/InventoryView.cs","Assets/Game/Inventory/InventoryGrid.cs"],"search":"RefreshSlots","done":"No per-frame allocation in the grid refresh path; Game.Runtime builds.","open":["should empty slots still be rebuilt, or reused?"]}

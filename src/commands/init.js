@@ -7,9 +7,8 @@
 // the one write this command may make inside a repository, and even then it only prints the ignore
 // lines rather than editing anyone's ignore file (9.1, 9.7).
 //
-// Extension seams, in the order they land: S39 adds `--network` and `--derive`, S58 replaces the
-// "this must be a Unity project" rule with workspace discovery and adds `--components`. Both edit this
-// file; until then a directory that is not a Unity project exits 1, which is base spec 9.1.
+// Unity-only projects retain their original schema and brief. Service and mixed workspaces use
+// the bounded workspace projection; export consent and install-manifest ownership are shared.
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { isAccepted } from '../cli/consent.js';
@@ -19,14 +18,16 @@ import { sha256Hex, sha256Tree } from '../core/hash.js';
 import { stringifyJson } from '../core/jsonc.js';
 import { writeConfigFile } from '../core/config.js';
 import { CURRENT_CONFIG_SCHEMA_VERSION } from '../core/migrations.js';
-import { FACTS_GENERATOR_VERSION, getInputsHash } from '../facts/stale.js';
+import { FACTS_GENERATOR_VERSION, checkFactsFreshness, getInputsHash } from '../facts/stale.js';
 import { buildProjectJson, renderFacts, validateProjectJson } from '../facts/render.js';
+import { buildWorkspaceJson, renderWorkspaceFacts, validateWorkspaceJson } from '../facts/workspace.js';
 import { IN_PROJECT_DIR, renderIgnoreGuidance } from '../facts/vcs-rules.js';
 import { createManifest, createdBy, loadManifest, saveManifest, upsertEntry } from '../install/manifest.js';
 import { refreshFragment } from '../install/wt-fragment.js';
 import { buildEditorLocalRecord, isConfirmedHub, requireEditorAgent, resolveEditorAgent } from '../opencode/editor.js';
 import { buildLocalState, recordProject, writeLocalState } from '../project/local.js';
 import { checkProjectFreshness, loadSession, resolveProject } from '../project/session.js';
+import { resolveWorkspaceProjectRoot, scanWorkspace } from '../project/workspace.js';
 import { createNodeFsView } from '../unity/fs-view.js';
 import { isUnityProjectRoot } from '../unity/root.js';
 import { scanUnityProject } from '../unity/scan.js';
@@ -50,7 +51,14 @@ export const EDITOR_HUB_CONSENT_ID = 'editor-hub-url';
 export async function run(cliContext, dependencies = {}) {
   const session = await loadSession(cliContext);
   const view = dependencies.view ?? createNodeFsView();
-  const project = await resolveProject(session, { path: readRequestedPath(cliContext), view });
+  const requested = readRequestedPath(cliContext);
+  const root = resolveWorkspaceProjectRoot(view, path.resolve(session.cwd, requested ?? '.'), { env: session.env, explicit: requested !== undefined });
+  const project = await resolveProject(session, { path: root, view });
+  const workspace = scanWorkspace(view, project.root, { env: session.env, settings: /** @type {any} */ (session.config).project });
+  if (workspace.components.length === 0 && Array.isArray(workspace.options.components)) throw usageError('No selected workspace component was found', {
+    code: 'workspace_components_missing', hint: 'Check project.components IDs or set project.components to auto.',
+  });
+  if (!workspace.unityOnly && workspace.components.length > 0) return runWorkspaceInit(cliContext, dependencies, session, project, workspace);
   requireUnityProject(view, project.root);
 
   const printOnly = cliContext.options.print === true;
@@ -156,6 +164,81 @@ export async function run(cliContext, dependencies = {}) {
       factsLength: facts.length,
       dropped: facts.dropped,
     },
+    warnings,
+  };
+}
+
+/**
+ * A backend has no Unity editor identity. Mixed workspaces can initialize their specific Unity
+ * client separately with --editor; selecting one from several here would bind the wrong hub.
+ * @param {import('../cli/main.js').CommandContext} cliContext
+ * @param {InitDependencies} dependencies
+ * @param {import('../project/session.js').Session} session
+ * @param {import('../project/session.js').ProjectContext} project
+ * @param {import('../project/workspace.js').WorkspaceScan} workspace
+ * @returns {Promise<import('../cli/main.js').CommandResult>}
+ */
+async function runWorkspaceInit(cliContext, dependencies, session, project, workspace) {
+  if (cliContext.options.editor === true) throw usageError('Editor checks require one Unity project', {
+    code: 'workspace_editor_requires_unity', hint: 'Run init --editor with the path of the specific Unity client folder.',
+  });
+  const printOnly = cliContext.options.print === true;
+  const inProject = cliContext.options.inProject === true;
+  if (!printOnly && !inProject && cliContext.options.refresh !== true && project.initialized &&
+      !checkFactsFreshness(project.projectJson, workspace.inputsHash).stale) return {
+    message: `${project.name} is already scanned and its facts are fresh; run 'opencode-unity init --refresh' to scan again`,
+    data: describeProject(project, { written: [] }), warnings: session.warnings,
+  };
+  const facts = renderWorkspaceFacts(workspace, { version: session.version });
+  const warnings = [...session.warnings, ...workspace.warnings, ...describeDroppedFacts(facts)];
+  const projectJson = buildWorkspaceJson(workspace, { version: session.version });
+  const errors = validateWorkspaceJson(projectJson);
+  if (errors.length > 0) throw new CliError(`The workspace scan produced invalid facts: ${errors.map((error) => `${error.path} ${error.message}`).join('; ')}`, { code: 'project_json_invalid' });
+  const data = { projectId: project.id, root: project.root, factsLength: facts.length, componentCount: workspace.components.length, inputsHash: workspace.inputsHash };
+  if (printOnly) {
+    cliContext.output.text(facts.text.trimEnd());
+    return { message: `${facts.length} characters of facts for ${project.name} (nothing was written)`, data: { ...data, facts: facts.text }, warnings };
+  }
+  const wouldWrite = [project.paths.facts, project.paths.projectJson, project.paths.localJson, session.paths.projectsIndex];
+  const exportDirectory = path.join(project.root, IN_PROJECT_DIR);
+  const inProjectFiles = inProject ? [path.join(exportDirectory, 'facts.md'), path.join(exportDirectory, 'project.json'), session.paths.installManifest] : [];
+  if (cliContext.global.dryRun === true) {
+    for (const line of [`Dry run for ${project.name}: nothing is written. A real run writes:`, ...wouldWrite.map((file) => `  ${file}`), ...inProjectFiles.map((file) => `  ${file} (after export consent)` )]) cliContext.output.text(line);
+    return { message: `${project.name} scanned: ${facts.length} characters of facts; dry run, nothing was written`, data: { ...data, dryRun: true, wouldWrite, inProject: inProjectFiles }, warnings };
+  }
+  const decisions = inProject ? await cliContext.consent.request([{
+    id: IN_PROJECT_CONSENT_ID,
+    title: `Write ${IN_PROJECT_DIR}/facts.md and ${IN_PROJECT_DIR}/project.json inside ${project.root}`,
+    detail: 'Two text files with relative component paths and no configuration values. No ignore file is edited.',
+    recommended: true, preselected: true,
+  }]) : [];
+  /** @type {string[]} */
+  const written = [];
+  await fs.mkdir(project.paths.dir, { recursive: true });
+  await writeTextFile(project.paths.facts, facts.text, written);
+  await writeTextFile(project.paths.projectJson, stringifyJson(projectJson), written);
+  await writeLocalState(project.paths.localJson, {
+    schemaVersion: 1, projectPath: project.root, expectedInstanceId: '', dataPath: '', hubUrl: '',
+    hubUrlSource: 'package-default', hubConfigPath: null, hubLoopback: false, editorWindowTitlePrefix: '', editor: null,
+  });
+  written.push(project.paths.localJson);
+  await recordProject(session.paths.projectsIndex, { id: project.id, name: project.name, path: project.root, factsVersion: FACTS_GENERATOR_VERSION });
+  written.push(session.paths.projectsIndex);
+  const fragment = await (dependencies.refreshFragment ?? refreshFragment)({ env: session.env, platform: cliContext.platform, paths: session.paths });
+  written.push(...fragment.updated);
+  warnings.push(...fragment.warnings);
+  const exported = inProject && isAccepted(decisions, IN_PROJECT_CONSENT_ID) ? await exportIntoProject(project.root, facts.text, projectJson) : [];
+  if (inProject && exported.length === 0) warnings.push(`${IN_PROJECT_DIR}/ was not written because the change was declined.`);
+  if (exported.length > 0) {
+    const guidance = renderIgnoreGuidance(workspace.vcsKind);
+    for (const line of [`${IN_PROJECT_DIR}/ was written. Ignore guidance (printed only, nothing was edited):`, ...guidance.lines, ...guidance.notes]) cliContext.output.text(line);
+    const recorded = await recordInProjectExport(session, exportDirectory);
+    if (recorded.warning) warnings.push(recorded.warning);
+    else written.push(session.paths.installManifest);
+  }
+  return {
+    message: `${project.name} scanned: ${facts.length} characters of facts, ${workspace.components.length} workspace components`,
+    data: { ...describeProject(project, { written: [...written, ...exported.map((file) => file.path)] }), ...data, exported, dropped: facts.dropped, editorAgent: false },
     warnings,
   };
 }

@@ -94,9 +94,11 @@ describe('summarizeLedger', () => {
     assert.equal(summary.seconds, 25);
   });
 
-  it('counts only usable jobs as paid tokens avoided, and labels the figure an estimate', () => {
+  it('subtracts returned text and excludes failed work from the source-input estimate', () => {
     const summary = summarizeLedger([entry(), entry({ status: 'gpu_busy', promptTokens: 0, outputTokens: 0 }), entry({ status: 'edit_invalid' })], { now: () => NOW });
-    assert.equal(summary.estimatedPaidTokensAvoided, 1500);
+    assert.equal(summary.estimatedPaidTokensAvoided, 914);
+    assert.equal(summary.estimatedInputTokensAvoided, 914);
+    assert.equal(summary.usableLocalTokens, 1500);
     assert.match(summary.estimateNote, /estimate/);
     assert.doesNotMatch(summary.estimateNote, /\$|USD|cost/);
   });
@@ -104,6 +106,12 @@ describe('summarizeLedger', () => {
   it('drops entries older than --since', () => {
     const summary = summarizeLedger([entry({ timestamp: '2026-09-01T00:00:00.000Z' }), entry()], { since: '1d', now: () => NOW });
     assert.equal(summary.jobs, 1);
+  });
+
+  it('does not credit partial answers or outputs larger than the source', () => {
+    const summary = summarizeLedger([entry({ status: 'partial' }), entry({ summaryChars: 5000 })], { now: () => NOW });
+    assert.equal(summary.estimatedInputTokensAvoided, 0);
+    assert.equal(summary.estimatedPaidTokensAvoided, 0);
   });
 
   it('ignores an entry without a usable timestamp', () => {
@@ -123,7 +131,7 @@ describe('renderLedgerText', () => {
     assert.match(text, /2 delegate jobs/);
     assert.match(text, /ask: 1 \(ok=1\)/);
     assert.match(text, /edit: 1 \(dry_run=1\)/);
-    assert.match(text, /paid tokens avoided \(estimate\)/);
+    assert.match(text, /source input tokens avoided \(estimate\)/);
     assert.doesNotMatch(text, /\$/);
   });
 

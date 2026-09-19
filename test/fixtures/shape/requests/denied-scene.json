@@ -1,0 +1,10 @@
+{
+  "note": "An edit of a scene file.",
+  "text": "move the spawn point in Main.unity",
+  "expect": {
+    "status": "passthrough",
+    "verdict": null,
+    "reason": "denied_intent",
+    "rule": "PROTECTED_EDIT"
+  }
+}

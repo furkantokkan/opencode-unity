@@ -31,9 +31,9 @@ describe('help groups (D15)', () => {
   it('groups the four everyday verbs first, then the advanced verbs', () => {
     assert.deepEqual(HELP_GROUPS.map((group) => group.title), ['Everyday', 'Advanced']);
     const groups = getCommandGroups();
-    assert.deepEqual(groups[0].commands.map((command) => command.name), ['doctor', 'setup', 'init', 'start']);
+    assert.deepEqual(groups[0].commands.map((command) => command.name), ['shape', 'doctor', 'setup', 'init', 'start']);
     assert.deepEqual(groups[1].commands.map((command) => command.name), [
-      'status', 'guard', 'warm', 'stop', 'bench', 'delegate', 'upgrade', 'uninstall',
+      'host', 'status', 'guard', 'warm', 'stop', 'bench', 'delegate', 'upgrade', 'uninstall',
     ]);
   });
 
@@ -44,8 +44,8 @@ describe('help groups (D15)', () => {
 
   it('renders the groups in order in the global help', () => {
     const text = renderGlobalHelp({ isAvailable: allAvailable });
-    assert.deepEqual(getFirstWords(getSection(text, 'Everyday')), ['doctor', 'setup', 'init', 'start']);
-    assert.deepEqual(getFirstWords(getSection(text, 'Advanced')), ['status', 'guard', 'warm', 'stop', 'bench', 'delegate', 'upgrade', 'uninstall']);
+    assert.deepEqual(getFirstWords(getSection(text, 'Everyday')), ['shape', 'doctor', 'setup', 'init', 'start']);
+    assert.deepEqual(getFirstWords(getSection(text, 'Advanced')), ['host', 'status', 'guard', 'warm', 'stop', 'bench', 'delegate', 'upgrade', 'uninstall']);
     assert.ok(text.indexOf('Everyday') < text.indexOf('Advanced'));
   });
 });
@@ -60,7 +60,7 @@ describe('renderGlobalHelp', () => {
   it('lists global options and every exit code', () => {
     const text = renderGlobalHelp({ isAvailable: allAvailable });
     const options = getFirstWords(getSection(text, 'Global options'));
-    assert.deepEqual(options, ['--json', '--yes', '--dry-run', '--project', '--experimental', '--verbose', '--no-color', '--help', '--version']);
+    assert.deepEqual(options, ['--json', '--yes', '--dry-run', '--project', '--experimental', '--verbose', '--no-color', '--help', '--version', '--print-platform']);
     assert.deepEqual(getFirstWords(getSection(text, 'Exit codes')), ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '130']);
   });
 

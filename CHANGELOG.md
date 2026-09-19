@@ -5,6 +5,27 @@ All notable changes to this project are documented here. The format follows
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html). While the version is `0.y.z`, a minor release
 may change the CLI or the config schema, with automatic migrations and a Breaking section.
 
+## [0.1.0-preview.6] - 2026-09-19
+
+### Added
+
+- Managed `host install/verify/update/uninstall` for Claude and Codex, wired into `setup --host`, preserving user-edited files and tracking owned copies.
+- Schema-v2 configuration migration preserving delegation and guard preferences; bounded Unity/service workspace facts and read-only service launch inspection.
+- Standalone `shape` with one guarded rewrite or `--no-model`; platform facts via `--print-platform`; generated installation commands for four shells.
+- `unitynet` with bounded documentation and loopback reads, request permissions, reserved-port protection, pinned network policy and startup permission verification.
+- Real OpenCode `doctor --capture/--selftest`, mock protocol benchmarks and guarded `bench edits`. Unsupported live benchmark suites explicitly refuse.
+
+### Fixed
+
+- Shell network classification handles quoted URLs and encoded commands conservatively; network permission overrides cannot silently widen access.
+- Context accounting excludes duplicated tool UI metadata and tool definitions absent from compaction requests.
+- Delegation reports measured local tokens separately from estimated source-input reduction, subtracts the returned summary and gives failed or partial jobs no estimated savings credit.
+
+### Limits
+
+- Windows remains the model-execution platform. Linux/macOS hardware probes, broad native-tool reliability evidence and stable npm publication remain future release gates.
+- See [completion status](docs/completion-plan.md), [diagnostics](docs/diagnostics.md) and [network policy](docs/network-policy.md) for validation and scope.
+
 ## [0.1.0-preview.5] - 2026-09-19
 
 ### Added

@@ -67,6 +67,26 @@ async function prepare(t) {
 }
 
 describe('real OpenCode contract', { timeout: 180_000 }, () => {
+  it('enforces shell network asks and refuses a project override to allow', async (t) => {
+    const ready = await prepare(t);
+    const config = JSON.parse(await fs.readFile(ready.harness.paths.config, 'utf8'));
+    config.network = { bash: 'ask' };
+    await fs.writeFile(ready.harness.paths.config, JSON.stringify(config));
+    const valid = await ready.start();
+    assert.equal(valid.exitCode, 0, valid.message);
+    await fs.writeFile(path.join(ready.harness.projectRoot, 'opencode.json'), JSON.stringify({ agent: { 'unity-code': { permission: { bash: { 'curl example.test': 'allow' } } } } }));
+    const invalid = await ready.start();
+    assert.equal(invalid.exitCode, 4, invalid.message);
+    assert.match(invalid.message, /bash permissions/);
+    assert.equal(ready.launched.length, 1);
+  });
+  it('refuses network tool permissions widened by a project', async (t) => {
+    const ready = await prepare(t);
+    await fs.writeFile(path.join(ready.harness.projectRoot, 'opencode.json'), JSON.stringify({ agent: { 'unity-code': { permission: { unitynet: { 'GET https://unlisted.example/*': 'allow' } } } } }));
+    const result = await ready.start();
+    assert.equal(result.exitCode, 4, result.message);
+    assert.equal(ready.launched.length, 0);
+  });
   it('resolves the shipped provider, agent and permissions before allowing a session', async (t) => {
     const ready = await prepare(t);
     const result = await ready.start();

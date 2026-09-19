@@ -1,0 +1,10 @@
+{
+  "note": "A subject without an action.",
+  "text": "the inventory is broken",
+  "reply": "good",
+  "expect": {
+    "status": "shaped",
+    "verdict": "needs_shaping",
+    "reason": null
+  }
+}

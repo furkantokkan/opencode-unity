@@ -1,0 +1,10 @@
+{
+  "note": "A verb and a basename that exactly one file has.",
+  "text": "rename Refresh in InventoryView.cs to RefreshSlots",
+  "expect": {
+    "status": "ready",
+    "verdict": "ready",
+    "reason": null,
+    "anchorRule": 2
+  }
+}

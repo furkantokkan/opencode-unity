@@ -2,7 +2,8 @@
 // - detect: `tasklist /FI "IMAGENAME eq Unity.exe" /FO CSV /NH`, which starts no PowerShell, so the
 //   loaded path stays fast while Unity is closed.
 // - sample: the shipped win32-probe.ps1, piped as text to `powershell.exe -NoProfile -NonInteractive
-//   -Command -` (no -EncodedCommand, no execution policy change).
+//   -Command -` (no -EncodedCommand, no execution policy change). Each process in the snapshot gets
+//   its `program`, the image name without `.exe`, so the analysis never spells a Windows name.
 // Both are read-only. Every failure is an error result, and the guard blocks on it.
 import fs from 'node:fs/promises';
 import { validateProcessSnapshot } from '../unity-processes.js';
@@ -103,7 +104,20 @@ export function parseProbeResult(result) {
   if (parsed === undefined) {
     return { ok: false, error: `powershell.exe process probe printed no JSON${describeOutput(result)}` };
   }
-  return validateProcessSnapshot(parsed);
+  const reading = validateProcessSnapshot(parsed);
+  if (!reading.ok) return reading;
+  const processes = reading.snapshot.processes.map((entry) => ({ ...entry, program: readWin32ProgramName(entry.name) }));
+  return { ok: true, snapshot: { ...reading.snapshot, processes } };
+}
+
+/**
+ * The program a Windows process runs: its image name without the `.exe` suffix, compared without
+ * case the way Windows compares image names, so `UNITY.EXE` and `Unity` are both the Unity program.
+ * @param {string} imageName  `Win32_Process.Name`
+ * @returns {string}
+ */
+export function readWin32ProgramName(imageName) {
+  return imageName.toLowerCase().replace(/\.exe$/, '');
 }
 
 /**

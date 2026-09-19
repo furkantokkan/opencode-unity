@@ -1,0 +1,10 @@
+{
+  "note": "Two nouns.",
+  "text": "inventory grid",
+  "reply": "good",
+  "expect": {
+    "status": "shaped",
+    "verdict": "needs_shaping",
+    "reason": null
+  }
+}

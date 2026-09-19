@@ -1,0 +1,16 @@
+{
+  "note": "Four numbered asks: shaped as one goal plus a note, never split.",
+  "text": "1. make the menu faster\n2. make the music quieter\n3. add a pause button\n4. make the fonts bigger",
+  "reply": {
+    "goal": "Make the menu faster, the music quieter, add a pause button and make the fonts bigger.",
+    "files": [],
+    "search": "",
+    "done": "All four changes are visible in the menu.",
+    "open": []
+  },
+  "expect": {
+    "status": "shaped",
+    "verdict": "needs_shaping",
+    "reason": null
+  }
+}

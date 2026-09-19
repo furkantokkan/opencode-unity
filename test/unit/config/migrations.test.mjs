@@ -37,8 +37,15 @@ describe('migrateDocument (spec 6.2, 22)', () => {
     assert.deepEqual(result.applied, []);
   });
 
-  it('ships no migration yet, because version 1 is the first released format', () => {
-    assert.deepEqual(CONFIG_MIGRATIONS, []);
+  it('upgrades the released version 1 format through the shipped migration', () => {
+    const input = { schemaVersion: 1, guard: { allowOffload: true } };
+    const result = migrateDocument(input);
+    assert.deepEqual(CONFIG_MIGRATIONS.map((step) => step.from), [1]);
+    assert.equal(result.toVersion, CURRENT_CONFIG_SCHEMA_VERSION);
+    assert.equal(result.document.schemaVersion, 2);
+    assert.deepEqual(result.document.guard, input.guard);
+    assert.equal(result.applied.length, 1);
+    assert.equal(input.schemaVersion, 1);
   });
 
   it('walks every step in order and reports what it applied', () => {

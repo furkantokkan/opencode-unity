@@ -166,12 +166,12 @@ describe('setup plan platform split', () => {
     assert.equal(none?.nature, 'note');
   });
 
-  it('names the planned host command and the preview host files instead of writing a host integration itself', () => {
+  it('leaves host selection for setup to resolve through the managed installer', () => {
     const step = buildSetupPlan(input({ hostTargets: ['claude', 'codex'] })).steps.find((candidate) => candidate.id === 'host-install');
     assert.equal(step?.nature, 'note');
     assert.deepEqual(step?.operations, []);
-    assert.equal(step?.lines[0], 'Planned: opencode-unity host install --host claude,codex. The host command group is not in this preview.');
-    assert.match(step?.lines[1] ?? '', /hosts\/ folder of this package/);
+    assert.equal(step?.lines[0], 'Host selection: claude,codex.');
+    assert.match(step?.lines[1] ?? '', /Managed Claude\/Codex installation is resolved by setup/);
   });
 
   it('skips both model steps with --no-model', () => {

@@ -1,0 +1,9 @@
+{
+  "note": "A commit word that is not a commit.",
+  "text": "fix the commit message parser in CommitLog.cs",
+  "expect": {
+    "status": "ready",
+    "verdict": "ready",
+    "reason": null
+  }
+}

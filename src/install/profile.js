@@ -6,6 +6,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { renderRuntimeProfile } from '../core/profile.js';
 import { buildConfigLevelPermission, renderProfileAssets } from '../opencode/render.js';
+import { NETWORK_PROMPT } from '../network/render.js';
 
 export const PLUGIN_SOURCE_URL = new URL('../../plugin/', import.meta.url);
 
@@ -29,13 +30,14 @@ export const MODELFILE_FILE = 'Modelfile';
  * @returns {Promise<Record<string, string | Uint8Array>>}
  */
 export async function renderProfileFiles({ profile, config, cliVersion, editorAgent = false, pluginFiles }) {
-  const permission = buildConfigLevelPermission({ safety: config.safety });
+  const permission = buildConfigLevelPermission({ safety: config.safety, extensions: { unitynet: 'deny' } });
   const assets = renderProfileAssets({
     modelTag: profile.provider.modelTag,
     sampling: profile.provider.sampling,
     permission,
     editorAgent,
     version: cliVersion,
+    extensions: { networkBlock: NETWORK_PROMPT },
   });
   /** @type {Record<string, string | Uint8Array>} */
   const files = { ...assets, [RUNTIME_PROFILE_FILE]: renderRuntimeProfile(profile) };

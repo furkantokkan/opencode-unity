@@ -157,7 +157,7 @@ describe('calibration', () => {
 });
 
 describe('measurements', () => {
-  it('reads the session id off the first message and the size off the whole history', () => {
+  it('reads the session id and estimates model-facing content without bookkeeping', () => {
     const messages = [{ info: { sessionID: 'ses1' }, parts: [{ text: 'hello' }] }, { info: { sessionID: 'ses1' } }];
     const measured = measureHistory(messages);
     assert.equal(measured.sessionId, 'ses1');
@@ -165,12 +165,23 @@ describe('measurements', () => {
   });
 
   it('survives a history it cannot serialize or read', () => {
-    const cyclic = /** @type {any} */ ({ info: { sessionID: 'ses1' } });
-    cyclic.self = cyclic;
+    const cyclic = /** @type {any} */ ({ info: { sessionID: 'ses1' }, parts: [] });
+    cyclic.parts.push(cyclic);
     assert.deepEqual(measureHistory([cyclic]), { sessionId: 'ses1', chars: 0 });
     assert.deepEqual(measureHistory(/** @type {any} */ (null)), { sessionId: null, chars: 0 });
     assert.deepEqual(measureHistory([]), { sessionId: null, chars: '[]'.length });
     assert.deepEqual(measureHistory([{ info: { sessionID: 7 } }]).sessionId, null);
+  });
+
+  it('counts tool content once when OpenCode repeats it in UI metadata', () => {
+    const output = 'Large read output\n'.repeat(100);
+    const base = { type: 'tool', tool: 'read', callID: 'call-1', state: { input: { filePath: '/fixture.cs' }, output } };
+    const withMetadata = structuredClone(base);
+    withMetadata.state.metadata = { preview: output, filediff: { before: output, after: output } };
+    const measure = (part) => measureHistory([{ info: { sessionID: 's' }, parts: [part] }]).chars;
+    assert.equal(measure(base), measure(withMetadata));
+    assert.ok(measure(base) >= output.length);
+    assert.equal(resolveToolsTokens(profile.budget.toolsTokens, COMPACTION_AGENT), 0);
   });
 
   it('adds up every system part, so more than one is never undercounted', () => {

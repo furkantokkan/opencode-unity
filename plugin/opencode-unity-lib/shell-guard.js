@@ -32,6 +32,7 @@ export { PROTECTED_EDIT_GLOBS };
  * @property {import('./shell-classify.js').ShellFamily} [family]
  * @property {string | null} [shell]                The shell OpenCode runs the command with, when it is known.
  * @property {string} [platform]
+ * @property {'deny' | 'ask'} [networkBash]
  */
 
 /**
@@ -54,6 +55,7 @@ export function createShellGuard({
   family,
   shell = null,
   platform = process.platform,
+  networkBash,
 } = {}) {
   const resolvedFamily = selectShellFamily({ family, shell, platform });
   const classifyOptions = {
@@ -63,6 +65,7 @@ export function createShellGuard({
     mcpHub: parseHubEndpoint(mcpHubUrl),
     blockedPrograms,
     allowExactCommands,
+    networkBash,
   };
   return {
     family: resolvedFamily,

@@ -2,12 +2,12 @@
 // parallel as possible: a loaded model needs no GPU query, a closed Unity needs no PowerShell, and
 // the GPU utilization wait overlaps the CPU sampling window, so a cold check costs about 2-2.5 s.
 // Probes never throw; every failure comes back as an error that decideGuard turns into a block.
+// The platform probes are selected here and nowhere else (CP-D2). Their three-state reads are folded
+// into the GuardProbes shape the rest of the guard and every caller's test double already speak; an
+// unavailable read folds into an error for now, so a capability nobody measures blocks.
 import { classifyModelState } from './decide.js';
-import { readNvidiaSmi } from './probes/nvidia-smi.js';
+import { selectProbes } from './probes/index.js';
 import { readOllamaPs, parseOllamaBaseUrl, isLoopbackHost } from './probes/ollama-ps.js';
-import { createUnsupportedProcessProbe } from './probes/processes-unsupported.js';
-import { createWin32ProcessProbe } from './probes/processes-win32.js';
-import { runCommand } from './probes/run-command.js';
 import { analyzeUnityProcesses } from './unity-processes.js';
 
 // Fixed, small timeouts for the two probes the spec pins (7.2); the others follow probeTimeoutSec.
@@ -44,13 +44,49 @@ export const UNITY_DETECT_TIMEOUT_MS = 5000;
  * @param {{ platform?: string, env?: Record<string, string | undefined>, fetchImpl?: typeof fetch, run?: import('./probes/run-command.js').RunCommand }} [options]
  * @returns {GuardProbes}
  */
-export function createDefaultProbes({ platform = process.platform, env = process.env, fetchImpl = fetch, run = runCommand } = {}) {
+export function createDefaultProbes({ platform = process.platform, env = process.env, fetchImpl = fetch, run } = {}) {
+  const platformProbes = selectProbes({ platform, env, run, now: Date.now });
   return {
     readOllamaPs: (baseUrl, options) => readOllamaPs(baseUrl, { ...options, fetchImpl }),
-    readNvidiaSmi: (options) => readNvidiaSmi({ ...options, run, env, platform }),
-    processes: platform === 'win32' ? createWin32ProcessProbe({ run, env }) : createUnsupportedProcessProbe(platform),
+    readNvidiaSmi: async ({ command, timeoutMs, signal }) => toNvidiaSmiReading(await platformProbes.readAccelerator({ nvidiaSmiCommand: command, timeoutMs, signal })),
+    processes: toProcessProbe(platformProbes),
     sleep,
     now: Date.now,
+  };
+}
+
+/**
+ * A query that listed no device reads as zero devices with both capabilities failed, which
+ * collectGpu treats exactly like a failed nvidia-smi run.
+ * @param {import('./probes/index.js').AcceleratorSample} sample
+ * @returns {import('./probes/nvidia-smi.js').NvidiaSmiReading}
+ */
+function toNvidiaSmiReading(sample) {
+  const memory = sample.memory;
+  const utilization = sample.utilization;
+  return {
+    ok: true,
+    gpuCount: sample.deviceCount,
+    memory: memory.status === 'ok' ? { ok: true, totalMiB: memory.value.totalMiB, freeMiB: memory.value.freeMiB } : { ok: false, error: memory.detail },
+    utilization: utilization.status === 'ok' ? { ok: true, percent: utilization.value.percent } : { ok: false, error: utilization.detail },
+  };
+}
+
+/**
+ * @param {import('./probes/index.js').PlatformProbes} platformProbes
+ * @returns {import('./unity-processes.js').ProcessProbe}
+ */
+function toProcessProbe(platformProbes) {
+  return {
+    platform: platformProbes.platform,
+    async detect(options) {
+      const read = await platformProbes.readUnityPresence(options);
+      return read.status === 'ok' ? { ok: true, running: read.value.running, count: read.value.count } : { ok: false, error: read.detail };
+    },
+    async sample(request) {
+      const read = await platformProbes.readProcessSnapshot(request);
+      return read.status === 'ok' ? { ok: true, snapshot: read.value } : { ok: false, error: read.detail };
+    },
   };
 }
 

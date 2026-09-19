@@ -145,6 +145,37 @@ export function verifyNonNegotiableRules({ permission, tuples = NON_NEGOTIABLE_T
   return toCheck('V-b', 'Non-negotiable rules', failures);
 }
 
+/** Require the exact launch network rules, including order; reject rules a project merged in.
+ * @param {unknown} permission
+ * @param {unknown} expected
+ * @param {boolean} [caseInsensitive]
+ * @returns {CheckResult}
+ */
+export function verifyNetworkPermission(permission, expected, caseInsensitive = false) {
+  return verifyToolPermission(permission, expected, 'unitynet', caseInsensitive);
+}
+
+/** Verify an entire sensitive tool's rule list so merged project rules cannot bypass an ask.
+ * @param {unknown} permission
+ * @param {unknown} expected
+ * @param {string} tool
+ * @param {boolean} [caseInsensitive]
+ * @returns {CheckResult}
+ */
+export function verifyToolPermission(permission, expected, tool, caseInsensitive = false) {
+  const rules = toRuleset(permission, 'effective config');
+  const alias = caseInsensitive && rules.some((rule) => rule.name.toLowerCase() === tool && rule.name !== tool);
+  const network = rules.filter((rule) => rule.name === tool);
+  // OpenCode may repeat the global deny before the agent deny. Only leading identical denies
+  // can be discarded; an allow or an extra pattern at any position is material.
+  while (network.length > 1 && network[0].pattern === '*' && network[1].pattern === '*') network.shift();
+  const wanted = flattenPermission({ [tool]: /** @type {any} */ (expected) });
+  const pairs = (/** @type {Array<{pattern:string,action:string}>} */ rows) => rows.map(({ pattern, action }) => [pattern, action]);
+  const first = rules.findIndex((rule) => rule.name === tool);
+  const wildcardOverride = rules.slice(first + 1).some((rule) => rule.name !== tool && rule.name.includes('*') && new RegExp(`^${rule.name.replace(/[.+?^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*')}$`, caseInsensitive ? 'i' : '').test(tool) && rule.action !== 'deny');
+  return toCheck('V-d', `${tool} permission`, first >= 0 && !alias && !wildcardOverride && JSON.stringify(pairs(network)) === JSON.stringify(pairs(wanted)) ? [] : [{ check: 'V-d', rule: `${tool} permissions equal the launch policy`, effective: 'missing, reordered or widened rules', source: 'the merged agent permissions' }]);
+}
+
 /**
  * V-c: the visible tool set equals what this OpenCode version is expected to show, plus the editor
  * allow-list when the editor agent is on (`agent.handler.ts` L60-64).

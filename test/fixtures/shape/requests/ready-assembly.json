@@ -1,0 +1,9 @@
+{
+  "note": "A verb and an assembly name.",
+  "text": "add an EditMode test in Game.Tests.EditMode for the slot count",
+  "expect": {
+    "status": "ready",
+    "verdict": "ready",
+    "reason": null
+  }
+}

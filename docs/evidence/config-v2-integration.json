@@ -1,0 +1,962 @@
+{
+  "reviewDate": "2026-09-19",
+  "scope": "Completion plan steps 1 and 2: isolated baseline and config-v2/runtime-profile integration",
+  "baseCommit": "85b80c69d9444f13b9dbe972f7fce2ae2cb89827",
+  "branch": "codex/config-v2-integration",
+  "commitOrPublishPerformed": false,
+  "verification": {
+    "runtime": "Node v24.13.0 / Windows",
+    "unit": {
+      "tests": 3215,
+      "passed": 3215,
+      "failed": 0,
+      "skipped": 0
+    },
+    "coverage": {
+      "scope": "Same include patterns and 90% line gate as .github/workflows/ci.yml",
+      "linePercent": 99.64,
+      "branchPercent": 93.56,
+      "functionPercent": 98.61
+    },
+    "opencodeContract": {
+      "version": "1.18.31",
+      "tests": 4,
+      "passed": 4,
+      "failed": 0
+    },
+    "packageRoundtrip": {
+      "enabled": true,
+      "tests": 1,
+      "passed": 1,
+      "failed": 0
+    },
+    "typecheck": "PASS",
+    "lint": "PASS",
+    "releasePrechecks": "PASS",
+    "personalData": {
+      "status": "PASS",
+      "denylistTerms": 7
+    },
+    "hardware": "NOT_RUN; local-model health refused import_busy; no delegation job started"
+  },
+  "limitations": [
+    "Network, shape, workspace policy compilation and non-Windows guard features are deferred.",
+    "The initial 711-test result included deferred features; it is not directly comparable with this branch's 3215-test suite.",
+    "No GitHub CI run or publication was triggered for this uncommitted integration."
+  ],
+  "reviewedFiles": [
+    {
+      "path": "docs/configuration.md",
+      "sha256": "665b1c8c4e42f91938e72d13f9dff5c2bc3d82449bae22f5ec5753c91184b604"
+    },
+    {
+      "path": "schema/config.schema.json",
+      "sha256": "b6ad951ffc5281251d08454e2653f8a44cd2ea1ae23727fc361df19ccc8bb82a"
+    },
+    {
+      "path": "schema/install-matrix.schema.json",
+      "sha256": "ecbc25395812a2b9418d72f3482c74a23a1263f9d6eee2db2a9e8748c7a3a05d"
+    },
+    {
+      "path": "src/commands/delegate.js",
+      "sha256": "47817837d882edf813ba08070d67e164242c27465d291d922529e50afae612bf"
+    },
+    {
+      "path": "src/commands/setup.js",
+      "sha256": "e19274397d3403354823297c8e5d9e3266dc34311dc57fb100ff9883ea82b84f"
+    },
+    {
+      "path": "src/commands/upgrade.js",
+      "sha256": "d9f779f3327509f642bb9c85ef0654f0c2e7bec09bbab6b4b00fb7d99abae800"
+    },
+    {
+      "path": "src/core/config.js",
+      "sha256": "fa964f7e1758837ef578c7c6286a246ecf1432fa59f7a9174227d609300c9c8a"
+    },
+    {
+      "path": "src/core/migrations.js",
+      "sha256": "56f40cc7cf59fd4acc4ee5827d8362102c02e2dcacc2fd493a6e11ffeca476aa"
+    },
+    {
+      "path": "src/core/profile.js",
+      "sha256": "04e1f530e30aba3f91e2da0491e7117263f777eaf02778a418e1208f52363ab0"
+    },
+    {
+      "path": "src/doctor/context.js",
+      "sha256": "5c8acb4ff2382db35312d0e5f62edd33f7d7302632ed877422501c5004da8fbe"
+    },
+    {
+      "path": "src/project/session.js",
+      "sha256": "ce2be6b5255b733f7752cf566eeba568dc83b4518cf3e93113afa6eea1f04a6b"
+    },
+    {
+      "path": "test/install/upgrade-command.test.mjs",
+      "sha256": "02d408fd318d73daac1dac772385aff990f3895bd1842ef269ac8a991882a753"
+    },
+    {
+      "path": "test/unit/config-v2/install-matrix-schema.test.mjs",
+      "sha256": "6eca0f52eaf6bafbe51c5c7bc6593b5674ad6de34e4740133cd1b5422fb43ed5"
+    },
+    {
+      "path": "test/unit/config-v2/migration.test.mjs",
+      "sha256": "10396dd625bdbbaff1ffe9c2a3619f8b4438eea3eba2cfa76a165592d412ff73"
+    },
+    {
+      "path": "test/unit/config-v2/platform-defaults.test.mjs",
+      "sha256": "b8c3a0dff78f92873f4ac8cca2817bc0ef5256b8604d4feff509350d67ed0046"
+    },
+    {
+      "path": "test/unit/config-v2/released-settings.test.mjs",
+      "sha256": "f19ebc15a282cc2713691d902dc0955ed5fa46549aae7d499166c13c5185eecb"
+    },
+    {
+      "path": "test/unit/config-v2/schema-v2.test.mjs",
+      "sha256": "b2c4cdd2a794f2876f2a47c1c1b323f040941925c1cd68664ba59ecb20336b6b"
+    },
+    {
+      "path": "test/unit/config-v2/write-free.test.mjs",
+      "sha256": "40ed1f51393539a11dde9cd9325c5690c3f3c74dedc0be6c39675de3b1985907"
+    },
+    {
+      "path": "test/unit/config/config.test.mjs",
+      "sha256": "e1b543ef05685967614c8fdbf864cee4a5983df06793024d43b028b35b91f88e"
+    },
+    {
+      "path": "test/unit/config/migrations.test.mjs",
+      "sha256": "81ef26297a4d290e11818df2bcdf5c5c5a695e0c335da90c997db04356254470"
+    },
+    {
+      "path": "test/unit/vram-profile/config-boundary.test.mjs",
+      "sha256": "3f16a1c41e9a4bff305b83f77aa00aff38bd661d748075ce3596423cb6c03f85"
+    }
+  ],
+  "originalCheckout": {
+    "head": "40b25ffe8a17ca141d9398e6edf5380e4846466b",
+    "preservationCheck": {
+      "checked": 117,
+      "changed": [],
+      "extra": []
+    },
+    "changes": [
+      {
+        "path": "docs/completion-plan.md",
+        "kind": "untracked",
+        "sha256": "300234b55e350da62611b9011aece069d91126f6a4ce1a00eafa281d7dbcacd7",
+        "disposition": "planning_document",
+        "slice": "planning"
+      },
+      {
+        "path": "plugin/opencode-unity-lib/guard/collect.js",
+        "kind": "tracked",
+        "sha256": "98d919c0fb8d581f12c986698a22fe17ddaad4fbe36663ad8965f635cd4944a5",
+        "disposition": "deferred",
+        "slice": "probe-interface"
+      },
+      {
+        "path": "plugin/opencode-unity-lib/guard/probes/index.js",
+        "kind": "untracked",
+        "sha256": "7c64d185567574ea96621d174a8292a794d75a719ff80426fac5bbc748b312d9",
+        "disposition": "deferred",
+        "slice": "probe-interface"
+      },
+      {
+        "path": "plugin/opencode-unity-lib/guard/probes/processes-unsupported.js",
+        "kind": "tracked",
+        "sha256": null,
+        "disposition": "deferred",
+        "slice": "probe-interface"
+      },
+      {
+        "path": "plugin/opencode-unity-lib/guard/probes/processes-win32.js",
+        "kind": "tracked",
+        "sha256": "0f74d366170a0591ae92c43246fa429b9fd62f2165b9e122c31f168db176148d",
+        "disposition": "deferred",
+        "slice": "probe-interface"
+      },
+      {
+        "path": "plugin/opencode-unity-lib/guard/probes/unsupported.js",
+        "kind": "untracked",
+        "sha256": "3c8af3172ceb8e27c224b9c7c99ab5568ab8c661ce8013d403c2610ae181a511",
+        "disposition": "deferred",
+        "slice": "probe-interface"
+      },
+      {
+        "path": "plugin/opencode-unity-lib/guard/probes/win32.js",
+        "kind": "untracked",
+        "sha256": "b6f57106482e81226ffe26f9595fae6a89e1467339ec9cbc2c1333df99f56094",
+        "disposition": "deferred",
+        "slice": "probe-interface"
+      },
+      {
+        "path": "plugin/opencode-unity-lib/guard/unity-processes.js",
+        "kind": "tracked",
+        "sha256": "3c472279faf22bbbc4705a1d533c747bf37ef2da33a1a035bf7fafd085e8572b",
+        "disposition": "deferred",
+        "slice": "probe-interface"
+      },
+      {
+        "path": "plugin/opencode-unity-lib/net/ask-pattern.js",
+        "kind": "untracked",
+        "sha256": "b45e88080559f22b96a5e20d1591f79d5e1d76871946b200530caa6f0e3872c2",
+        "disposition": "deferred",
+        "slice": "network"
+      },
+      {
+        "path": "plugin/opencode-unity-lib/net/codes.js",
+        "kind": "untracked",
+        "sha256": "fbb89f5d837c50ce2791bd2d64d751a1739e1a824ab8d9bb4848dd5a1641faa5",
+        "disposition": "deferred",
+        "slice": "network"
+      },
+      {
+        "path": "plugin/opencode-unity-lib/net/tool.js",
+        "kind": "untracked",
+        "sha256": "6e3b6180c0c15453fdc674242309dac1c27cdea94ce46e2b9260a6dbaabbac87",
+        "disposition": "deferred",
+        "slice": "network"
+      },
+      {
+        "path": "plugin/opencode-unity-lib/shell-classify.js",
+        "kind": "tracked",
+        "sha256": "a822b6c56513ba3b3c69c5e452b750649c27c34e27a25a6c761797e68f91e48e",
+        "disposition": "deferred",
+        "slice": "network"
+      },
+      {
+        "path": "plugin/opencode-unity-lib/shell-families.json",
+        "kind": "tracked",
+        "sha256": "86a3022dbe2fd4045df3f8e707b5fe0cccc1ba697a1dce986dc9361c09c8bccb",
+        "disposition": "deferred",
+        "slice": "network"
+      },
+      {
+        "path": "plugin/opencode-unity.js",
+        "kind": "tracked",
+        "sha256": "f3704f810304cd0613d3e72953c9e426842d36613e682c4c8b962469608fb2c1",
+        "disposition": "deferred",
+        "slice": "network"
+      },
+      {
+        "path": "schema/config.schema.json",
+        "kind": "tracked",
+        "sha256": "5eb0a96a73b1faf6d672dba0bdc80175f2b17fbe3796e8b9bb037125772c1604",
+        "disposition": "integrated",
+        "slice": "config-v2"
+      },
+      {
+        "path": "schema/install-matrix.schema.json",
+        "kind": "untracked",
+        "sha256": "ecbc25395812a2b9418d72f3482c74a23a1263f9d6eee2db2a9e8748c7a3a05d",
+        "disposition": "integrated",
+        "slice": "config-v2"
+      },
+      {
+        "path": "schema/shape-output.schema.json",
+        "kind": "untracked",
+        "sha256": "6e2b295b25dea9afbf15bee1a29c897fee006959eab5647ca62bfc67d82e00ae",
+        "disposition": "deferred",
+        "slice": "shape"
+      },
+      {
+        "path": "spikes/README.md",
+        "kind": "tracked",
+        "sha256": "316b5d5b2ac7fa8672c4cee9320ab7193a11175d8c63bfff9959143fa25af952",
+        "disposition": "deferred",
+        "slice": "network-runtime-spikes"
+      },
+      {
+        "path": "spikes/fixtures/spike-tool-plugin/opencode-unity-spike-tool.js",
+        "kind": "untracked",
+        "sha256": "3d7c027dd341f5268079238481f48a321e1aa851e122f3b65f8b9ee42032e1af",
+        "disposition": "deferred",
+        "slice": "network-runtime-spikes"
+      },
+      {
+        "path": "spikes/results/N.json",
+        "kind": "untracked",
+        "sha256": "e19f5f42a3a58b6542939535945e6fbb2caaf1a7395d2d6c38fc404bc86bb763",
+        "disposition": "deferred",
+        "slice": "network-runtime-spikes"
+      },
+      {
+        "path": "spikes/results/O.json",
+        "kind": "untracked",
+        "sha256": "eed40fe3b61641d10f099d82d4fa6173749221949d0a8a77626be6e7c654b35d",
+        "disposition": "deferred",
+        "slice": "network-runtime-spikes"
+      },
+      {
+        "path": "spikes/results/summary.json",
+        "kind": "tracked",
+        "sha256": "ba104e6d953815fa45fc1a33f74f9ba101e5b54bea821706fc42010cc48e64f0",
+        "disposition": "deferred",
+        "slice": "network-runtime-spikes"
+      },
+      {
+        "path": "spikes/run-all.mjs",
+        "kind": "tracked",
+        "sha256": "791bb230ea8745456e8af8aa7a44b290725e1084698d10eb6f8fcc4bbd036eb1",
+        "disposition": "deferred",
+        "slice": "network-runtime-spikes"
+      },
+      {
+        "path": "spikes/spike-n-tool-rejection.mjs",
+        "kind": "untracked",
+        "sha256": "662537d0d0e620016f91e9d02df189c4177f903221d4496a3b2f9423ca1dc3c3",
+        "disposition": "deferred",
+        "slice": "network-runtime-spikes"
+      },
+      {
+        "path": "spikes/spike-o-tool-hidden.mjs",
+        "kind": "untracked",
+        "sha256": "31570b2949b783670a4c808a3cb1fa04026785768ee1f42ff4c6fe4a381a37aa",
+        "disposition": "deferred",
+        "slice": "network-runtime-spikes"
+      },
+      {
+        "path": "src/commands/shape.js",
+        "kind": "untracked",
+        "sha256": "4b461cbe196f2eede3a606aeac886c31b8df30e83f0cbe3fc48c817371100785",
+        "disposition": "deferred",
+        "slice": "shape"
+      },
+      {
+        "path": "src/commands/start.js",
+        "kind": "tracked",
+        "sha256": "f6fe4548033df8cc441b5a4660554a453969476262ec4104a46f0abbbb4bb372",
+        "disposition": "superseded_by_release",
+        "slice": "startup-validation"
+      },
+      {
+        "path": "src/core/config.js",
+        "kind": "tracked",
+        "sha256": "b5ba65572de9644d6fc77dda9c31bd68fe27c99b9bc0bb0e1f50346d1fd77d32",
+        "disposition": "integrated",
+        "slice": "config-v2"
+      },
+      {
+        "path": "src/core/migrations.js",
+        "kind": "tracked",
+        "sha256": "56f40cc7cf59fd4acc4ee5827d8362102c02e2dcacc2fd493a6e11ffeca476aa",
+        "disposition": "integrated",
+        "slice": "config-v2"
+      },
+      {
+        "path": "src/shape/anchors.js",
+        "kind": "untracked",
+        "sha256": "cd5f20991ba50aaec9b6daa58c01879b24f2f51649f9bb44a4df58d5604bd725",
+        "disposition": "deferred",
+        "slice": "shape"
+      },
+      {
+        "path": "src/shape/index.js",
+        "kind": "untracked",
+        "sha256": "92bc43e86fc72b7cd0d5c10e783f59f7477278589f12da99ea3780d522af966b",
+        "disposition": "deferred",
+        "slice": "shape"
+      },
+      {
+        "path": "src/shape/intent-deny.js",
+        "kind": "untracked",
+        "sha256": "25db31a0a4f3aae0bf7c4caadc0f9bf6f17e092893448ca03b0a246ac28683d2",
+        "disposition": "deferred",
+        "slice": "shape"
+      },
+      {
+        "path": "src/shape/render.js",
+        "kind": "untracked",
+        "sha256": "00e17cfd19424bf73c7ff596681e249ab869f0c9fae48fe30340097b88747f44",
+        "disposition": "deferred",
+        "slice": "shape"
+      },
+      {
+        "path": "src/shape/rewrite.js",
+        "kind": "untracked",
+        "sha256": "359235b9ff1b67f900958df5d89c149f343a11b0e706d9f64a835aa85c3df073",
+        "disposition": "deferred",
+        "slice": "shape"
+      },
+      {
+        "path": "src/shape/validate.js",
+        "kind": "untracked",
+        "sha256": "636cd622d69668fa479c6b83f889ff1e8f39b9d00859cfcef3c0bac408a2c286",
+        "disposition": "deferred",
+        "slice": "shape"
+      },
+      {
+        "path": "src/shape/verdict.js",
+        "kind": "untracked",
+        "sha256": "f0f83763bb41ebe9ed448f715b3234877f86b4047c8371c67c82f9c13651378a",
+        "disposition": "deferred",
+        "slice": "shape"
+      },
+      {
+        "path": "templates/shape/instruction.md.tpl",
+        "kind": "untracked",
+        "sha256": "bcbf90a961063f13cdef44bdbde1db476b3c4ade7e2b25a87a16f8392ca9153f",
+        "disposition": "deferred",
+        "slice": "shape"
+      },
+      {
+        "path": "test/fixtures/shape/golden/good-git-ugui-inputsystem.txt",
+        "kind": "untracked",
+        "sha256": "663ff14f66215dd915f21218352d77f5a784c71f069a32e42e8ec82b197e6c08",
+        "disposition": "deferred",
+        "slice": "shape"
+      },
+      {
+        "path": "test/fixtures/shape/golden/good-plastic-no-facts.txt",
+        "kind": "untracked",
+        "sha256": "c2b755c6bcc7797e34a01802158d744a2e4b2d7db666dce818d6f49393501d33",
+        "disposition": "deferred",
+        "slice": "shape"
+      },
+      {
+        "path": "test/fixtures/shape/model-replies/at-mention.json",
+        "kind": "untracked",
+        "sha256": "3aab5f7853fcf00507205c2fefdc6dbfa306f10d200fb25fbe2940d03fc9e47b",
+        "disposition": "deferred",
+        "slice": "shape"
+      },
+      {
+        "path": "test/fixtures/shape/model-replies/good.json",
+        "kind": "untracked",
+        "sha256": "e608dfcd6fbba53c53c2a8fbe188e9ab0b21fe6c56e87942a7126f93c261ee67",
+        "disposition": "deferred",
+        "slice": "shape"
+      },
+      {
+        "path": "test/fixtures/shape/model-replies/invented-path.json",
+        "kind": "untracked",
+        "sha256": "881fab9b6c7825e488a74410c167515a9cd2067114972b4cf3d1183497a67c76",
+        "disposition": "deferred",
+        "slice": "shape"
+      },
+      {
+        "path": "test/fixtures/shape/model-replies/missing-key.json",
+        "kind": "untracked",
+        "sha256": "c466d66a51c92dc8697609d152ad4b5edb985ec95d174432acc9df7e6410d57f",
+        "disposition": "deferred",
+        "slice": "shape"
+      },
+      {
+        "path": "test/fixtures/shape/model-replies/not-json.txt",
+        "kind": "untracked",
+        "sha256": "b64860761946a7e24e8ee3bf5f702e29f960edb85a22fb120b737e425d9ff6d7",
+        "disposition": "deferred",
+        "slice": "shape"
+      },
+      {
+        "path": "test/fixtures/shape/model-replies/off-topic.json",
+        "kind": "untracked",
+        "sha256": "c773d768dc885b8156e6cb3a06e1561c27eb3040e087d0d9b56be9ffdc103a44",
+        "disposition": "deferred",
+        "slice": "shape"
+      },
+      {
+        "path": "test/fixtures/shape/model-replies/over-long-goal.json",
+        "kind": "untracked",
+        "sha256": "5e3d891096579d99f92cd69255a394913397b0ce249478461975359fa77b6f4f",
+        "disposition": "deferred",
+        "slice": "shape"
+      },
+      {
+        "path": "test/fixtures/shape/model-replies/protected-path.json",
+        "kind": "untracked",
+        "sha256": "b0037963b02afb5eb138ff6b669bd06daef5c7106f9eebb6a02a47c3d8a6ea17",
+        "disposition": "deferred",
+        "slice": "shape"
+      },
+      {
+        "path": "test/fixtures/shape/model-replies/shell-block.json",
+        "kind": "untracked",
+        "sha256": "4528dbb5734b6fcdf8620c58b686751371c2268aed7985e736af04e878cebe12",
+        "disposition": "deferred",
+        "slice": "shape"
+      },
+      {
+        "path": "test/fixtures/shape/model-replies/too-many-open.json",
+        "kind": "untracked",
+        "sha256": "6e94bcbd37ff8c8022106b75ce910d1967753d840a3e155752be5667832feee7",
+        "disposition": "deferred",
+        "slice": "shape"
+      },
+      {
+        "path": "test/fixtures/shape/projects/inventory-game/Assets/Game/Audio/Config.cs",
+        "kind": "untracked",
+        "sha256": "febe21aa64b6102a1ea5fd3c3d25302f7d81e35d848f2ebc7704d894cbe78dd3",
+        "disposition": "deferred",
+        "slice": "shape"
+      },
+      {
+        "path": "test/fixtures/shape/projects/inventory-game/Assets/Game/Config.cs",
+        "kind": "untracked",
+        "sha256": "e63bf42ba99735da836f7c6cb23eef421936c1e89ca2a5429946384a8b8b5135",
+        "disposition": "deferred",
+        "slice": "shape"
+      },
+      {
+        "path": "test/fixtures/shape/projects/inventory-game/Assets/Game/Game.Runtime.asmdef",
+        "kind": "untracked",
+        "sha256": "0e4d0961ec08d9c9ff2c74794ac9269d2979489f9631a5eca625e95a29f801e8",
+        "disposition": "deferred",
+        "slice": "shape"
+      },
+      {
+        "path": "test/fixtures/shape/projects/inventory-game/Assets/Game/Inventory/InventoryGrid.cs",
+        "kind": "untracked",
+        "sha256": "7ea87d2fafa289e57ab2f00dae382f68187d8585e55bd5d68cfef3e32c857bc9",
+        "disposition": "deferred",
+        "slice": "shape"
+      },
+      {
+        "path": "test/fixtures/shape/projects/inventory-game/Assets/Game/Inventory/InventoryModel.cs",
+        "kind": "untracked",
+        "sha256": "00d5a19c019fc48b80092a0d6c64bd237db8e4d943ae5e6ea9253a2926acdc02",
+        "disposition": "deferred",
+        "slice": "shape"
+      },
+      {
+        "path": "test/fixtures/shape/projects/inventory-game/Assets/Game/Inventory/InventorySlot.cs",
+        "kind": "untracked",
+        "sha256": "d775833c2e2d0b95e48b5c760effcbfba29173f0c634862fd29da9ce21650155",
+        "disposition": "deferred",
+        "slice": "shape"
+      },
+      {
+        "path": "test/fixtures/shape/projects/inventory-game/Assets/Game/Inventory/InventoryView.cs",
+        "kind": "untracked",
+        "sha256": "8fc72e25e55967597746d3248959b9f6e89c41a45fb196ac2cf8d021affd3cb3",
+        "disposition": "deferred",
+        "slice": "shape"
+      },
+      {
+        "path": "test/fixtures/shape/projects/inventory-game/Assets/Game/Net/Config.cs",
+        "kind": "untracked",
+        "sha256": "9091b2579319de67e4ae09acfd48069cfbcfb2df38ee878e48c41824cc9c4aca",
+        "disposition": "deferred",
+        "slice": "shape"
+      },
+      {
+        "path": "test/fixtures/shape/projects/inventory-game/Assets/Game/Tests/EditMode/Game.Tests.EditMode.asmdef",
+        "kind": "untracked",
+        "sha256": "8a08c6f392a0fce625031ade15b6ecca4334c4d9808f98f9f70cbeb628c75fce",
+        "disposition": "deferred",
+        "slice": "shape"
+      },
+      {
+        "path": "test/fixtures/shape/projects/inventory-game/Assets/Game/Tests/EditMode/SlotCountTests.cs",
+        "kind": "untracked",
+        "sha256": "dc4b69278d08ee4b0124ae7d1427fbd1bf80c06b956fc9cb12fd6b74fc504616",
+        "disposition": "deferred",
+        "slice": "shape"
+      },
+      {
+        "path": "test/fixtures/shape/projects/inventory-game/Assets/Game/Tools/CommitLog.cs",
+        "kind": "untracked",
+        "sha256": "18cb37b309f22b1c1fde621d39c7832af3a117941e20a91adbe2977afe36a5cb",
+        "disposition": "deferred",
+        "slice": "shape"
+      },
+      {
+        "path": "test/fixtures/shape/projects/inventory-game/Assets/Prefabs/Slot.prefab",
+        "kind": "untracked",
+        "sha256": "499cdcbb4d032ee8d4bce2807d596741105957b3f015d006e44c04423f4f520f",
+        "disposition": "deferred",
+        "slice": "shape"
+      },
+      {
+        "path": "test/fixtures/shape/projects/inventory-game/Assets/Scenes/Main.unity",
+        "kind": "untracked",
+        "sha256": "f4ec51409cc4ca0151a430870743fbe3615aa5ed862e441bd154bebe41ce8f3a",
+        "disposition": "deferred",
+        "slice": "shape"
+      },
+      {
+        "path": "test/fixtures/shape/projects/inventory-game/Packages/manifest.json",
+        "kind": "untracked",
+        "sha256": "8e257e79671e3d1c9b9577cec1baca0a587ce75085433494ca567f736eccb0cf",
+        "disposition": "deferred",
+        "slice": "shape"
+      },
+      {
+        "path": "test/fixtures/shape/projects/inventory-game/ProjectSettings/ProjectSettings.asset",
+        "kind": "untracked",
+        "sha256": "1bdfb5d46ba27f362410e0476ff25b8c42f3d9b430482918aede185ca9da8973",
+        "disposition": "deferred",
+        "slice": "shape"
+      },
+      {
+        "path": "test/fixtures/shape/projects/inventory-game/ProjectSettings/ProjectVersion.txt",
+        "kind": "untracked",
+        "sha256": "b20cf2a7903e684e309bac5e249c21b2ada8ab85b5326ed982eb236561a67c3f",
+        "disposition": "deferred",
+        "slice": "shape"
+      },
+      {
+        "path": "test/fixtures/shape/requests/ambiguous-basename.json",
+        "kind": "untracked",
+        "sha256": "66ba0504c5fcdc489dd778408eb926435628e607e9df0791af00bf0703831d54",
+        "disposition": "deferred",
+        "slice": "shape"
+      },
+      {
+        "path": "test/fixtures/shape/requests/denied-commit.json",
+        "kind": "untracked",
+        "sha256": "7d6b865b3c099c9b7c59550f3beb54bce4bd3ffd10cfbdb4b01c2076c8de271b",
+        "disposition": "deferred",
+        "slice": "shape"
+      },
+      {
+        "path": "test/fixtures/shape/requests/denied-scene.json",
+        "kind": "untracked",
+        "sha256": "ea5e0579e5aeb9b3fe3949ffff5799d75fa81967c4fe64b626b2ec72a613d775",
+        "disposition": "deferred",
+        "slice": "shape"
+      },
+      {
+        "path": "test/fixtures/shape/requests/missing-file.json",
+        "kind": "untracked",
+        "sha256": "312b5f09c1a64e30b16c643d2108c4b125e80e5348b2e74d04acfcc206c84e88",
+        "disposition": "deferred",
+        "slice": "shape"
+      },
+      {
+        "path": "test/fixtures/shape/requests/multi-outcome.json",
+        "kind": "untracked",
+        "sha256": "fbe911a5cf67eb302de5241b26ad5a5b4e7c2d778fb26eba830616584911740b",
+        "disposition": "deferred",
+        "slice": "shape"
+      },
+      {
+        "path": "test/fixtures/shape/requests/near-miss.json",
+        "kind": "untracked",
+        "sha256": "023b3f08b78e2e41590be2ff230b15017de0f58f8c98c36bd0fba7444164239b",
+        "disposition": "deferred",
+        "slice": "shape"
+      },
+      {
+        "path": "test/fixtures/shape/requests/non-english.json",
+        "kind": "untracked",
+        "sha256": "daf924dd34b2bf18e9c14e4ab1920fb20b8475e991fc98957d52e66b2f539b68",
+        "disposition": "deferred",
+        "slice": "shape"
+      },
+      {
+        "path": "test/fixtures/shape/requests/ready-assembly.json",
+        "kind": "untracked",
+        "sha256": "8c3bff5dbe6c757c6879b7d4ee58935b97c6b8ef43d9f01df32ac19aabdf3226",
+        "disposition": "deferred",
+        "slice": "shape"
+      },
+      {
+        "path": "test/fixtures/shape/requests/ready-basename.json",
+        "kind": "untracked",
+        "sha256": "dc133ad515557008db3f647b7e55ab52543fe578253d2f2b00da6555d4ccd396",
+        "disposition": "deferred",
+        "slice": "shape"
+      },
+      {
+        "path": "test/fixtures/shape/requests/ready-grep.json",
+        "kind": "untracked",
+        "sha256": "81e30e6f6e8e7064937e79da0c07bda3a62595adaa58de187cdee2a5a23a9cdb",
+        "disposition": "deferred",
+        "slice": "shape"
+      },
+      {
+        "path": "test/fixtures/shape/requests/ready-path.json",
+        "kind": "untracked",
+        "sha256": "30114600e84fd7a1662ae31426af7adb6db9a906629d76c219e8d50f089e6385",
+        "disposition": "deferred",
+        "slice": "shape"
+      },
+      {
+        "path": "test/fixtures/shape/requests/too-long.json",
+        "kind": "untracked",
+        "sha256": "85a73f0db73a22d72fbff333c42b96212372de479006c2ab177c98b87ee455fe",
+        "disposition": "deferred",
+        "slice": "shape"
+      },
+      {
+        "path": "test/fixtures/shape/requests/vague-noverb.json",
+        "kind": "untracked",
+        "sha256": "79022858a5ffd3b3744ecd939adda50144b54d0f6fd8d8a5e509228b55c02f2a",
+        "disposition": "deferred",
+        "slice": "shape"
+      },
+      {
+        "path": "test/fixtures/shape/requests/vague-subject.json",
+        "kind": "untracked",
+        "sha256": "b60712d79b1d2947c3973c67020867bd61ffe48f7eee61379c5cccf1f247f89a",
+        "disposition": "deferred",
+        "slice": "shape"
+      },
+      {
+        "path": "test/lint/no-platform-literals.test.mjs",
+        "kind": "tracked",
+        "sha256": "08f2be6bf4e2fdc9fc8a4932795d98c3735896c0e7b0f43cd487acb6cafe86d7",
+        "disposition": "deferred",
+        "slice": "probe-interface"
+      },
+      {
+        "path": "test/lint/probe-isolation.test.mjs",
+        "kind": "untracked",
+        "sha256": "bccd3e967ad10dc8c55e508ce5321feda314d4db05ff0729aec5aa4a22b54b36",
+        "disposition": "deferred",
+        "slice": "probe-interface"
+      },
+      {
+        "path": "test/plugin/net-tool/arguments.test.mjs",
+        "kind": "untracked",
+        "sha256": "edb53fe5db0a00b4045532cfc3b9d643254cdf42c060c3344dee5dd0915ed38c",
+        "disposition": "deferred",
+        "slice": "network"
+      },
+      {
+        "path": "test/plugin/net-tool/ask-pattern.test.mjs",
+        "kind": "untracked",
+        "sha256": "27e260b5940f57ed25faf1559f26469fdbed93635c0a51998f303928aa6103a4",
+        "disposition": "deferred",
+        "slice": "network"
+      },
+      {
+        "path": "test/plugin/net-tool/codes.test.mjs",
+        "kind": "untracked",
+        "sha256": "9eccde9f20248d2348f2375205d49d60353526a7a0399466d0daa416a4b21407",
+        "disposition": "deferred",
+        "slice": "network"
+      },
+      {
+        "path": "test/plugin/net-tool/helpers.mjs",
+        "kind": "untracked",
+        "sha256": "0e717d8dc6761625f669415972e91210261b47a823f17bfa19401d679efda9dd",
+        "disposition": "deferred",
+        "slice": "network"
+      },
+      {
+        "path": "test/plugin/net-tool/injected-page.test.mjs",
+        "kind": "untracked",
+        "sha256": "ea4ad499d81ad37ed75b28b4c5f1fe25abd5599b154d13cb0be2f3a4aa781c67",
+        "disposition": "deferred",
+        "slice": "network"
+      },
+      {
+        "path": "test/plugin/net-tool/log-records.test.mjs",
+        "kind": "untracked",
+        "sha256": "0f05d2413cf8ec88dc767b286681b27fd9690042eb7f781a8dafcce72a01005b",
+        "disposition": "deferred",
+        "slice": "network"
+      },
+      {
+        "path": "test/plugin/net-tool/never-throws.test.mjs",
+        "kind": "untracked",
+        "sha256": "51d600d8e913e9c80957af9fd5bc7f594bbb59bb5cd18fe46566b5e7447640ea",
+        "disposition": "deferred",
+        "slice": "network"
+      },
+      {
+        "path": "test/plugin/net-tool/plugin.test.mjs",
+        "kind": "untracked",
+        "sha256": "594f1afbf77281b84b223d8ed16a33a56d0231ec456cb5a847c9073583e905b0",
+        "disposition": "deferred",
+        "slice": "network"
+      },
+      {
+        "path": "test/plugin/net-tool/policy-state.test.mjs",
+        "kind": "untracked",
+        "sha256": "478c9a6fab6646b2e2092d7c19fdea9ab31cd90f611ad1ce5d3f221afc689bb8",
+        "disposition": "deferred",
+        "slice": "network"
+      },
+      {
+        "path": "test/plugin/net-tool/responses.test.mjs",
+        "kind": "untracked",
+        "sha256": "92ddbf61bbe6e3df53273c5122afb7eb849c5a697088e35e85346358e0e25785",
+        "disposition": "deferred",
+        "slice": "network"
+      },
+      {
+        "path": "test/plugin/net-tool/steps.test.mjs",
+        "kind": "untracked",
+        "sha256": "60f1596c5c026a6b0c94e7bb8c736201e13ceac36a5ed88405e42e725f74a1e2",
+        "disposition": "deferred",
+        "slice": "network"
+      },
+      {
+        "path": "test/plugin/net-tool/tiers.test.mjs",
+        "kind": "untracked",
+        "sha256": "df67b67c9c1aecfc3c05c727ba0f851611b1b3a4b068daae8a37c31dd22f9737",
+        "disposition": "deferred",
+        "slice": "network"
+      },
+      {
+        "path": "test/plugin/shell-network/network-text.test.mjs",
+        "kind": "untracked",
+        "sha256": "f45c98ab9510eed0f41966db338931052c8dfac1bf1553b942ee24c4c76c6b34",
+        "disposition": "deferred",
+        "slice": "network"
+      },
+      {
+        "path": "test/plugin/shell-network/network-tokens.test.mjs",
+        "kind": "untracked",
+        "sha256": "6d2f864c70d1f5934e63813b785208490994da5b58d3e9c5d2e61f498ec31479",
+        "disposition": "deferred",
+        "slice": "network"
+      },
+      {
+        "path": "test/unit/commands/start.test.mjs",
+        "kind": "tracked",
+        "sha256": "444994511d1113b1535d57734adc6ebb53b820805e123afa98f7db804a0ab14b",
+        "disposition": "superseded_by_release",
+        "slice": "startup-validation"
+      },
+      {
+        "path": "test/unit/config-v2/install-matrix-schema.test.mjs",
+        "kind": "untracked",
+        "sha256": "6eca0f52eaf6bafbe51c5c7bc6593b5674ad6de34e4740133cd1b5422fb43ed5",
+        "disposition": "integrated",
+        "slice": "config-v2"
+      },
+      {
+        "path": "test/unit/config-v2/migration.test.mjs",
+        "kind": "untracked",
+        "sha256": "10396dd625bdbbaff1ffe9c2a3619f8b4438eea3eba2cfa76a165592d412ff73",
+        "disposition": "integrated",
+        "slice": "config-v2"
+      },
+      {
+        "path": "test/unit/config-v2/platform-defaults.test.mjs",
+        "kind": "untracked",
+        "sha256": "cb640f6281c6728ae0a68f2c8357eb9aa75de863a687f1851f248d3eded02c68",
+        "disposition": "integrated",
+        "slice": "config-v2"
+      },
+      {
+        "path": "test/unit/config-v2/schema-v2.test.mjs",
+        "kind": "untracked",
+        "sha256": "b2c4cdd2a794f2876f2a47c1c1b323f040941925c1cd68664ba59ecb20336b6b",
+        "disposition": "integrated",
+        "slice": "config-v2"
+      },
+      {
+        "path": "test/unit/config-v2/write-free.test.mjs",
+        "kind": "untracked",
+        "sha256": "40ed1f51393539a11dde9cd9325c5690c3f3c74dedc0be6c39675de3b1985907",
+        "disposition": "integrated",
+        "slice": "config-v2"
+      },
+      {
+        "path": "test/unit/guard-probes/collect-fold.test.mjs",
+        "kind": "untracked",
+        "sha256": "5b9560c673d6415dd3acd1235aee17a7c6f8733e0e6ba6c787644f3012545979",
+        "disposition": "deferred",
+        "slice": "probe-interface"
+      },
+      {
+        "path": "test/unit/guard-probes/golden/win32-verdicts.json",
+        "kind": "untracked",
+        "sha256": "1d3229d8d7a05145411fae74a7d48d0462739ea61ba500144467ce5af47e6097",
+        "disposition": "deferred",
+        "slice": "probe-interface"
+      },
+      {
+        "path": "test/unit/guard-probes/probe-interface.test.mjs",
+        "kind": "untracked",
+        "sha256": "fe203535dc286e14db52260056a38cb81e152b969ce6b2f08328f55392311327",
+        "disposition": "deferred",
+        "slice": "probe-interface"
+      },
+      {
+        "path": "test/unit/guard-probes/processes.test.mjs",
+        "kind": "tracked",
+        "sha256": "2ace0991fb21cfc0e67b59ad5b1fa4edd61ceab7464a30acee410d1b15b28ab3",
+        "disposition": "deferred",
+        "slice": "probe-interface"
+      },
+      {
+        "path": "test/unit/guard-probes/unity-processes.test.mjs",
+        "kind": "tracked",
+        "sha256": "f8ffade94363b9fa8dedf371e96a995ae71712c35259f4d11152ca7dcc67aaa6",
+        "disposition": "deferred",
+        "slice": "probe-interface"
+      },
+      {
+        "path": "test/unit/guard-probes/win32-golden.test.mjs",
+        "kind": "untracked",
+        "sha256": "d6df80abc72bdd1de9bbf609d7056d8c7703af2498b74f87f8d7fa8b43bef072",
+        "disposition": "deferred",
+        "slice": "probe-interface"
+      },
+      {
+        "path": "test/unit/guard-probes/win32-scenarios.mjs",
+        "kind": "untracked",
+        "sha256": "4c13ffe7e25560ea1269b26986fbac1d706ba18a66c1fe503f5a60204fda01be",
+        "disposition": "deferred",
+        "slice": "probe-interface"
+      },
+      {
+        "path": "test/unit/shape/anchors.test.mjs",
+        "kind": "untracked",
+        "sha256": "06fc11f8d04911482e75d32672b58649d2a86dfd88f7710bcc9d2cf71f3b8864",
+        "disposition": "deferred",
+        "slice": "shape"
+      },
+      {
+        "path": "test/unit/shape/command.test.mjs",
+        "kind": "untracked",
+        "sha256": "fdf10256bb4cad0ad610229c8e748f15a7adb7c61174edd47eca93b762dcd29d",
+        "disposition": "deferred",
+        "slice": "shape"
+      },
+      {
+        "path": "test/unit/shape/helpers.mjs",
+        "kind": "untracked",
+        "sha256": "d314369218bc4c954acfd202119af917055fc2caa7ac32ea9fc54a9a260dbe3f",
+        "disposition": "deferred",
+        "slice": "shape"
+      },
+      {
+        "path": "test/unit/shape/intent-deny.test.mjs",
+        "kind": "untracked",
+        "sha256": "cd53e41cc77d3498cb76329e4df795cb43cace8aa43e8626cc4229bceda7bbb5",
+        "disposition": "deferred",
+        "slice": "shape"
+      },
+      {
+        "path": "test/unit/shape/pipeline.test.mjs",
+        "kind": "untracked",
+        "sha256": "af1d2d7653850b87ec6a9ccf34b3d4471d51193f7bda75ae080d4618b5457a6b",
+        "disposition": "deferred",
+        "slice": "shape"
+      },
+      {
+        "path": "test/unit/shape/render.test.mjs",
+        "kind": "untracked",
+        "sha256": "6e63d305915fdf108a626915b44c49e4a0af78912a4ed6fc4daa99d64932250c",
+        "disposition": "deferred",
+        "slice": "shape"
+      },
+      {
+        "path": "test/unit/shape/rewrite.test.mjs",
+        "kind": "untracked",
+        "sha256": "7bf45b25233b97e99d28dbd043e2aa722214c856fc21d53b0b4105912ea0d6a2",
+        "disposition": "deferred",
+        "slice": "shape"
+      },
+      {
+        "path": "test/unit/shape/validate.test.mjs",
+        "kind": "untracked",
+        "sha256": "8770e7660cb7f59b81073ab185fe7d599923b78b4d76bc531e3dbde61299a526",
+        "disposition": "deferred",
+        "slice": "shape"
+      },
+      {
+        "path": "test/unit/shape/verdict.test.mjs",
+        "kind": "untracked",
+        "sha256": "f8c69f6721549b99333a1225b269e5b1449c9fcb2cdcd541ad52a6657b82b82e",
+        "disposition": "deferred",
+        "slice": "shape"
+      }
+    ]
+  }
+}

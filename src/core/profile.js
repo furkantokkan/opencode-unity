@@ -198,7 +198,14 @@ export function buildRuntimeProfile({
       toolsTokensSource: toolsTokens.source,
       ...structuredClone(config.budget),
     },
-    safety: structuredClone(config.safety),
+    // Config may also carry workspace policy settings. Keep the plugin's versioned
+    // profile limited to the settings its validator and consumers support.
+    safety: {
+      bashMode: config.safety.bashMode,
+      readLimitLines: config.safety.readLimitLines,
+      extraProtectedEditGlobs: [...config.safety.extraProtectedEditGlobs],
+      extraProtectedReadGlobs: [...config.safety.extraProtectedReadGlobs],
+    },
     home,
     compat: { opencode: compat.opencode.tested, ollama: compat.ollama.tested },
   };

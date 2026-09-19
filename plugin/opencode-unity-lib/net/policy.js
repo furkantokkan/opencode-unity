@@ -116,6 +116,7 @@ function emptyPolicy() {
  * @property {boolean} shipped
  * @property {import('./budget.js').EntryBudget} budget
  * @property {string | null} consentId
+ * @property {Record<string, string>} headers
  * @property {string | null} caFile
  */
 
@@ -524,6 +525,8 @@ function normalizeEntry(candidate) {
   if (methods === null) return null;
   const pathPrefix = normalizePathPrefix(raw.pathPrefix);
   if (pathPrefix === null) return null;
+  if (raw.headers !== undefined && (raw.headers === null || typeof raw.headers !== 'object' || Array.isArray(raw.headers) || Object.values(raw.headers).some((value) => typeof value !== 'string'))) return null;
+  const headers = /** @type {Record<string, string>} */ ({ .../** @type {Record<string, string>} */ (raw.headers ?? {}) });
 
   return {
     id,
@@ -541,6 +544,7 @@ function normalizeEntry(candidate) {
     shipped: raw.shipped === true,
     budget: normalizeBudget(raw.budget),
     consentId: typeof raw.consentId === 'string' && raw.consentId !== '' ? raw.consentId : null,
+    headers,
     caFile: typeof raw.caFile === 'string' && raw.caFile !== '' ? raw.caFile : null,
   };
 }

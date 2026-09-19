@@ -4,6 +4,8 @@
 // The order the user sees is deliberate: the platform block first, so nobody agrees to a 19 GiB download
 // before they know their machine is on an experimental row, then one question per change, then the work.
 import fs from 'node:fs/promises';
+import os from 'node:os';
+import { buildHostInstallStep } from '../hosts/install.js';
 import { CliError, EXIT, usageError } from '../cli/exit-codes.js';
 import { CLI_NAME } from '../cli/version.js';
 import { loadConfig, renderInitialConfig } from '../core/config.js';
@@ -42,6 +44,7 @@ import { run as runUpgrade } from './upgrade.js';
  * @property {Record<string, Uint8Array>} [pluginFiles]
  * @property {import('../install/apply.js').ApplyIo['onOperation']} [onOperation]
  * @property {() => Date} [now]
+ * @property {string} [homedir]
  */
 
 /**
@@ -72,7 +75,7 @@ export async function run(context, dependencies = {}) {
   const warnings = [];
   if (flags.delegate.length > 0) warnings.push(describeDeprecatedDelegateFlag(flags.delegate));
 
-  const loaded = await loadConfig(paths.config);
+  const loaded = await loadConfig(paths.config, { platform });
   const compat = loadCompat();
   const ollamaClient = dependencies.ollamaClient ?? createOllamaClient({ baseUrl: loaded.config.ollama.baseUrl });
   const facts0 = dependencies.preflight ?? (await runPreflight({ platform, env, nodeVersion: process.versions.node, compat, ollama: ollamaClient, signal: context.signal }));
@@ -128,6 +131,14 @@ export async function run(context, dependencies = {}) {
     hostTargets: flags.host,
   });
   warnings.push(...plan.warnings);
+  const managedHosts = flags.host.filter((target) => target !== 'antigravity');
+  const hostInput = { targets: managedHosts, homedir: dependencies.homedir ?? os.homedir(), platform, cliVersion, manifest };
+  if (managedHosts.length > 0) {
+    const hostPlan = await buildHostInstallStep(hostInput);
+    plan.steps = plan.steps.map((step) => step.id === 'host-install' ? hostPlan.step : step);
+    warnings.push(...hostPlan.warnings);
+  }
+  if (flags.host.includes('antigravity')) warnings.push('Antigravity integration remains a manual copy from hosts/antigravity; managed installation supports Claude and Codex.');
   plan = await markSettledSteps(plan, createProbe({ userEnv, installed: new Set(preflight.models), warnings }));
 
   for (const line of renderPlanText({ ...plan, platformBlock: [] })) output.text(line);
@@ -139,6 +150,11 @@ export async function run(context, dependencies = {}) {
 
   const decisions = await context.consent.request(toConsentItems(plan));
   plan = applyDecisions(plan, decisions);
+  if (managedHosts.length > 0 && plan.steps.some((step) => step.id === 'host-install' && step.accepted)) {
+    const refreshed = await buildHostInstallStep(hostInput);
+    plan.steps = plan.steps.map((step) => step.id === 'host-install' ? { ...refreshed.step, accepted: true } : step);
+    warnings.push(...refreshed.warnings);
+  }
   assertPlatformAcknowledged(plan, { facts, tier });
 
   const createdState = !(await pathExists(paths.state));

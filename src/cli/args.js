@@ -19,6 +19,7 @@ import { COMMANDS, GLOBAL_OPTIONS, findCommand, findSubcommand } from './registr
  * @property {boolean} experimental
  * @property {boolean} verbose
  * @property {boolean} noColor
+ * @property {boolean} [printPlatform]
  */
 
 /**
@@ -390,6 +391,7 @@ function buildGlobalOptions(values) {
     experimental: values.get('experimental') === true,
     verbose: values.get('verbose') === true,
     noColor: values.get('no-color') === true,
+    ...(values.get('print-platform') === true ? { printPlatform: true } : {}),
   };
 }
 

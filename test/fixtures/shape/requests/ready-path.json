@@ -1,0 +1,10 @@
+{
+  "note": "A verb and a full path that exists.",
+  "text": "add a null check in Assets/Game/Inventory/InventoryView.cs",
+  "expect": {
+    "status": "ready",
+    "verdict": "ready",
+    "reason": null,
+    "anchorRule": 1
+  }
+}

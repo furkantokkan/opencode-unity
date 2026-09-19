@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "opencode-unity workspace project.json",
+  "description": "Bounded shareable workspace facts. Raw manifests, script bodies, secret values and machine paths are excluded by the projection in src/project/workspace.js.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "generator", "workspace", "vcs", "inputsHash"],
+  "properties": {
+    "schemaVersion": { "const": 2 },
+    "generator": {
+      "type": "object", "additionalProperties": false,
+      "required": ["name", "version", "factsVersion"],
+      "properties": { "name": { "const": "opencode-unity" }, "version": { "type": "string" }, "factsVersion": { "type": "integer", "minimum": 1 } }
+    },
+    "workspace": {
+      "type": "object", "additionalProperties": false,
+      "required": ["components", "settings", "truncated"],
+      "properties": {
+        "components": {
+          "type": "array", "maxItems": 64,
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["id", "kind", "dir", "declaredBy", "status", "attachedTo", "details"],
+            "properties": {
+              "id": { "type": "string" },
+              "kind": { "enum": ["unity-client", "node-service", "dotnet-service", "firebase-project", "database", "game-server"] },
+              "dir": { "$ref": "#/$defs/path" }, "declaredBy": { "$ref": "#/$defs/path" },
+              "status": { "enum": ["ok", "unreadable", "unbudgeted"] },
+              "attachedTo": { "type": ["string", "null"] },
+              "details": {
+                "type": "object", "additionalProperties": false,
+                "properties": {
+                  "version": { "type": ["string", "null"] }, "pipeline": { "type": "string" },
+                  "assemblies": { "type": "integer" }, "sources": { "type": "integer" },
+                  "frameworks": { "$ref": "#/$defs/strings" }, "packageManager": { "type": ["string", "null"] },
+                  "typescript": { "type": "boolean" }, "testRunner": { "type": ["string", "null"] },
+                  "scripts": { "$ref": "#/$defs/strings" }, "entry": { "anyOf": [{ "$ref": "#/$defs/path" }, { "type": "null" }] },
+                  "routes": { "type": "integer" }, "sdk": { "type": ["string", "null"] },
+                  "targetFramework": { "type": ["string", "null"] }, "efCore": { "type": "boolean" }, "testProjects": { "type": "integer" },
+                  "products": { "$ref": "#/$defs/strings" }, "codebases": { "type": "integer" },
+                  "rulesFiles": { "type": "integer" }, "emulators": { "$ref": "#/$defs/strings" },
+                  "tool": { "type": "string" }, "models": { "type": ["integer", "null"] },
+                  "migrations": { "type": "integer" }, "dialect": { "type": ["string", "null"] }
+                }
+              }
+            }
+          }
+        },
+        "settings": { "type": "object" }, "truncated": { "type": "boolean" }
+      }
+    },
+    "vcs": { "type": "object", "additionalProperties": false, "required": ["kind"], "properties": { "kind": { "enum": ["git", "plastic", "perforce", "svn", "hg", "none"] } } },
+    "inputsHash": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+  },
+  "$defs": {
+    "path": { "type": "string", "pattern": "^(?![/\\\\]|[A-Za-z]:)(?!.*(?:^|/)\\.\\.(?:/|$))[^\\r\\n]*$" },
+    "strings": { "type": "array", "items": { "type": "string" } }
+  }
+}

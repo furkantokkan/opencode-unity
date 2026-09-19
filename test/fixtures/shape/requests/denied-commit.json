@@ -1,0 +1,10 @@
+{
+  "note": "A VCS write bound to its object.",
+  "text": "fix the crash and commit it",
+  "expect": {
+    "status": "passthrough",
+    "verdict": null,
+    "reason": "denied_intent",
+    "rule": "VCS_WRITE_DENY"
+  }
+}

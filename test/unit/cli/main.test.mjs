@@ -101,6 +101,15 @@ async function runMain(argv, run = () => undefined, overrides = {}) {
 }
 
 describe('main: command execution', () => {
+  it('prints platform facts without loading any command or model', async () => {
+    const result = await runMain(['--print-platform', '--json'], () => { throw new Error('must not run'); }, { platformFacts: makePlatformFacts({ os: 'win32', arch: 'x64' }) });
+    assert.equal(result.exitCode, 0);
+    const envelope = parseEnvelope(result.stdout);
+    assert.equal(envelope.data.platform.os, 'win32');
+    assert.ok(envelope.data.tiers);
+    assert.equal(result.contexts.length, 0);
+  });
+
   it('passes parsed arguments, options and globals to the command', async () => {
     const result = await runMain(['probe', 'Game', '--dry-level', '2', '--json', '--yes', '--project', 'P']);
     assert.equal(result.exitCode, 0);

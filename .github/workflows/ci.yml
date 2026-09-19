@@ -57,6 +57,7 @@ jobs:
           node scripts/gen-cli-docs.mjs
           node scripts/gen-config-docs.mjs
           node scripts/gen-doctor-docs.mjs
+          node scripts/gen-install-docs.mjs --check
           if [ -n "$(git status --porcelain)" ]; then
             echo "Generated docs differ from the committed ones. Run the gen-* scripts and commit the result."
             git status --porcelain

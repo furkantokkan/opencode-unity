@@ -1,10 +1,9 @@
-// The Unity process probes: the fast tasklist check, the PowerShell probe script, and the answer for
-// platforms this version has no adapter for.
+// The Windows Unity process probe: the fast tasklist check and the PowerShell probe script. The answer
+// for platforms without a probe family is in probe-interface.test.mjs.
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import { describe, it } from 'node:test';
 import { buildProbeInput, createWin32ProcessProbe, parseProbeResult, parseTasklistOutput, readProbeScript } from '../../../plugin/opencode-unity-lib/guard/probes/processes-win32.js';
-import { createUnsupportedProcessProbe } from '../../../plugin/opencode-unity-lib/guard/probes/processes-unsupported.js';
 
 const FIXTURES = new URL('../../fixtures/processes/', import.meta.url);
 const ENV = { SystemRoot: 'C:\\Windows' };
@@ -189,17 +188,5 @@ describe('the Windows process probe', () => {
     assert.ok(reading.snapshot.probePid > 0);
     assert.ok(reading.snapshot.ancestors.includes(process.pid), 'the probe must know its own parent chain, so the guard can skip it');
     assert.equal(reading.snapshot.sampleMs, 150);
-  });
-});
-
-describe('the probe for platforms without an adapter', () => {
-  it('answers with an error, so the guard blocks', async () => {
-    const probe = createUnsupportedProcessProbe('darwin');
-    assert.equal(probe.platform, 'darwin');
-    const presence = await probe.detect({ timeoutMs: 5000 });
-    assert.equal(presence.ok, false);
-    assert.match(presence.error, /not implemented on darwin/);
-    const reading = await probe.sample({ patterns: [], sampleMs: 1500, sampleCpu: true, timeoutMs: 5000 });
-    assert.equal(reading.ok, false);
   });
 });

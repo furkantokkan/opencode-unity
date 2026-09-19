@@ -109,7 +109,8 @@ describe('delegate ledger', () => {
 
     assert.equal(result.data.jobs, 2);
     assert.deepEqual(result.data.byStatus, { ok: 2 });
-    assert.ok(result.data.estimatedPaidTokensAvoided > 0);
+    assert.equal(result.data.estimatedInputTokensAvoided, 0, 'no source files were avoided');
+    assert.ok(result.data.usableLocalTokens > 0);
     assert.match(result.data.estimateNote, /estimate/);
   });
 

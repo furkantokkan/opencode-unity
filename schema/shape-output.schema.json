@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "opencode-unity shaped request",
+  "description": "The one object the shaping call may return (amendment 36.4). It is sent to Ollama as the `format` constraint and checked again after the answer. No length, count or pattern keyword appears here on purpose: the schema-to-grammar conversion is not trusted to honour them, so every cap is enforced by src/shape/validate.js instead.",
+  "type": "object",
+  "properties": {
+    "goal": { "type": "string" },
+    "files": { "type": "array", "items": { "type": "string" } },
+    "search": { "type": "string" },
+    "done": { "type": "string" },
+    "open": { "type": "array", "items": { "type": "string" } }
+  },
+  "required": ["goal", "done", "open"]
+}

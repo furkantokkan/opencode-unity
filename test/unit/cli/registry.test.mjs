@@ -19,7 +19,7 @@ const OPTION_NAME = /^[a-z][a-z0-9-]*$/;
 describe('command registry', () => {
   it('matches the spec command surface (sections 5.4 and 5.5)', () => {
     assert.deepEqual(COMMANDS.map((command) => command.name), [
-      'doctor', 'setup', 'init', 'start', 'status', 'guard', 'warm', 'stop', 'bench', 'delegate', 'upgrade', 'uninstall',
+      'host', 'shape', 'doctor', 'setup', 'init', 'start', 'status', 'guard', 'warm', 'stop', 'bench', 'delegate', 'upgrade', 'uninstall',
     ]);
     assert.deepEqual(findCommand('delegate')?.subcommands?.map((entry) => entry.name), ['on', 'off', 'status', 'monitor', 'health', 'ask', 'map', 'edit', 'apply', 'restore', 'ledger']);
   });

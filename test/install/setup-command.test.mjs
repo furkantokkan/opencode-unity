@@ -465,7 +465,7 @@ describe('setup preconditions', () => {
     const { envelope, stderr } = await harness.run(['setup', '--no-model', '--delegate', 'claude', ...YES]);
 
     assert.ok(envelope.warnings.some((warning) => /--delegate is now --host/.test(warning)));
-    assert.match(stderr, /opencode-unity host install --host claude/);
+    assert.match(stderr, /Install delegation skills for claude/);
   });
 
   it('accepts --host through the registry, with every host id, and prints no deprecation notice', async (t) => {
@@ -475,7 +475,8 @@ describe('setup preconditions', () => {
 
     assert.equal(exitCode, EXIT.OK);
     assert.ok(!envelope.warnings.some((warning) => /--delegate is now --host/.test(warning)));
-    assert.match(stderr, /opencode-unity host install --host codex,antigravity/);
+    assert.match(stderr, /Install delegation skills for codex/);
+    assert.ok(envelope.warnings.some((warning) => /Antigravity.*manual/.test(warning)));
   });
 });
 

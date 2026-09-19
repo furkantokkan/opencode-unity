@@ -1,0 +1,180 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "opencode-unity install matrix",
+  "description": "install/install-matrix.json (amendment 34.2): the single fact set behind every install command the product shows. The one-prompt install, the terminal path, the per-OS pages and the README region are all generated from it, so a command changes here or nowhere.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "cliVersion", "pins", "shells", "steps"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "cliVersion": { "$ref": "#/$defs/exactVersion" },
+    "pins": {
+      "description": "Every version a rendering names. One field per pin, so every rendering prints the same one.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["opencodeUnity", "opencode", "ollama", "node", "modelBase", "modelDownloadGiB"],
+      "properties": {
+        "opencodeUnity": {
+          "description": "latest, which the first step resolves once and every later step then names exactly (D-M31), or an exact version.",
+          "anyOf": [{ "const": "latest" }, { "$ref": "#/$defs/exactVersion" }]
+        },
+        "opencode": { "$ref": "#/$defs/exactVersion" },
+        "ollama": { "$ref": "#/$defs/exactVersion" },
+        "node": { "description": "The supported Node range, such as >=22.", "type": "string", "pattern": "^>=\\d+(?:\\.\\d+){0,2}$" },
+        "modelBase": { "description": "The Ollama model the presets build on.", "type": "string", "pattern": "^[a-z0-9][a-z0-9._/-]*:[A-Za-z0-9._-]+$" },
+        "modelDownloadGiB": { "description": "Download size stated before the pull is confirmed.", "type": "number", "exclusiveMinimum": 0, "maximum": 1024 }
+      }
+    },
+    "shells": {
+      "description": "One entry per shell a command is written for. Every step covers all four.",
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/shell" }
+    },
+    "steps": {
+      "description": "In phase order, as the renderings print them.",
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/step" }
+    }
+  },
+  "$defs": {
+    "exactVersion": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+(?:-[0-9A-Za-z.-]+)?$" },
+    "shellId": { "enum": ["powershell", "cmd", "zsh", "bash"] },
+    "shell": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "os", "title", "comment", "quote", "cd", "forbid"],
+      "properties": {
+        "id": { "$ref": "#/$defs/shellId" },
+        "os": { "enum": ["win32", "darwin", "linux"] },
+        "title": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "comment": { "description": "The comment leader, such as # or REM.", "type": "string", "minLength": 1, "maxLength": 8 },
+        "quote": { "description": "The quote a literal argument takes in this shell.", "enum": ["single", "double"] },
+        "cd": { "description": "The command that changes into a project directory, before its quoted path.", "type": "string", "minLength": 1 },
+        "forbid": {
+          "description": "Text the quoting linter refuses in any command for this shell.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "note": { "type": "string", "minLength": 1 }
+      }
+    },
+    "step": {
+      "description": "One install step. A step that writes anything at all is persistent, names its manifest kinds and is confirmed first (D-M4 as amended by D-M28); a step marked privileged carries the vendor page that documents the privilege (CP-D15).",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "phase", "title", "why", "readOnly", "expect", "commands"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$", "maxLength": 64 },
+        "phase": { "enum": ["prerequisite", "install", "configure", "host", "project", "verify", "uninstall"] },
+        "title": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "why": {
+          "description": "One sentence, which the prompt rendering turns into the agent's stated intent.",
+          "type": "string",
+          "maxLength": 240,
+          "pattern": "^(?![^\\r\\n]*[.!?]\\s)[^\\r\\n]*[^\\s.!?]\\.$"
+        },
+        "expect": {
+          "description": "What a human or an agent checks afterwards; null, stated explicitly, when the step has no observable result.",
+          "anyOf": [{ "type": "null" }, { "type": "string", "minLength": 1 }]
+        },
+        "optional": { "type": "boolean" },
+        "readOnly": { "description": "The step writes nothing anywhere.", "type": "boolean" },
+        "persistent": { "description": "The step writes something: outside <home>, inside it or into the project. The sole trigger for a confirmation.", "type": "boolean" },
+        "manifestKinds": {
+          "description": "The install-manifest kinds the step's writes are recorded as.",
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^[a-z][A-Za-z0-9]{0,63}$" }
+        },
+        "pin": { "description": "How a command that names a published package pins it.", "enum": ["exact", "range"] },
+        "privileged": { "type": "boolean" },
+        "vendorDocumented": { "description": "The vendor page that documents the privileged command.", "type": "string", "pattern": "^https://\\S+$" },
+        "commands": { "$ref": "#/$defs/commands" },
+        "onFail": { "$ref": "#/$defs/onFail" },
+        "evidence": {
+          "description": "Claim ids the step rests on; scripts/check-claims.mjs resolves them.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9-]{0,15}$" }
+        }
+      },
+      "$ref": "#/$defs/privilegeRule",
+      "anyOf": [
+        {
+          "description": "A step that writes is persistent, names its manifest kinds, and pins any package it names exactly (D-M31).",
+          "required": ["persistent", "manifestKinds"],
+          "properties": { "readOnly": { "const": false }, "persistent": { "const": true }, "pin": { "const": "exact" } }
+        },
+        {
+          "description": "A read-only step is never persistent and names no manifest kind.",
+          "properties": { "readOnly": { "const": true }, "persistent": { "const": false }, "manifestKinds": false }
+        }
+      ]
+    },
+    "privilegeRule": {
+      "anyOf": [
+        {
+          "description": "A privileged step names the vendor page that documents the privilege; the product never introduces privilege of its own.",
+          "required": ["privileged", "vendorDocumented"],
+          "properties": { "privileged": { "const": true } }
+        },
+        {
+          "properties": { "privileged": { "const": false }, "vendorDocumented": false }
+        }
+      ]
+    },
+    "commands": {
+      "description": "A command line for every shell, or the reason the step does not apply to it. A shell left out is an error, never a silent gap.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["powershell", "cmd", "zsh", "bash"],
+      "properties": {
+        "powershell": { "$ref": "#/$defs/shellCommand" },
+        "cmd": { "$ref": "#/$defs/shellCommand" },
+        "zsh": { "$ref": "#/$defs/shellCommand" },
+        "bash": { "$ref": "#/$defs/shellCommand" }
+      }
+    },
+    "shellCommand": {
+      "anyOf": [
+        { "$ref": "#/$defs/commandLine" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["notApplicable"],
+          "properties": { "notApplicable": { "description": "Why the step does not apply to this shell.", "type": "string", "minLength": 1 } }
+        }
+      ]
+    },
+    "commandLine": {
+      "description": "One line as a human pastes it: no line break and no trailing continuation character.",
+      "type": "string",
+      "pattern": "^[^\\r\\n]*[^\\r\\n\\s\\\\`^]$"
+    },
+    "onFail": {
+      "description": "What to do when the step fails: one line for every shell, per-shell lines, or both.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "all": { "type": "string", "minLength": 1 },
+        "powershell": { "type": "string", "minLength": 1 },
+        "cmd": { "type": "string", "minLength": 1 },
+        "zsh": { "type": "string", "minLength": 1 },
+        "bash": { "type": "string", "minLength": 1 }
+      },
+      "anyOf": [
+        { "required": ["all"] },
+        { "required": ["powershell"] },
+        { "required": ["cmd"] },
+        { "required": ["zsh"] },
+        { "required": ["bash"] }
+      ]
+    }
+  }
+}

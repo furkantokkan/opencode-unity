@@ -7,13 +7,13 @@ Windows, and `$XDG_DATA_HOME/opencode-unity` (default `~/.local/share/opencode-u
 `OPENCODE_UNITY_HOME` environment variable moves the whole home. `opencode-unity setup` writes the file
 only when it is absent, and never replaces yours.
 
-User settings in &lt;home&gt;/config.json. Keys left out take their defaults; unknown keys are rejected. The schema describes the file after defaults are applied.
+User settings in &lt;home&gt;/config.json. Keys left out take their defaults, and a few defaults differ per platform; unknown keys are rejected. The schema describes the file after defaults are applied. Network policy, the standalone shape command and workspace discovery are active in preview.6. project.verify and safety.multiplayerProtectedGlobs are reserved configuration and do not add execution or protection beyond the existing checks in this preview.
 
 ## Top-level keys
 
 | Key | Type | Default | Description |
 |---|---|---|---|
-| `schemaVersion` | `1` (fixed) | `1` | Config format version. Older files are migrated forward automatically. |
+| `schemaVersion` | `2` (fixed) | `2` | Config format version. An older file is migrated forward in memory every time it is read, and is rewritten only by an explicit write such as upgrade. |
 | `preset` | string | `"nvidia-24gb-qwen3-coder-30b-16k"` | Model preset id from presets/. Experimental presets need --experimental. |
 
 ## overrides
@@ -33,15 +33,15 @@ Preset fields to replace, for example {"model": {"numCtx": 8192}}. Any override 
 | Key | Type | Default | Description |
 |---|---|---|---|
 | `ollama.baseUrl` | string | `"http://127.0.0.1:11434"` | Ollama server URL. A non-loopback host is blocked by the guard unless guard.remote is unguarded. |
-| `ollama.startAppIfDown` | one of `"ask"`, `"always"`, `"never"` | `"ask"` | Start the installed Ollama app when the server is down. |
+| `ollama.startAppIfDown` | one of `"ask"`, `"always"`, `"never"` | `"ask"` | Start the installed Ollama app when the server is down. The Linux default is never: there Ollama is a systemd service, and starting it needs root. |
 | `ollama.appPath` | string or null | `null` | Path of the Ollama app; null means the default install location. |
-| `ollama.serverLogPath` | string or null | `null` | Path of the Ollama server log; null means the default location. |
+| `ollama.serverLogPath` | string or null | `null` | Path of the Ollama server log; null means the platform's log source: the server log file on Windows and macOS, the systemd journal on Linux. |
 
 ## guard
 
 | Key | Type | Default | Description |
 |---|---|---|---|
-| `guard.minFreeVramAfterLoadMiB` | integer (0 to 1048576) | `1500` | Free video memory that must remain after the model loads. |
+| `guard.minFreeVramAfterLoadMiB` | integer (0 to 1048576) | `1500` | Free video memory that must remain after the model loads. The macOS default is 4096, because the memory is shared with the rest of the system; that value is not calibrated on hardware. |
 | `guard.allowOffload` | boolean | `false` | Let the model load when it does not fit in video memory alone; the rest runs from system RAM and replies are slower. The free-memory minimum still applies. |
 | `guard.maxGpuUtilPercent` | integer (1 to 100) | `60` | Block a cold load when GPU utilization is at or above this in both samples. |
 | `guard.gpuUtilSampleIntervalMs` | integer (100 to 10000) | `1000` | Delay between the two GPU utilization samples. |
@@ -82,13 +82,14 @@ Preset fields to replace, for example {"model": {"numCtx": 8192}}. Any override 
 | `safety.readLimitLines` | integer (1 to 2000) | `200` | Most lines one read call returns. |
 | `safety.extraProtectedEditGlobs` | array of strings | `[]` | More globs the agent may never edit. |
 | `safety.extraProtectedReadGlobs` | array of strings | `[]` | More globs the agent may never read. |
+| `safety.multiplayerProtectedGlobs` | array of strings | `["*.rules","*Economy/*","*Purchas*/*","*Entitlement*/*","*Anticheat*/*","*AntiCheat*/*","*ServerAuthority*","*Reconcil*","*Rollback*"]` | Paths where a multiplayer authority, economy or anti-cheat decision usually lives; they are read-only for the session when the workspace has a game server. A coarse net with known false positives: remove an entry to make those paths editable. doctor and the facts list what it protects. |
 
 ## start
 
 | Key | Type | Default | Description |
 |---|---|---|---|
 | `start.warm` | boolean | `false` | Load the model (through the guard) before the TUI opens. |
-| `start.pane` | one of `"auto"`, `"never"` | `"auto"` | Open the status pane in Windows Terminal. |
+| `start.pane` | one of `"auto"`, `"never"` | `"auto"` | Open the status pane in Windows Terminal. The Linux and macOS default is never: the pane is a Windows Terminal feature. |
 | `start.agent` | one of `"unity-code"`, `"unity-editor"` | `"unity-code"` | Agent the TUI opens with. |
 | `start.projectConfig` | one of `"load"`, `"disable"` | `"load"` | Load project OpenCode config files, or disable them. |
 
@@ -106,6 +107,64 @@ Preset fields to replace, for example {"model": {"numCtx": 8192}}. Any override 
 | `delegate.checkCommandPrefixes` | array of strings | `["dotnet build ","dotnet test "]` | A custom check command must start with one of these. |
 | `delegate.extraSensitivePatterns` | array of strings | `[]` | More file patterns delegate refuses without --allow-sensitive. |
 
+## network
+
+Outbound HTTP for the agent's unitynet tool (amendment 35). Everything fetched is data, never instructions.
+
+| Key | Type | Default | Description |
+|---|---|---|---|
+| `network.enabled` | boolean | `true` | false removes the unitynet tool from every session. |
+| `network.profile` | one of `"none"`, `"standard"`, `"custom"` | `"standard"` | standard: the shipped read-only documentation hosts, loopback reads, what init derived and what you granted. none: no tool at all. custom: only your allow list. |
+| `network.allow` | array of objects | `[]` | Your own entries, applied after the profile's. A non-loopback host requires a consentId label and an explicit permission ask on each request; the label does not grant access. |
+| `network.limits.maxResponseBytes` | integer (1024 to 4194304) | `65536` | Response bytes read before the socket is closed. |
+| `network.limits.maxOutputChars` | integer (256 to 65536) | `8192` | Characters handed to the model after sanitising. |
+| `network.limits.maxRequestBodyBytes` | integer (0 to 1048576) | `32768` | Largest request body on any entry; an entry's own budget may be lower. |
+| `network.limits.maxUrlChars` | integer (64 to 8192) | `2048` | - |
+| `network.limits.connectTimeoutMs` | integer (100 to 60000) | `5000` | - |
+| `network.limits.firstByteTimeoutMs` | integer (100 to 120000) | `10000` | - |
+| `network.limits.totalTimeoutMs` | integer (100 to 300000) | `20000` | - |
+| `network.limits.maxRequestsPerSession` | integer (0 to 1000) | `40` | - |
+| `network.limits.maxRequestsPerMinute` | integer (0 to 600) | `20` | - |
+| `network.bash` | one of `"deny"`, `"ask"` | `"deny"` | Network commands in the agent's shell: deny refuses them; ask prompts through OpenCode and startup verifies the effective shell permission rules. |
+| `network.extraDeniedQueryKeys` | array of strings | `[]` | - |
+| `network.extraDeniedHosts` | array of strings | `[]` | - |
+| `network.extraReservedPorts` | array of integers (1 to 65535) | `[]` | - |
+
+## shape
+
+Prompt shaping (amendment 36): a clear request starts at once with no model call; an unclear one is rewritten once, shown, and the work continues.
+
+| Key | Type | Default | Description |
+|---|---|---|---|
+| `shape.mode` | one of `"auto"`, `"off"`, `"always"` | `"auto"` | auto rewrites only an unclear request; off never rewrites; always rewrites every request. |
+| `shape.maxInputChars` | integer (100 to 20000) | `2000` | Longest request that is shaped. |
+| `shape.maxOutputTokens` | integer (16 to 4096) | `256` | Output limit of the one rewrite call. |
+| `shape.timeoutSec` | integer (1 to 600) | `60` | Timeout of the rewrite call. |
+| `shape.anchorCandidates` | integer (0 to 20) | `5` | Most project files offered to the rewrite as anchors. |
+| `shape.grepTimeoutMs` | integer (100 to 60000) | `2000` | Time budget of the anchor search. |
+
+## project
+
+Workspace components (amendment 37): what init discovers beside the Unity project, and how much of it reaches the facts.
+
+| Key | Type | Default | Description |
+|---|---|---|---|
+| `project.components` | array of one or more strings, or one of `"auto"`, `"unity-only"` | `"auto"` | auto discovers every component; unity-only keeps the Unity project alone; a list keeps the named component ids. |
+| `project.maxComponents` | integer (1 to 64) | `12` | Most anchors and overlays; discovery stops beyond this and doctor warns. |
+| `project.factsBudgetChars` | integer (500 to 20000) | `2600` | Characters facts.md may spend on all fact blocks together. |
+| `project.unityBlockChars` | integer (100 to 20000) | `1100` | Characters of the Unity fact block. |
+| `project.componentBlockChars` | integer (50 to 2000) | `200` | Characters of each other component's fact block. |
+| `project.maxRenderedBlocks` | integer (1 to 32) | `6` | Most fact blocks rendered; the rest are dropped in the printed order. |
+| `project.walkEntryCap` | integer (1000 to 1000000) | `50000` | Most directory entries one discovery walk visits. |
+| `project.readBudgetBytes` | integer (65536 to 67108864) | `6291456` | Most bytes discovery reads from project files. |
+| `project.verify.enabled` | boolean | `true` | Render a verify command for each component that has one. |
+| `project.verify.scriptOrder` | array of one or more strings | `["test","build","typecheck","check"]` | package.json script names tried in order for a component's verify command. |
+| `project.verify.timeoutSec` | integer (1 to 86400) | `900` | - |
+| `project.verify.blockScriptBodies` | boolean | `true` | Refuse a verify script whose body does more than build, test or type-check. false needs --experimental and a consent item. |
+| `project.database.readEnvExampleKeys` | boolean | `true` | List the key names, never the values, of an .env.example file. |
+| `project.database.maxEnvExampleKeys` | integer (0 to 100) | `12` | - |
+| `project.multiplayer.ruleBlock` | one of `"auto"`, `"always"`, `"never"` | `"auto"` | The multiplayer rule block: auto renders it when a game server is found. |
+
 ## projects
 
 Per-project settings keyed by project id (&lt;name&gt;-&lt;sha8&gt;).
@@ -116,11 +175,26 @@ Per-project settings keyed by project id (&lt;name&gt;-&lt;sha8&gt;).
 | `projects.<project-id>.editor.trust` | boolean | `false` | - |
 | `projects.<project-id>.editor.allowPlayMode` | boolean | `false` | - |
 | `projects.<project-id>.bashMode` | null, or one of `"allowlist"`, `"ask"` | `null` | Overrides safety.bashMode for this project; null uses the global value. |
+| `projects.<project-id>.network.enabled` | boolean | - | - |
+| `projects.<project-id>.network.profile` | one of `"none"`, `"standard"`, `"custom"` | - | - |
+| `projects.<project-id>.network.allow` | array of objects | - | - |
+| `projects.<project-id>.network.limits.maxResponseBytes` | integer (1024 to 4194304) | - | Response bytes read before the socket is closed. |
+| `projects.<project-id>.network.limits.maxOutputChars` | integer (256 to 65536) | - | Characters handed to the model after sanitising. |
+| `projects.<project-id>.network.limits.maxRequestBodyBytes` | integer (0 to 1048576) | - | Largest request body on any entry; an entry's own budget may be lower. |
+| `projects.<project-id>.network.limits.maxUrlChars` | integer (64 to 8192) | - | - |
+| `projects.<project-id>.network.limits.connectTimeoutMs` | integer (100 to 60000) | - | - |
+| `projects.<project-id>.network.limits.firstByteTimeoutMs` | integer (100 to 120000) | - | - |
+| `projects.<project-id>.network.limits.totalTimeoutMs` | integer (100 to 300000) | - | - |
+| `projects.<project-id>.network.limits.maxRequestsPerSession` | integer (0 to 1000) | - | - |
+| `projects.<project-id>.network.limits.maxRequestsPerMinute` | integer (0 to 600) | - | - |
+| `projects.<project-id>.network.extraDeniedQueryKeys` | array of strings | - | - |
+| `projects.<project-id>.network.extraDeniedHosts` | array of strings | - | - |
+| `projects.<project-id>.network.extraReservedPorts` | array of integers (1 to 65535) | - | - |
 
 ## experimental
 
 | Key | Type | Default | Description |
 |---|---|---|---|
-| `experimental.platforms` | boolean | `false` | - |
+| `experimental.platforms` | boolean | `false` | Accepts an experimental platform tier for every command, the lasting form of --experimental. setup writes it when you accept the platform acknowledgement. |
 | `experimental.presets` | boolean | `false` | - |
 | `experimental.untestedVersions` | boolean | `false` | - |

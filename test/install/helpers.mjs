@@ -219,6 +219,7 @@ export async function createHarness(t, options = {}) {
       if (runOptions.input !== undefined) stdin.end(runOptions.input);
       else stdin.end('');
       const dependencies = {
+        homedir: sandbox.dirs.home,
         ollamaClient,
         // Read per run, so a model created by the previous run is seen by the next one.
         preflight: state.preflight ?? preflightFacts({ models: [...ollamaClient.installed] }),

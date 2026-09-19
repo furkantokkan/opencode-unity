@@ -50,9 +50,11 @@ describe('README.md', () => {
     assert.match(README, /Install the opencode-unity preview on this machine/);
   });
 
-  it('tells you to copy only host files the package ships', () => {
+  it('uses managed host commands and names only shipped manual host files', () => {
     const copied = [...README.matchAll(/hosts[\\/]((?:claude|codex|antigravity)[\w\\/.-]*\.md)/g)].map((match) => match[1].replace(/\\/g, '/'));
-    assert.ok(copied.length >= 6, `found ${copied.length} host file references`);
+    assert.ok(copied.includes('antigravity/opencode-unity-delegate.md'));
+    assert.match(README, /opencode-unity host install --host claude,codex --yes/);
+    assert.match(README, /opencode-unity host verify --host claude,codex/);
     for (const file of new Set(copied)) assert.ok(fs.existsSync(path.join(REPO_ROOT, 'hosts', file)), `hosts/${file} exists`);
     assert.ok(PACKAGE.files.includes('hosts/'), 'package.json files ships hosts/');
   });

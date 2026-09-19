@@ -17,12 +17,13 @@ import {
   validateConfig,
   writeConfigFile,
 } from '../../../src/core/config.js';
+import { CURRENT_CONFIG_SCHEMA_VERSION } from '../../../src/core/migrations.js';
 import { catchError } from '../../helpers/catch-error.mjs';
 import { useSandbox } from '../../helpers/sandbox.mjs';
 
 describe('defaults (spec 6.2)', () => {
   it('matches the documented default for every block', () => {
-    assert.equal(DEFAULT_CONFIG.schemaVersion, 1);
+    assert.equal(DEFAULT_CONFIG.schemaVersion, CURRENT_CONFIG_SCHEMA_VERSION);
     assert.equal(DEFAULT_CONFIG.preset, DEFAULT_PRESET_ID);
     assert.equal(DEFAULT_CONFIG.ollama.baseUrl, 'http://127.0.0.1:11434');
     assert.equal(DEFAULT_CONFIG.ollama.startAppIfDown, 'ask');
@@ -72,7 +73,9 @@ describe('parseConfigText', () => {
   it('accepts comments and trailing commas', () => {
     const loaded = parseConfigText('{\n  // the preset to use\n  "schemaVersion": 1,\n  "preset": "nvidia-24gb-qwen3-coder-30b-32k",\n}\n');
     assert.equal(loaded.config.preset, 'nvidia-24gb-qwen3-coder-30b-32k');
-    assert.deepEqual(loaded.user, { schemaVersion: 1, preset: 'nvidia-24gb-qwen3-coder-30b-32k' });
+    assert.equal(loaded.user.schemaVersion, CURRENT_CONFIG_SCHEMA_VERSION);
+    assert.equal(loaded.user.preset, 'nvidia-24gb-qwen3-coder-30b-32k');
+    assert.equal(loaded.migrations.length, 1);
     assert.equal(loaded.exists, true);
     assert.equal(loaded.fileVersion, 1);
   });
@@ -140,7 +143,7 @@ describe('loadConfig and writeConfigFile', () => {
     const sandbox = await useSandbox(t, 'config-write');
     const file = sandbox.path('product-home', 'config.json');
     const initial = renderInitialConfig('nvidia-24gb-qwen3-coder-30b-32k');
-    assert.deepEqual(JSON.parse(initial), { schemaVersion: 1, preset: 'nvidia-24gb-qwen3-coder-30b-32k' });
+    assert.deepEqual(JSON.parse(initial), { schemaVersion: CURRENT_CONFIG_SCHEMA_VERSION, preset: 'nvidia-24gb-qwen3-coder-30b-32k' });
     await writeConfigFile(file, JSON.parse(initial));
     const loaded = await loadConfig(file);
     assert.equal(loaded.exists, true);

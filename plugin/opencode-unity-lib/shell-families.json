@@ -16,17 +16,23 @@
       { "pattern": "[\\r\\v\\f\\x00-\\x08\\x0e-\\x1f]", "what": "a control character" }
     ],
     "unmodelledArguments": [
-      { "pattern": "(?:^|:)(?:alias|function):", "flags": "i", "what": "a PowerShell alias or function drive path, which defines a name that runs another command" }
+      { "pattern": "(?:^|:)(?:alias|function|env|variable):", "flags": "i", "what": "a PowerShell alias, function, environment or variable drive path, which changes what a later name runs" }
     ]
   },
-  "unmodelledCommandsNote": "First words that are not programs: shell reserved words and compound-statement keywords, whose body is a command the node reader never sees as a first word (if git push; then :; fi), and constructs that define a new name for a program or run a command later (alias, Set-Alias, hash -p, trap, sched, emulate -c, cmd's call). Every family refuses all of them, because the family itself can be wrong.",
+  "unmodelledCommandsNote": "First words that are not programs: shell reserved words and compound-statement keywords, whose body is a command the node reader never sees as a first word (if git push; then :; fi), and constructs that define a new name for a program or run a command later (alias, Set-Alias, hash -p, trap, sched, emulate -c, cmd's call). Every family refuses all of them, because the family itself can be wrong. The second block (S36) is the alias rule: the agent shell runs without the user's aliases, so the constructs that would re-enable, define or rebind a name from inside the command are refused too - shell options (shopt, setopt, set, enable), variables that decide what a later word resolves to (export, declare, typeset, PATH through set or setx, PowerShell's Set-Variable) and loaders that bring in definitions (autoload, zmodload, Import-Module, Add-Type, New-Object). The third block is PowerShell statements that yield no command node at all.",
   "unmodelledCommands": [
     "if", "then", "else", "elif", "elseif", "fi", "do", "done", "while", "until", "for", "foreach", "in",
     "case", "esac", "select", "switch", "function", "filter", "workflow", "repeat", "begin", "end",
     "and", "or", "not", "try", "catch", "finally", "trap",
     "alias", "unalias", "hash", "fc", "sched", "emulate",
     "set-alias", "sal", "new-alias", "nal", "import-alias", "ipal",
-    "call", "doskey"
+    "call", "doskey",
+    "export", "declare", "typeset", "local", "readonly", "integer", "float", "set", "unset",
+    "shopt", "setopt", "unsetopt", "enable", "disable", "autoload", "zmodload", "functions", "unfunction",
+    "setenv", "unsetenv", "setx", "path", "assoc", "ftype",
+    "set-variable", "sv", "new-variable", "nv", "clear-variable", "clv", "remove-variable", "rv",
+    "import-module", "ipmo", "new-module", "nmo", "add-type", "new-object", "set-executionpolicy", "set-psdebug",
+    "using", "param", "class", "enum", "data", "dynamicparam", "configuration", "throw", "return", "exit", "break", "continue"
   ],
   "commandPrefixes": [
     "env",
@@ -60,7 +66,14 @@
     "flock",
     "parallel",
     "wsl",
-    "wsl2"
+    "wsl2",
+    "invoke-command",
+    "icm",
+    "start-job",
+    "sajb",
+    "start-threadjob",
+    "invoke-item",
+    "ii"
   ],
   "shells": {
     "sh": "posix",
@@ -109,6 +122,11 @@
         "escape": "doubled",
         "escapeInQuotes": ["\"", "'"],
         "expands": { "\"": "$`", "'": "" }
+      },
+      "expressionsNote": "A pipeline element that starts with a quoted string or a number literal is an expression, not a command: the parse OpenCode runs yields no command node for it, so the permission layer never evaluates it (amendment 35.8, claim 148). An unquoted word that only starts with a digit, such as 7z, is still a command name.",
+      "expressions": {
+        "quotedFirstWord": true,
+        "firstWord": { "pattern": "^(?:0x[0-9a-f]+|0b[01]+|\\d+(?:\\.\\d*)?(?:e[+-]?\\d+)?)(?:[dlnsy]|u[lsy]?)?(?:kb|mb|gb|tb|pb)?$|^\\d+(?:\\.\\d+)?\\.\\.", "flags": "i", "what": "a number or a range" }
       },
       "unmodelled": [
         { "pattern": "\\[", "what": "a type literal" },

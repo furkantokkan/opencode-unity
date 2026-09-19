@@ -11,8 +11,8 @@ when `exitCode` is 0 and `code` is a stable snake_case identifier.
 
 ## Commands
 
-- Everyday: [`doctor`](#doctor), [`setup`](#setup), [`init`](#init), [`start`](#start)
-- Advanced: [`status`](#status), [`guard`](#guard), [`warm`](#warm), [`stop`](#stop), [`bench`](#bench), [`delegate`](#delegate), [`upgrade`](#upgrade), [`uninstall`](#uninstall)
+- Everyday: [`shape`](#shape), [`doctor`](#doctor), [`setup`](#setup), [`init`](#init), [`start`](#start)
+- Advanced: [`host`](#host), [`status`](#status), [`guard`](#guard), [`warm`](#warm), [`stop`](#stop), [`bench`](#bench), [`delegate`](#delegate), [`upgrade`](#upgrade), [`uninstall`](#uninstall)
 
 ## Global options
 
@@ -29,6 +29,7 @@ Every command accepts these.
 | `--no-color` | Plain output without colors |
 | `--help` | Show help |
 | `--version` | Show the version |
+| `--print-platform` | Print detected platform facts and command support tiers without starting a model |
 
 ## Exit codes
 
@@ -55,17 +56,17 @@ matching row wins. `refused` exits 8 before the command starts. `experimental` r
 reference measurements do not cover; `setup` asks you to acknowledge it first, or takes
 `--experimental` as the acknowledgement. `degraded` runs and names what it cannot measure.
 
-| Platform | `doctor` | `setup` | `init` | `start` | `status` | `guard` | `warm` | `stop` | `bench` | `delegate` | `upgrade` | `uninstall` |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| WSL or container | full (reports an ERROR) | refused | full | refused | refused | refused | refused | refused | refused | refused | full | full |
-| Unsupported OS version | full | refused | full | refused | refused | refused | refused | refused | refused | refused | full | full |
-| Windows 10/11 | full | full | full | full | full | full | full | full | full | full | full | full |
-| Linux + amdgpu | full (experimental backend) | experimental | full | experimental | experimental | experimental | experimental | experimental | experimental | experimental | full | full |
-| Linux + NVIDIA | full | experimental | full | experimental | experimental | experimental | experimental | experimental | experimental | experimental | full | full |
-| Linux arm64 | degraded | refused | full | refused | refused | refused | refused | refused | refused | refused | full | full |
-| macOS 14+, Apple silicon | degraded | experimental (degraded, no shipped preset) | full | experimental (degraded) | experimental (degraded) | experimental (degraded) | experimental (degraded) | experimental (degraded) | experimental (degraded) | experimental (degraded) | full | full |
-| macOS Intel | degraded | refused | full | refused | refused | refused | refused | refused | refused | refused | full | full |
-| Not in the support matrix | degraded | refused | full | refused | refused | refused | refused | refused | refused | refused | full | full |
+| Platform | `host` | `shape` | `doctor` | `setup` | `init` | `start` | `status` | `guard` | `warm` | `stop` | `bench` | `delegate` | `upgrade` | `uninstall` |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| WSL or container | full | refused | full (reports an ERROR) | refused | full | refused | refused | refused | refused | refused | refused | refused | full | full |
+| Unsupported OS version | full | refused | full | refused | full | refused | refused | refused | refused | refused | refused | refused | full | full |
+| Windows 10/11 | full | full | full | full | full | full | full | full | full | full | full | full | full | full |
+| Linux + amdgpu | full | experimental | full (experimental backend) | experimental | full | experimental | experimental | experimental | experimental | experimental | experimental | experimental | full | full |
+| Linux + NVIDIA | full | experimental | full | experimental | full | experimental | experimental | experimental | experimental | experimental | experimental | experimental | full | full |
+| Linux arm64 | full | refused | degraded | refused | full | refused | refused | refused | refused | refused | refused | refused | full | full |
+| macOS 14+, Apple silicon | full | experimental (degraded) | degraded | experimental (degraded, no shipped preset) | full | experimental (degraded) | experimental (degraded) | experimental (degraded) | experimental (degraded) | experimental (degraded) | experimental (degraded) | experimental (degraded) | full | full |
+| macOS Intel | full | refused | degraded | refused | full | refused | refused | refused | refused | refused | refused | refused | full | full |
+| Not in the support matrix | full | refused | degraded | refused | full | refused | refused | refused | refused | refused | refused | refused | full | full |
 
 What a refusal prints:
 
@@ -74,6 +75,24 @@ What a refusal prints:
 - `linux_arm64`: The Unity Editor is not available for Linux on arm64, so there is no project for this command to act on. doctor and init still run.
 - `darwin_intel`: Ollama runs on CPU only on Intel Macs, so a 30B model is not usable for agent work. doctor and init still run.
 - `unsupported_platform`: This platform is not a row in the support matrix, so the GPU guard has never been run on it. doctor and init still run.
+
+## shape
+
+```text
+opencode-unity shape <text> [options]
+```
+
+Check a request and, when needed, rewrite it once with the guarded local model. Returns the original request if rewriting fails. Writes no files. --no-model checks readiness without calling Ollama.
+
+| Argument | Description |
+|---|---|
+| `<text>` | Request text, @file, or - for standard input |
+
+| Flag | Description |
+|---|---|
+| `--no-model` | Check readiness without calling the model |
+
+Exit codes: 0 (OK), 1 (USAGE), 7 (RUNTIME), 8 (UNSUPPORTED).
 
 ## doctor
 
@@ -91,8 +110,8 @@ Diagnose an OpenCode + Ollama setup without loading a model. Static analysis by 
 |---|---|
 | `--profile` | Analyze the opencode-unity clean-room profile for this project |
 | `--deep` | Also run opencode debug config and debug agent |
-| `--capture` | Record the exact first request against a local mock endpoint (not available in this build; exits 8) |
-| `--selftest` | Run mock end-to-end scenarios with the installed OpenCode (not available in this build; exits 8) |
+| `--capture` | Capture redacted request metadata with real OpenCode and a local mock endpoint |
+| `--selftest` | Run bounded mock end-to-end scenarios with the installed OpenCode |
 | `--logs <path>` | Ollama server log to read |
 | `--markdown` | Issue-ready report (implies --redact) |
 | `--redact` | Remove user, machine, path, project, email and key values |
@@ -115,7 +134,7 @@ Install the clean-room profile and the local model, asking before each change.
 | `--no-model` | Skip the model pull and create |
 | `--ollama-env` | Preselect the Ollama server environment item |
 | `--terminal` | Preselect the Windows Terminal fragment |
-| `--host <ids>` | Name the host integration for these tools; the host command group is planned, so this preview prints how to copy the preview host files (comma-separated: claude, codex, antigravity, auto) |
+| `--host <ids>` | Install managed Claude/Codex skills; Antigravity prints manual installation guidance (comma-separated: claude, codex, antigravity, auto) |
 | `--delegate <targets>` | Deprecated alias of --host (comma-separated: claude, codex) |
 | `--migrate` | Migrate an earlier installation (used by upgrade) |
 
@@ -168,6 +187,68 @@ Launch OpenCode for a Unity project in the clean room.
 Refused flags (exit 1): `--auto`, `--yolo`, `--dangerously-skip-permissions`. Start refuses auto-approval flags: dangerous actions are denied and every remaining ask must reach you.
 
 Exit codes: 0 (OK), 1 (USAGE), 2 (BLOCKED), 4 (VALIDATION), 7 (RUNTIME), 8 (UNSUPPORTED).
+
+## host
+
+```text
+opencode-unity host <subcommand> [options]
+```
+
+Install, verify, update or remove managed Claude and Codex skills.
+
+### host install
+
+```text
+opencode-unity host install [options]
+```
+
+install the selected host skills.
+
+| Flag | Description |
+|---|---|
+| `--host <value>` | Host skills to manage (required; comma-separated: claude, codex, auto) |
+| `--host-home <dir>` | Host home directory (default: the user home) |
+
+### host verify
+
+```text
+opencode-unity host verify [options]
+```
+
+verify the selected host skills.
+
+| Flag | Description |
+|---|---|
+| `--host <value>` | Host skills to manage (required; comma-separated: claude, codex, auto) |
+| `--host-home <dir>` | Host home directory (default: the user home) |
+
+### host update
+
+```text
+opencode-unity host update [options]
+```
+
+update the selected host skills.
+
+| Flag | Description |
+|---|---|
+| `--host <value>` | Host skills to manage (required; comma-separated: claude, codex, auto) |
+| `--host-home <dir>` | Host home directory (default: the user home) |
+
+### host uninstall
+
+```text
+opencode-unity host uninstall [options]
+```
+
+uninstall the selected host skills.
+
+| Flag | Description |
+|---|---|
+| `--host <value>` | Host skills to manage (required; comma-separated: claude, codex, auto) |
+| `--host-home <dir>` | Host home directory (default: the user home) |
+
+Exit codes: 0 (OK), 1 (USAGE), 4 (VALIDATION), 5 (CHECK_FAILED), 7 (RUNTIME), 9 (CONSENT_REQUIRED), 130 (INTERRUPTED).
 
 ## status
 
@@ -228,9 +309,7 @@ Exit codes: 0 (OK), 2 (BLOCKED), 7 (RUNTIME).
 opencode-unity bench <suite> [options]
 ```
 
-Run guarded reliability benchmarks on the bundled sample project.
-
-**Not available in this build.** Running it exits 8 with the code `command_not_available`.
+Measure guarded local edits or run explicit mock protocol checks.
 
 | Argument | Description |
 |---|---|
@@ -240,8 +319,9 @@ Run guarded reliability benchmarks on the bundled sample project.
 |---|---|
 | `--runs <n>` | Runs per task (default 20) (range 1 to 1000) |
 | `--temperature <t>` | Sampling temperature override (range 0 to 2) |
+| `--mock` | Run guard, budget or all protocol scenarios with real OpenCode and mock endpoints; no model reliability claim |
 
-Exit codes: 0 (OK), 2 (BLOCKED), 5 (CHECK_FAILED), 7 (RUNTIME).
+Exit codes: 0 (OK), 1 (USAGE), 2 (BLOCKED), 4 (VALIDATION), 5 (CHECK_FAILED), 7 (RUNTIME), 8 (UNSUPPORTED), 130 (INTERRUPTED).
 
 ## delegate
 
@@ -374,7 +454,7 @@ Restore the backups of a job.
 opencode-unity delegate ledger [options]
 ```
 
-Job counts, tokens, durations and estimated paid tokens avoided.
+Job counts, local tokens and estimated source-input reduction before review overhead.
 
 | Flag | Description |
 |---|---|

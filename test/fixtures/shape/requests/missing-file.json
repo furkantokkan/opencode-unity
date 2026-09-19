@@ -1,0 +1,18 @@
+{
+  "note": "The named file does not exist; the model repeats it anyway.",
+  "text": "fix Assets/Game/Inventory/InventorySlots.cs",
+  "reply": {
+    "goal": "Fix the inventory slot handling.",
+    "files": [
+      "Assets/Game/Inventory/InventorySlots.cs"
+    ],
+    "search": "",
+    "done": "Slots are handled without errors.",
+    "open": []
+  },
+  "expect": {
+    "status": "shaped",
+    "verdict": "needs_shaping",
+    "reason": null
+  }
+}

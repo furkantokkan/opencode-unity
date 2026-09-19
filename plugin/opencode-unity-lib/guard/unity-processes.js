@@ -7,6 +7,8 @@
 //   import in-process do the work inside the editor process;
 // - CPU percent: delta CPU time over the measured wall time, 100% = one logical core.
 // The probe's own process tree is skipped: its command lines may name an import log.
+// Which executable a process runs is the platform probe's answer (`program`), so no platform's
+// spelling of an executable name appears here (amendment 33.6).
 
 /**
  * @typedef {object} CpuReading
@@ -17,14 +19,20 @@
  */
 
 /**
- * @typedef {object} SnapshotProcess
+ * @typedef {object} ProcessEntry
  * @property {number} pid
  * @property {number} parentPid
- * @property {string} name
+ * @property {string} name                The name the platform reports, shown as is.
  * @property {string | null} commandLine  Null when Windows does not expose it.
  * @property {boolean} hasWindow
  * @property {CpuReading | null} first
  * @property {CpuReading | null} second
+ */
+
+/**
+ * @typedef {ProcessEntry & { program: string }} SnapshotProcess
+ * `program` is the executable the process runs, lowercased and without the platform's executable
+ * suffix, as the platform probe derives it from `name`.
  */
 
 /**
@@ -37,8 +45,14 @@
  */
 
 /**
+ * @typedef {Omit<ProcessSnapshot, 'processes'> & { processes: ProcessEntry[] }} ScriptSnapshot
+ * A snapshot as the probe script prints it, before the platform probe names each program.
+ */
+
+/**
  * @typedef {{ ok: true, running: boolean, count: number } | { ok: false, error: string }} UnityPresence
  * @typedef {{ ok: true, snapshot: ProcessSnapshot } | { ok: false, error: string }} SnapshotReading
+ * @typedef {{ ok: true, snapshot: ScriptSnapshot } | { ok: false, error: string }} ScriptSnapshotReading
  */
 
 /**
@@ -111,7 +125,7 @@ export function analyzeUnityProcesses(presence, reading, { patterns, cpuSampled,
   if (selfPid !== undefined) skipped.add(selfPid);
   const processes = snapshot.processes.filter((entry) => !skipped.has(entry.pid));
   const importEntries = processes.filter((entry) => isImportProcess(entry, patterns));
-  const windowed = processes.filter((entry) => entry.hasWindow && baseName(entry.name) === k_unityName);
+  const windowed = processes.filter((entry) => entry.hasWindow && entry.program === k_unityName);
   const editorEntries = windowed.filter((entry) => !importEntries.includes(entry));
 
   /** @type {UnreadableProcess[]} */
@@ -190,10 +204,10 @@ export function roundPercent(value) {
 /**
  * Validates a probe snapshot; anything malformed is an error, so the guard fails closed.
  * @param {unknown} value
- * @returns {SnapshotReading}
+ * @returns {ScriptSnapshotReading}
  */
 export function validateProcessSnapshot(value) {
-  const invalid = (/** @type {string} */ what) => /** @type {SnapshotReading} */ ({ ok: false, error: `process probe output is malformed (${what})` });
+  const invalid = (/** @type {string} */ what) => /** @type {ScriptSnapshotReading} */ ({ ok: false, error: `process probe output is malformed (${what})` });
   if (!isRecord(value)) return invalid('not an object');
   if (typeof value.error === 'string') return { ok: false, error: `process probe failed: ${value.error}` };
   if (value.schema !== 1) return invalid('unknown schema');
@@ -202,7 +216,7 @@ export function validateProcessSnapshot(value) {
   if (!isPid(value.sampleMs)) return invalid('sampleMs');
   if (value.elapsedMs !== null && !isNonNegativeNumber(value.elapsedMs)) return invalid('elapsedMs');
   if (!Array.isArray(value.processes)) return invalid('processes');
-  /** @type {SnapshotProcess[]} */
+  /** @type {ProcessEntry[]} */
   const processes = [];
   for (const entry of value.processes) {
     if (!isProcessEntry(entry)) return invalid('process entry');
@@ -252,9 +266,8 @@ function createIdleFacts(running, detailsRead, count) {
  * @returns {boolean}
  */
 function isImportProcess(entry, patterns) {
-  const name = baseName(entry.name);
-  if (name === k_shaderCompilerName) return true;
-  if (name === k_unityName && !entry.hasWindow && entry.commandLine === null) return true;
+  if (entry.program === k_shaderCompilerName) return true;
+  if (entry.program === k_unityName && !entry.hasWindow && entry.commandLine === null) return true;
   return patterns.some((pattern) => matchesProcessPattern(entry, pattern));
 }
 
@@ -293,14 +306,6 @@ function readCpuReading(value) {
   if (error !== null && typeof error !== 'string') return undefined;
   if (state === 'ok' && seconds === null) return undefined;
   return { state, seconds, startMs, error };
-}
-
-/**
- * @param {string} name
- * @returns {string}
- */
-function baseName(name) {
-  return name.toLowerCase().replace(/\.exe$/, '');
 }
 
 /**

@@ -3,6 +3,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import { describe, it } from 'node:test';
+import { parseProbeResult } from '../../../plugin/opencode-unity-lib/guard/probes/processes-win32.js';
 import { analyzeUnityProcesses, matchesProcessPattern, measureCpuPercent, roundPercent, validateProcessSnapshot } from '../../../plugin/opencode-unity-lib/guard/unity-processes.js';
 
 const FIXTURES = new URL('../../fixtures/processes/', import.meta.url);
@@ -10,11 +11,14 @@ const PATTERNS = ['AssetImportWorker', '-importWorker'];
 const RUNNING = { ok: true, running: true, count: 1 };
 
 /**
+ * The recordings are win32 probe output, so they are read the way the win32 probe reads its answer:
+ * that is where each process gets its `program`.
  * @param {string} name
  * @returns {Promise<import('../../../plugin/opencode-unity-lib/guard/unity-processes.js').SnapshotReading>}
  */
 async function readSnapshot(name) {
-  return validateProcessSnapshot(JSON.parse(await fs.readFile(new URL(`${name}.json`, FIXTURES), 'utf8')));
+  const stdout = JSON.stringify(JSON.parse(await fs.readFile(new URL(`${name}.json`, FIXTURES), 'utf8')));
+  return parseProbeResult({ ok: true, exitCode: 0, stdout, stderr: '', error: null, timedOut: false });
 }
 
 /**

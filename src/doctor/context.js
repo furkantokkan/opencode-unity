@@ -9,7 +9,7 @@
 import fsSync from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { DEFAULT_CONFIG, loadConfig } from '../core/config.js';
+import { getDefaultConfig, loadConfig } from '../core/config.js';
 import { findExecutable, runProcess } from '../core/exec.js';
 import { readGpuLock } from '../core/lock.js';
 import { getHomeDir, getHomePaths, getProjectId, resolveLogSource } from '../core/paths.js';
@@ -304,7 +304,7 @@ async function collectHome({ env, platform, homedir, warnings }) {
   const dir = getHomeDir({ env, platform, homedir });
   const paths = getHomePaths(dir, { platform });
   try {
-    const loaded = await loadConfig(paths.config);
+    const loaded = await loadConfig(paths.config, { platform });
     warnings.push(...loaded.warnings);
     return { dir, paths, installed: loaded.exists, config: loaded.config, userConfig: loaded.user, configWarnings: loaded.warnings, configError: null };
   } catch (cause) {
@@ -314,7 +314,7 @@ async function collectHome({ env, platform, homedir, warnings }) {
       dir,
       paths,
       installed: true,
-      config: DEFAULT_CONFIG,
+      config: getDefaultConfig(platform),
       userConfig: {},
       configWarnings: [],
       configError: cause instanceof Error ? cause.message : String(cause),

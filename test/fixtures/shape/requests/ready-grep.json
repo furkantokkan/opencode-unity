@@ -1,0 +1,10 @@
+{
+  "note": "Rules 1-4 fail; one bounded grep finds the identifier in two files.",
+  "text": "the RefreshSlots call allocates, cache the list",
+  "expect": {
+    "status": "ready",
+    "verdict": "ready",
+    "reason": null,
+    "anchorRule": 5
+  }
+}

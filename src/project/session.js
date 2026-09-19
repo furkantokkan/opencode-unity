@@ -17,7 +17,7 @@ import { loadPreset } from '../core/presets.js';
 import { buildRuntimeProfile } from '../core/profile.js';
 import { checkFactsFreshness, getInputsHash } from '../facts/stale.js';
 import { createNodeFsView } from '../unity/fs-view.js';
-import { findUnityProjectRoot } from '../unity/root.js';
+import { resolveWorkspaceProjectRoot, getWorkspaceInputsHash } from './workspace.js';
 import { parseRuntimeProfile } from '../../plugin/opencode-unity-lib/runtime-profile.js';
 import { readLocalState } from './local.js';
 
@@ -60,7 +60,7 @@ export async function loadSession(cliContext) {
   const platform = cliContext.platform;
   const home = getHomeDir({ env: cliContext.env, platform });
   const paths = getHomePaths(home, { platform });
-  const { config, user, warnings } = await loadConfig(paths.config);
+  const { config, user, warnings } = await loadConfig(paths.config, { platform });
   const loaded = await loadProfile({ paths, config, cliVersion: cliContext.version, home });
   return {
     home,
@@ -120,7 +120,7 @@ export async function loadProfile({ paths, config, cliVersion, home, readFile = 
 export async function resolveProject(session, { path: requested, view = createNodeFsView() } = {}) {
   const start = requested ?? session.cwd;
   const identity = resolveProjectIdentity(start, { platform: session.platform, cwd: session.cwd });
-  const root = findUnityProjectRoot(view, identity.absolutePath) ?? identity.absolutePath;
+  const root = resolveWorkspaceProjectRoot(view, identity.absolutePath, { env: session.env, explicit: requested !== undefined });
   const rootIdentity = resolveProjectIdentity(root, { platform: session.platform, cwd: session.cwd });
   const id = getProjectId(root, { platform: session.platform, cwd: session.cwd, caseInsensitive: rootIdentity.caseInsensitive });
   const paths = session.paths.project(id);
@@ -149,7 +149,9 @@ export async function resolveProject(session, { path: requested, view = createNo
  * @returns {{ stale: boolean, reason: string | null, inputsHash: string }}
  */
 export function checkProjectFreshness(project, { env = {}, view = createNodeFsView() } = {}) {
-  const inputsHash = getInputsHash(view, project.root, { env });
+  const inputsHash = project.projectJson?.schemaVersion === 2 && project.projectJson.workspace
+    ? getWorkspaceInputsHash(view, project.root, project.projectJson, { env })
+    : getInputsHash(view, project.root, { env });
   return { ...checkFactsFreshness(project.projectJson, inputsHash), inputsHash };
 }
 

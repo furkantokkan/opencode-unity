@@ -1,0 +1,6 @@
+{
+  "name": "Game.Tests.EditMode",
+  "references": ["Game.Runtime"],
+  "includePlatforms": ["Editor"],
+  "optionalUnityReferences": ["TestAssemblies"]
+}

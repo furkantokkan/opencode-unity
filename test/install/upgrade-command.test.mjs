@@ -62,6 +62,37 @@ describe('upgrade preconditions', () => {
 });
 
 describe('upgrade from an older version', () => {
+  it('migrates a preview v1 config only on apply and preserves released choices', async (t) => {
+    const harness = await createHarness(t);
+    await harness.run(['setup', '--no-model', ...YES]);
+    const { newDir } = await simulateOlderInstall(harness);
+    const preview = {
+      ...JSON.parse(await fs.readFile(harness.paths.config, 'utf8')),
+      schemaVersion: 1,
+      guard: { allowOffload: true },
+      delegate: { enabled: false, monitorWindow: true },
+      safety: { extraProtectedEditGlobs: ['*Art/*'] },
+    };
+    const text = JSON.stringify(preview, null, 2) + '\n';
+    await fs.writeFile(harness.paths.config, text);
+
+    const dry = await harness.run(['upgrade', '--dry-run']);
+    assert.equal(dry.exitCode, EXIT.OK, dry.envelope.message);
+    assert.ok(dry.envelope.data.steps.includes('config-migrate'));
+    assert.equal(await fs.readFile(harness.paths.config, 'utf8'), text);
+
+    const applied = await harness.run(['upgrade', ...YES]);
+    assert.equal(applied.exitCode, EXIT.OK, applied.envelope.message);
+    const config = JSON.parse(await fs.readFile(harness.paths.config, 'utf8'));
+    assert.equal(config.schemaVersion, 2);
+    assert.deepEqual(config.guard, preview.guard);
+    assert.deepEqual(config.delegate, preview.delegate);
+    assert.deepEqual(config.safety.extraProtectedEditGlobs, ['*Art/*']);
+    const profile = JSON.parse(await fs.readFile(path.join(newDir, 'opencode-unity.runtime.json'), 'utf8'));
+    assert.equal(profile.guard.allowOffload, true);
+    assert.deepEqual(profile.safety.extraProtectedEditGlobs, ['*Art/*']);
+  });
+
   it('renders the new profile, keeps the old one, and moves the pointer', async (t) => {
     const harness = await createHarness(t);
     await harness.run(['setup', '--no-model', ...YES]);

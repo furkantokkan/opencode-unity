@@ -154,8 +154,10 @@ export function createSessionTooLargeError() {
 }
 
 /**
- * The serialized size of the history OpenCode is about to send, and the session it belongs to.
- * @param {Array<{ info?: { sessionID?: unknown } }>} messages
+ * Estimate the model-facing history once. OpenCode's tool metadata repeats read output in previews
+ * and file diffs; that UI data is not sent to the model and must not triple its prompt estimate.
+ * Unknown part types stay in the estimate so future OpenCode additions cannot silently disappear.
+ * @param {Array<{ info?: { sessionID?: unknown, role?: unknown }, parts?: any[] }>} messages
  * @returns {{ sessionId: string | null, chars: number }}
  */
 export function measureHistory(messages) {
@@ -164,7 +166,17 @@ export function measureHistory(messages) {
   const sessionId = typeof (/** @type {{ sessionID?: unknown }} */ (first)?.sessionID) === 'string' ? String(/** @type {any} */ (first).sessionID) : null;
   let chars = 0;
   try {
-    chars = JSON.stringify(messages)?.length ?? 0;
+    chars = JSON.stringify(messages.map((message) => ({
+      ...message,
+      ...(Array.isArray(message.parts) ? { parts: message.parts.map((part) => {
+        if (part?.type === 'text' || part?.type === 'reasoning') return { ...part, metadata: undefined };
+        if (part?.type === 'tool') return {
+          ...part, metadata: undefined,
+          state: { ...part.state, metadata: undefined, title: undefined },
+        };
+        return part;
+      }) } : {}),
+    })))?.length ?? 0;
   } catch {
     chars = 0;
   }
@@ -188,6 +200,8 @@ export function measureSystem(system) {
  * @returns {number}
  */
 export function resolveToolsTokens(toolsTokens, agent) {
+  // OpenCode's compaction request carries no tools (captured with 1.18.31).
+  if (agent === COMPACTION_AGENT) return 0;
   const measured = toolsTokens[agent];
   if (typeof measured === 'number' && Number.isFinite(measured)) return measured;
   const values = Object.values(toolsTokens).filter((value) => typeof value === 'number' && Number.isFinite(value));

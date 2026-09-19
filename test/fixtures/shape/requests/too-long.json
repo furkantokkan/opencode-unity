@@ -1,0 +1,12 @@
+{
+  "note": "Longer than shape.maxInputChars.",
+  "textRepeat": {
+    "unit": "make the inventory refresh faster in InventoryView.cs. ",
+    "length": 2400
+  },
+  "expect": {
+    "status": "passthrough",
+    "verdict": null,
+    "reason": "too_long"
+  }
+}

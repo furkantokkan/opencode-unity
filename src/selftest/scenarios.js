@@ -23,6 +23,7 @@ import { createLoadedModelState, startMockBackend } from './mock-backend.js';
 import { DEFAULT_MCP_PATH, MOCK_HUB_INSTRUCTIONS_MARKER, startMockMcpHub } from './mock-mcp-hub.js';
 import { NATIVE_LOAD_PATHS } from './mock-ollama.js';
 import { estimatePromptTokens } from './mock-openai.js';
+import { createRedactor, getLocalRedactionTargets } from '../core/redact.js';
 
 export const SELFTEST_SCHEMA_VERSION = 1;
 
@@ -76,6 +77,7 @@ export const DEFAULT_SELFTEST_PROFILE = Object.freeze({
  * @property {readonly string[]} codeTools   Tool names the `unity-code` request must carry (the expected-tools fixture).
  * @property {readonly string[]} [editorMcpTools]  MCP tools visible to `unity-editor`; default: the 11.2 allow-list.
  * @property {(body: import('./capture-checks.js').CapturedChatBody) => number} [estimateTokens]
+ * @property {boolean} [captureRequests] Include redacted synthetic request bodies in the result.
  */
 
 /**
@@ -227,7 +229,10 @@ export const SELFTEST_SCENARIOS = [
     verify: (observation, context) => [
       checkAtLeast('compaction-requested', countKind(observation, 'compaction'), 1, 'compaction requests'),
       checkBudget(observation, context),
-      checkExitCodes(observation),
+      // OpenCode 1.18.31 exits 1 after a recovered ContextOverflowError too (spike C). Require the
+      // post-compaction request and answer, rather than treating the exit code as recovery evidence.
+      checkAtLeast('continued-after-compaction', countKind(observation, 'chat'), 2, 'agent requests'),
+      checkOutputContains(observation, DONE_TEXT, 'answer-after-compaction'),
     ],
   },
   {
@@ -312,6 +317,9 @@ export async function runSelftest(options) {
   const { launch, opencodeVersion, cliVersion, includeEditor = false, ids } = options;
   requireExpectations(options.expectations);
   const scenarios = selectSelftestScenarios({ includeEditor, ids });
+  if (scenarios.length === 0 || ids?.some((id) => !scenarios.some((scenario) => scenario.id === id))) {
+    throw new TypeError('self-test needs at least one known, enabled scenario');
+  }
   const startedAt = new Date();
   const results = [];
   for (const scenario of scenarios) {
@@ -370,13 +378,35 @@ export async function runScenario(scenario, options) {
         ...commonChecks(observation),
         ...scenario.verify(observation, { profile, expectations, setup: scenarioSetup }),
       ];
-      return buildScenarioResult(scenario, checks, { attempt, hangs, startedAt, observation });
+      const scenarioResult = buildScenarioResult(scenario, checks, { attempt, hangs, startedAt, observation });
+      const targets = getLocalRedactionTargets();
+      const redactor = createRedactor({ ...targets, homeDirs: [...(targets.homeDirs ?? []), scenarioSetup.root] });
+      return redactor.redactValue({ ...scenarioResult,
+        ...(expectations.captureRequests ? { requests: observation.chats.map(({ kind, body }) => ({ kind, body })) } : {}),
+        ...(!scenarioResult.ok ? { errors: readLaunchErrors(observation) } : {}),
+      });
     } finally {
       await scenarioSetup.cleanup();
     }
   }
   /* c8 ignore next */
   throw new Error(`scenario ${scenario.id} produced no result`);
+}
+
+/** Return structured error events only, never a transcript containing file contents or tool titles.
+ * @param {ScenarioObservation} observation
+ */
+function readLaunchErrors(observation) {
+  const errors = [];
+  for (const run of observation.runs) {
+    for (const line of run.stdout.split(/\r?\n/)) {
+      try {
+        const event = JSON.parse(line);
+        if (event.type === 'error') errors.push(event.error);
+      } catch { /* Non-JSON output is not a report artifact. */ }
+    }
+  }
+  return errors.slice(-5);
 }
 
 /**
@@ -664,7 +694,7 @@ function checkCodeSessionWithoutMcp(bodies) {
  */
 function checkBudget(observation, { profile, expectations }) {
   const estimate = expectations.estimateTokens ?? estimatePromptTokens;
-  return checkPromptsWithinBudget(observation.chats.filter((chat) => chat.kind === 'chat').map((chat) => chat.body), profile.promptBudget, estimate);
+  return checkPromptsWithinBudget(observation.chats.filter((chat) => chat.kind !== 'title').map((chat) => chat.body), profile.promptBudget, estimate);
 }
 
 /**

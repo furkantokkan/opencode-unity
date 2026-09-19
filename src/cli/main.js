@@ -1,7 +1,7 @@
 // CLI entry: parse, route to the command module, print the result, return the exit code.
 // `main` never calls process.exit, so tests run it in-process with injected streams and commands.
 import tty from 'node:tty';
-import { coversCommand, describePlatform, detectPlatform, resolveTier } from '../core/platform.js';
+import { coversCommand, describePlatform, detectPlatform, resolveTier, resolveTiers } from '../core/platform.js';
 import { parseArgv, scanGlobalFlags } from './args.js';
 import { createConsent } from './consent.js';
 import { createEnvelope, createErrorEnvelope } from './envelope.js';
@@ -94,6 +94,11 @@ export async function main(argv, dependencies = {}) {
   }
 
   const output = createOutputFor(parsed.global, deps);
+  if (parsed.global.printPlatform) {
+    const facts = deps.platformFacts ?? detectPlatform({ platform: deps.platform, env: deps.env });
+    const data = { platform: facts, tiers: resolveTiers(facts) };
+    return report(output, createEnvelope({ command: CLI_NAME, exitCode: EXIT.OK, message: JSON.stringify(data, null, 2), data }));
+  }
   if (parsed.kind === 'version') return printVersion(output, deps);
   if (parsed.kind === 'help') return printHelp(output, parsed.topic, deps);
   return runCommand(parsed, output, deps);
@@ -143,7 +148,7 @@ async function runCommand(request, output, deps) {
   });
   const uninstallSignals = deps.installSignals ? interrupts.install() : undefined;
   try {
-    requireSupportedPlatform(request.command, deps);
+    requireSupportedPlatform(request.command, deps, request.options);
     const module = await deps.loadCommand(request.command);
     /** @type {CommandContext} */
     const context = {
@@ -181,8 +186,9 @@ async function runCommand(request, output, deps) {
  * everywhere by accident.
  * @param {CommandSpec} command
  * @param {ResolvedDependencies} deps
+ * @param {Record<string, unknown>} options
  */
-function requireSupportedPlatform(command, deps) {
+function requireSupportedPlatform(command, deps, options) {
   if (!coversCommand(command.name)) {
     if (!command.platforms || command.platforms.includes(deps.platform)) return;
     throw new CliError(`'${command.name}' runs only on ${command.platforms.join(', ')} in this version (this is ${deps.platform})`, {
@@ -192,7 +198,8 @@ function requireSupportedPlatform(command, deps) {
     });
   }
   const facts = deps.platformFacts ?? detectPlatform({ platform: deps.platform, env: deps.env });
-  const result = resolveTier(command.name, facts);
+  const tierCommand = command.name === 'shape' && options.noModel === true ? 'shape-no-model' : command.name;
+  const result = resolveTier(tierCommand, facts);
   if (result.tier !== 'refused') return;
   throw new CliError(result.message ?? `'${command.name}' is not supported on ${deps.platform} in this version`, {
     exitCode: EXIT.UNSUPPORTED,

@@ -272,13 +272,13 @@ describe('tool hooks', () => {
     for (const command of commands) {
       const error = await run.hooks['tool.execute.before']({ tool: 'bash' }, { args: { command } }).catch((value) => value);
       assert.ok(error instanceof Error, command);
-      assert.match(error.message, /can change version control/, 'the model still reads the full reason');
+      assert.match(error.message, /can change version control|contains a URL/, 'the model still reads the specific refusal reason');
     }
     await run.runtime.log.flush();
     const records = run.appended.map((line) => JSON.parse(line)).filter((entry) => entry.event === 'shellBlocked');
     assert.equal(records.length, commands.length);
     for (const record of records) {
-      assert.equal(record.code, 'shell_vcs_write');
+      assert.ok(['shell_vcs_write', 'shell_blocked_text'].includes(record.code));
       assert.equal(record.reason, undefined);
       const text = JSON.stringify(record).toLowerCase();
       for (const fragment of ['clientgame', 'roadmap', 'token', 'example.invalid']) assert.ok(!text.includes(fragment), fragment);

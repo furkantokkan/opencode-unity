@@ -11,6 +11,8 @@
 //   shell.env               restore XDG_CONFIG_HOME for agent commands, opt out of .NET telemetry
 //   event                   calibrate from real usage, detect a silently truncated prompt
 //   text.complete           detect a tool call the model wrote as text
+//   tool.unitynet           the one model-visible HTTP path (amendment 35.5); refuses everything when
+//                           the runtime profile carries no usable network policy
 //
 // Failure rule (D3, S2): if the runtime profile is missing or invalid, the provider is not injected.
 // OpenCode then cannot resolve the model configured in `opencode.jsonc`, and the session stops before
@@ -27,6 +29,7 @@ import { createGuardCache } from './opencode-unity-lib/guard/cache.js';
 import { createGuardKey, evaluateGuard } from './opencode-unity-lib/guard/evaluate.js';
 import { createGuardError } from './opencode-unity-lib/guard/messages.js';
 import { createMcpArgsPolicy, isMcpTool, readEditorPolicyOptions } from './opencode-unity-lib/mcp-args.js';
+import { TOOL_ID, createNetTool, readServerPort } from './opencode-unity-lib/net/tool.js';
 import { applyProvider, applySampling } from './opencode-unity-lib/provider.js';
 import { clampReadArgs, isReadTool } from './opencode-unity-lib/read-limit.js';
 import { createSessionLog } from './opencode-unity-lib/session-log.js';
@@ -48,6 +51,7 @@ export const PLUGIN_ID = 'opencode-unity';
  * @property {import('./opencode-unity-lib/budget.js').BudgetTracker | null} budget
  * @property {import('./opencode-unity-lib/shell-guard.js').ShellGuard} shell
  * @property {import('./opencode-unity-lib/mcp-args.js').McpArgsPolicy} mcpArgs
+ * @property {import('./opencode-unity-lib/net/tool.js').NetTool} net
  * @property {() => Promise<import('./opencode-unity-lib/guard/decide.js').GuardVerdict>} checkGuard  Throws on a block.
  */
 
@@ -59,9 +63,12 @@ export const PLUGIN_ID = 'opencode-unity';
  * @param {string} [options.profilePath]
  * @param {typeof import('./opencode-unity-lib/guard/evaluate.js').evaluateGuard} [options.evaluate]
  * @param {Pick<typeof fs, 'readFile' | 'mkdir' | 'appendFile' | 'readdir' | 'rm'>} [options.fsImpl]
+ * @param {() => import('./opencode-unity-lib/net/tool.js').ServerPortReading} [options.readServerPort]
+ *   The OpenCode server port, read per request; unknown makes every loopback request fail closed.
+ * @param {Partial<import('./opencode-unity-lib/net/tool.js').NetToolOptions>} [options.netOptions]  Test seams.
  * @returns {Promise<PluginRuntime>}
  */
-export async function createPluginRuntime({ client, env = process.env, platform = process.platform, profilePath, evaluate = evaluateGuard, fsImpl = fs } = {}) {
+export async function createPluginRuntime({ client, env = process.env, platform = process.platform, profilePath, evaluate = evaluateGuard, fsImpl = fs, readServerPort: readPort, netOptions = {} } = {}) {
   const home = env.OPENCODE_UNITY_HOME ?? null;
   // Without a home there is nowhere the product owns to write to, and a diagnostic log is never worth
   // creating a directory somewhere else.
@@ -69,6 +76,13 @@ export async function createPluginRuntime({ client, env = process.env, platform 
   const toaster = createToaster({ client });
   const loaded = await loadRuntimeProfile({ ...(profilePath ? { path: profilePath } : {}), readFile: (target) => fsImpl.readFile(target, 'utf8') });
   const project = await readProjectContext({ home, projectId: env.OPENCODE_UNITY_PROJECT ?? null, fsImpl });
+  // The tool is registered either way, and without a usable policy it refuses every call (35.7).
+  const net = createNetTool({
+    network: loaded.ok ? readNetworkBlock(env.OPENCODE_UNITY_NETWORK_POLICY) : null,
+    log,
+    ...(readPort ? { readServerPort: readPort } : {}),
+    ...netOptions,
+  });
 
   if (!loaded.ok) {
     log.append({ event: 'providerSkipped', reason: loaded.reason });
@@ -81,6 +95,7 @@ export async function createPluginRuntime({ client, env = process.env, platform 
       shell: createShellGuard({ vcsKind: project.vcsKind, mcpHubUrl: project.hubUrl, platform, shell: env.SHELL ?? null }),
       // The editor policy holds even when the provider is not injected.
       mcpArgs: createMcpArgsPolicy(project.editor),
+      net,
       checkGuard: async () => {
         throw new Error('opencode-unity: the runtime profile is missing, so no request is prepared.');
       },
@@ -104,8 +119,10 @@ export async function createPluginRuntime({ client, env = process.env, platform 
       extraProtectedEditGlobs: profile.safety.extraProtectedEditGlobs,
       platform,
       shell: env.SHELL ?? null,
+      networkBash: env.OPENCODE_UNITY_NETWORK_BASH === 'ask' ? 'ask' : 'deny',
     }),
     mcpArgs: createMcpArgsPolicy(project.editor),
+    net,
     async checkGuard() {
       // One evaluation per request: `system.transform` measures and `chat.params` reuses the pass.
       const { verdict } = await cache.check(key);
@@ -122,13 +139,19 @@ export async function createPluginRuntime({ client, env = process.env, platform 
  * The hook map. Split from the module default export so a test can build it over a fake runtime.
  * @param {PluginRuntime} runtime
  * @param {{ env?: Record<string, string | undefined>, userHome?: string | null }} [options]
- * @returns {Record<string, Function>}
+ * @returns {Record<string, any>}
  */
 export function createHooks(runtime, { env = process.env, userHome = os.homedir() } = {}) {
   // A fake runtime in a test that carries no policy still gets the strictest one.
-  const { log, toaster, shell, mcpArgs = createMcpArgsPolicy() } = runtime;
+  const { log, toaster, shell, mcpArgs = createMcpArgsPolicy(), net = createNetTool({ network: null, log }) } = runtime;
 
   return {
+    // Registered from the `tool` map, so the id is used verbatim (claim 134). The permission layer
+    // removes it from the request where the rendered rule is `"unitynet": "deny"` (spike O).
+    tool: {
+      [TOOL_ID]: { description: net.description, args: net.args, execute: net.execute },
+    },
+
     /** @param {{ provider?: Record<string, unknown>, enabled_providers?: string[] }} config */
     config: async (config) => {
       if (!runtime.profile) return;
@@ -298,6 +321,17 @@ function readEventAgent(event) {
 }
 
 /**
+ * The runtime profile's `network` block (amendment 35.7), handed to the tool unread: the tool's own
+ * reader is the one that fails closed, so this module never interprets it.
+ * @param {string | undefined} serialized
+ * @returns {unknown}
+ */
+function readNetworkBlock(serialized) {
+  try { return typeof serialized === 'string' ? JSON.parse(serialized) : null; }
+  catch { return null; }
+}
+
+/**
  * @returns {import('./opencode-unity-lib/session-log.js').SessionLog}
  */
 function createNullLog() {
@@ -324,12 +358,14 @@ function readErrorCode(error) {
 
 /**
  * What `server` does, with its inputs injectable.
- * @param {{ client?: unknown }} [input]
+ * @param {{ client?: unknown, serverUrl?: unknown }} [input]
  * @param {Parameters<typeof createPluginRuntime>[0] & { userHome?: string | null }} [options]
- * @returns {Promise<Record<string, Function>>}
+ * @returns {Promise<Record<string, any>>}
  */
 export async function startPlugin(input = {}, options = {}) {
-  const runtime = await createPluginRuntime({ client: input?.client, ...options });
+  // `serverUrl` is a getter in OpenCode, so it is read on every request rather than once here: the
+  // OpenCode server row of the reserved-port table is only knowable per request (`DN10`).
+  const runtime = await createPluginRuntime({ client: input?.client, readServerPort: () => readServerPort(input), ...options });
   if (runtime.profile) {
     const { modelTag, numCtx } = runtime.profile.provider;
     runtime.log.append({ event: 'pluginLoaded', model: modelTag, source: runtime.profile.budget.toolsTokensSource });
@@ -341,8 +377,8 @@ export async function startPlugin(input = {}, options = {}) {
 export default {
   id: PLUGIN_ID,
   /**
-   * @param {{ client?: unknown }} input
-   * @returns {Promise<Record<string, Function>>}
+   * @param {{ client?: unknown, serverUrl?: unknown }} input
+   * @returns {Promise<Record<string, any>>}
    */
   server: (input) => startPlugin(input),
 };

@@ -1,0 +1,5360 @@
+{
+  "cold-clear": {
+    "verdict": {
+      "verdict": "pass",
+      "pass": true,
+      "path": "cold",
+      "mode": null,
+      "reasons": [],
+      "notes": [
+        "ocu-model-16k is not loaded",
+        "video memory: free 21.5 GiB minus the model's 18.6 GiB leaves 2.9 GiB (minimum 1.5 GiB)",
+        "GPU utilization 3% (limit 60%)",
+        "no Unity process is running"
+      ],
+      "cacheSec": 3,
+      "checkedAt": "2026-09-17T12:00:00.000Z",
+      "target": {
+        "modelTag": "ocu-model-16k",
+        "numCtx": 16384
+      },
+      "model": {
+        "loaded": false,
+        "state": "not-listed",
+        "contextLength": null,
+        "expiresInSec": null,
+        "sizeVramMiB": 0,
+        "reclaimableMiB": 0,
+        "otherModels": []
+      },
+      "measurements": {
+        "gpu": {
+          "memory": {
+            "ok": true,
+            "totalMiB": 24576,
+            "freeMiB": 22000
+          },
+          "utilization": {
+            "ok": true,
+            "samples": [
+              3
+            ]
+          },
+          "gpuCount": 1
+        },
+        "unity": {
+          "ok": true,
+          "running": false,
+          "detailsRead": true,
+          "editorCount": 0,
+          "cpuSampled": false,
+          "elapsedMs": null,
+          "importProcesses": [],
+          "importCpuPercent": 0,
+          "editors": [],
+          "busiestEditorCpuPercent": 0,
+          "unreadable": []
+        },
+        "loadedModels": []
+      }
+    },
+    "calls": [
+      {
+        "kind": "fetch",
+        "at": 0,
+        "url": "http://127.0.0.1:11434/api/ps"
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "nvidia-smi",
+        "args": [
+          "--query-gpu=index,memory.total,memory.free,utilization.gpu",
+          "--format=csv,noheader,nounits"
+        ],
+        "timeoutMs": 10000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "C:\\Windows\\System32\\tasklist.exe",
+        "args": [
+          "/FI",
+          "IMAGENAME eq Unity.exe",
+          "/FO",
+          "CSV",
+          "/NH"
+        ],
+        "timeoutMs": 5000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      }
+    ]
+  },
+  "cold-vram-low": {
+    "verdict": {
+      "verdict": "blocked",
+      "pass": false,
+      "path": "cold",
+      "mode": "stop",
+      "reasons": [
+        {
+          "id": "vram_low",
+          "mode": "stop",
+          "detail": "not enough video memory: free 14.6 GiB minus the model's 18.6 GiB leaves -3.9 GiB (minimum 1.5 GiB)",
+          "data": {
+            "freeMiB": 15000,
+            "reclaimableMiB": 0,
+            "availableMiB": 15000,
+            "modelVramMiB": 19000,
+            "freeAfterLoadMiB": -4000,
+            "minFreeVramAfterLoadMiB": 1500
+          }
+        }
+      ],
+      "notes": [
+        "ocu-model-16k is not loaded",
+        "GPU utilization 3% (limit 60%)",
+        "no Unity process is running"
+      ],
+      "cacheSec": 0,
+      "checkedAt": "2026-09-17T12:00:00.000Z",
+      "target": {
+        "modelTag": "ocu-model-16k",
+        "numCtx": 16384
+      },
+      "model": {
+        "loaded": false,
+        "state": "not-listed",
+        "contextLength": null,
+        "expiresInSec": null,
+        "sizeVramMiB": 0,
+        "reclaimableMiB": 0,
+        "otherModels": []
+      },
+      "measurements": {
+        "gpu": {
+          "memory": {
+            "ok": true,
+            "totalMiB": 24576,
+            "freeMiB": 15000
+          },
+          "utilization": {
+            "ok": true,
+            "samples": [
+              3
+            ]
+          },
+          "gpuCount": 1
+        },
+        "unity": {
+          "ok": true,
+          "running": false,
+          "detailsRead": true,
+          "editorCount": 0,
+          "cpuSampled": false,
+          "elapsedMs": null,
+          "importProcesses": [],
+          "importCpuPercent": 0,
+          "editors": [],
+          "busiestEditorCpuPercent": 0,
+          "unreadable": []
+        },
+        "loadedModels": []
+      }
+    },
+    "calls": [
+      {
+        "kind": "fetch",
+        "at": 0,
+        "url": "http://127.0.0.1:11434/api/ps"
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "nvidia-smi",
+        "args": [
+          "--query-gpu=index,memory.total,memory.free,utilization.gpu",
+          "--format=csv,noheader,nounits"
+        ],
+        "timeoutMs": 10000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "C:\\Windows\\System32\\tasklist.exe",
+        "args": [
+          "/FI",
+          "IMAGENAME eq Unity.exe",
+          "/FO",
+          "CSV",
+          "/NH"
+        ],
+        "timeoutMs": 5000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      }
+    ]
+  },
+  "cold-gpu-busy": {
+    "verdict": {
+      "verdict": "blocked",
+      "pass": false,
+      "path": "cold",
+      "mode": "stop",
+      "reasons": [
+        {
+          "id": "gpu_busy",
+          "mode": "stop",
+          "detail": "GPU utilization stayed high: 95% then 97% (limit 60%)",
+          "data": {
+            "samples": [
+              95,
+              97
+            ],
+            "maxGpuUtilPercent": 60
+          }
+        }
+      ],
+      "notes": [
+        "ocu-model-16k is not loaded",
+        "video memory: free 21.5 GiB minus the model's 18.6 GiB leaves 2.9 GiB (minimum 1.5 GiB)",
+        "no Unity process is running"
+      ],
+      "cacheSec": 0,
+      "checkedAt": "2026-09-17T12:00:00.000Z",
+      "target": {
+        "modelTag": "ocu-model-16k",
+        "numCtx": 16384
+      },
+      "model": {
+        "loaded": false,
+        "state": "not-listed",
+        "contextLength": null,
+        "expiresInSec": null,
+        "sizeVramMiB": 0,
+        "reclaimableMiB": 0,
+        "otherModels": []
+      },
+      "measurements": {
+        "gpu": {
+          "memory": {
+            "ok": true,
+            "totalMiB": 24576,
+            "freeMiB": 22000
+          },
+          "utilization": {
+            "ok": true,
+            "samples": [
+              95,
+              97
+            ]
+          },
+          "gpuCount": 1
+        },
+        "unity": {
+          "ok": true,
+          "running": false,
+          "detailsRead": true,
+          "editorCount": 0,
+          "cpuSampled": false,
+          "elapsedMs": null,
+          "importProcesses": [],
+          "importCpuPercent": 0,
+          "editors": [],
+          "busiestEditorCpuPercent": 0,
+          "unreadable": []
+        },
+        "loadedModels": []
+      }
+    },
+    "calls": [
+      {
+        "kind": "fetch",
+        "at": 0,
+        "url": "http://127.0.0.1:11434/api/ps"
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "nvidia-smi",
+        "args": [
+          "--query-gpu=index,memory.total,memory.free,utilization.gpu",
+          "--format=csv,noheader,nounits"
+        ],
+        "timeoutMs": 10000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "C:\\Windows\\System32\\tasklist.exe",
+        "args": [
+          "/FI",
+          "IMAGENAME eq Unity.exe",
+          "/FO",
+          "CSV",
+          "/NH"
+        ],
+        "timeoutMs": 5000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      },
+      {
+        "kind": "sleep",
+        "at": 0,
+        "ms": 1000
+      },
+      {
+        "kind": "spawn",
+        "at": 1000,
+        "file": "nvidia-smi",
+        "args": [
+          "--query-gpu=index,memory.total,memory.free,utilization.gpu",
+          "--format=csv,noheader,nounits"
+        ],
+        "timeoutMs": 10000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      }
+    ]
+  },
+  "cold-gpu-busy-then-idle": {
+    "verdict": {
+      "verdict": "pass",
+      "pass": true,
+      "path": "cold",
+      "mode": null,
+      "reasons": [],
+      "notes": [
+        "ocu-model-16k is not loaded",
+        "video memory: free 21.5 GiB minus the model's 18.6 GiB leaves 2.9 GiB (minimum 1.5 GiB)",
+        "GPU utilization 95% then 10% (limit 60%)",
+        "no Unity process is running"
+      ],
+      "cacheSec": 3,
+      "checkedAt": "2026-09-17T12:00:00.000Z",
+      "target": {
+        "modelTag": "ocu-model-16k",
+        "numCtx": 16384
+      },
+      "model": {
+        "loaded": false,
+        "state": "not-listed",
+        "contextLength": null,
+        "expiresInSec": null,
+        "sizeVramMiB": 0,
+        "reclaimableMiB": 0,
+        "otherModels": []
+      },
+      "measurements": {
+        "gpu": {
+          "memory": {
+            "ok": true,
+            "totalMiB": 24576,
+            "freeMiB": 22000
+          },
+          "utilization": {
+            "ok": true,
+            "samples": [
+              95,
+              10
+            ]
+          },
+          "gpuCount": 1
+        },
+        "unity": {
+          "ok": true,
+          "running": false,
+          "detailsRead": true,
+          "editorCount": 0,
+          "cpuSampled": false,
+          "elapsedMs": null,
+          "importProcesses": [],
+          "importCpuPercent": 0,
+          "editors": [],
+          "busiestEditorCpuPercent": 0,
+          "unreadable": []
+        },
+        "loadedModels": []
+      }
+    },
+    "calls": [
+      {
+        "kind": "fetch",
+        "at": 0,
+        "url": "http://127.0.0.1:11434/api/ps"
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "nvidia-smi",
+        "args": [
+          "--query-gpu=index,memory.total,memory.free,utilization.gpu",
+          "--format=csv,noheader,nounits"
+        ],
+        "timeoutMs": 10000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "C:\\Windows\\System32\\tasklist.exe",
+        "args": [
+          "/FI",
+          "IMAGENAME eq Unity.exe",
+          "/FO",
+          "CSV",
+          "/NH"
+        ],
+        "timeoutMs": 5000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      },
+      {
+        "kind": "sleep",
+        "at": 0,
+        "ms": 1000
+      },
+      {
+        "kind": "spawn",
+        "at": 1000,
+        "file": "nvidia-smi",
+        "args": [
+          "--query-gpu=index,memory.total,memory.free,utilization.gpu",
+          "--format=csv,noheader,nounits"
+        ],
+        "timeoutMs": 10000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      }
+    ]
+  },
+  "cold-gpu-busy-slow-first-read": {
+    "verdict": {
+      "verdict": "blocked",
+      "pass": false,
+      "path": "cold",
+      "mode": "stop",
+      "reasons": [
+        {
+          "id": "gpu_busy",
+          "mode": "stop",
+          "detail": "GPU utilization stayed high: 95% then 99% (limit 60%)",
+          "data": {
+            "samples": [
+              95,
+              99
+            ],
+            "maxGpuUtilPercent": 60
+          }
+        }
+      ],
+      "notes": [
+        "ocu-model-16k is not loaded",
+        "video memory: free 21.5 GiB minus the model's 18.6 GiB leaves 2.9 GiB (minimum 1.5 GiB)",
+        "no Unity process is running"
+      ],
+      "cacheSec": 0,
+      "checkedAt": "2026-09-17T12:00:00.000Z",
+      "target": {
+        "modelTag": "ocu-model-16k",
+        "numCtx": 16384
+      },
+      "model": {
+        "loaded": false,
+        "state": "not-listed",
+        "contextLength": null,
+        "expiresInSec": null,
+        "sizeVramMiB": 0,
+        "reclaimableMiB": 0,
+        "otherModels": []
+      },
+      "measurements": {
+        "gpu": {
+          "memory": {
+            "ok": true,
+            "totalMiB": 24576,
+            "freeMiB": 22000
+          },
+          "utilization": {
+            "ok": true,
+            "samples": [
+              95,
+              99
+            ]
+          },
+          "gpuCount": 1
+        },
+        "unity": {
+          "ok": true,
+          "running": false,
+          "detailsRead": true,
+          "editorCount": 0,
+          "cpuSampled": false,
+          "elapsedMs": null,
+          "importProcesses": [],
+          "importCpuPercent": 0,
+          "editors": [],
+          "busiestEditorCpuPercent": 0,
+          "unreadable": []
+        },
+        "loadedModels": []
+      }
+    },
+    "calls": [
+      {
+        "kind": "fetch",
+        "at": 0,
+        "url": "http://127.0.0.1:11434/api/ps"
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "nvidia-smi",
+        "args": [
+          "--query-gpu=index,memory.total,memory.free,utilization.gpu",
+          "--format=csv,noheader,nounits"
+        ],
+        "timeoutMs": 10000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      },
+      {
+        "kind": "spawn",
+        "at": 1400,
+        "file": "C:\\Windows\\System32\\tasklist.exe",
+        "args": [
+          "/FI",
+          "IMAGENAME eq Unity.exe",
+          "/FO",
+          "CSV",
+          "/NH"
+        ],
+        "timeoutMs": 5000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      },
+      {
+        "kind": "sleep",
+        "at": 1400,
+        "ms": 0
+      },
+      {
+        "kind": "spawn",
+        "at": 1400,
+        "file": "nvidia-smi",
+        "args": [
+          "--query-gpu=index,memory.total,memory.free,utilization.gpu",
+          "--format=csv,noheader,nounits"
+        ],
+        "timeoutMs": 10000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      }
+    ]
+  },
+  "cold-gpu-second-read-fails": {
+    "verdict": {
+      "verdict": "blocked",
+      "pass": false,
+      "path": "cold",
+      "mode": "stop",
+      "reasons": [
+        {
+          "id": "probe_failed",
+          "mode": "stop",
+          "detail": "nvidia-smi exited with code 9: NVIDIA-SMI has failed",
+          "data": {
+            "probe": "nvidia-smi-utilization",
+            "error": "nvidia-smi exited with code 9: NVIDIA-SMI has failed"
+          }
+        }
+      ],
+      "notes": [
+        "ocu-model-16k is not loaded",
+        "video memory: free 21.5 GiB minus the model's 18.6 GiB leaves 2.9 GiB (minimum 1.5 GiB)",
+        "no Unity process is running"
+      ],
+      "cacheSec": 0,
+      "checkedAt": "2026-09-17T12:00:00.000Z",
+      "target": {
+        "modelTag": "ocu-model-16k",
+        "numCtx": 16384
+      },
+      "model": {
+        "loaded": false,
+        "state": "not-listed",
+        "contextLength": null,
+        "expiresInSec": null,
+        "sizeVramMiB": 0,
+        "reclaimableMiB": 0,
+        "otherModels": []
+      },
+      "measurements": {
+        "gpu": {
+          "memory": {
+            "ok": true,
+            "totalMiB": 24576,
+            "freeMiB": 22000
+          },
+          "utilization": {
+            "ok": false,
+            "samples": [
+              95
+            ],
+            "error": "nvidia-smi exited with code 9: NVIDIA-SMI has failed"
+          },
+          "gpuCount": 1
+        },
+        "unity": {
+          "ok": true,
+          "running": false,
+          "detailsRead": true,
+          "editorCount": 0,
+          "cpuSampled": false,
+          "elapsedMs": null,
+          "importProcesses": [],
+          "importCpuPercent": 0,
+          "editors": [],
+          "busiestEditorCpuPercent": 0,
+          "unreadable": []
+        },
+        "loadedModels": []
+      }
+    },
+    "calls": [
+      {
+        "kind": "fetch",
+        "at": 0,
+        "url": "http://127.0.0.1:11434/api/ps"
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "nvidia-smi",
+        "args": [
+          "--query-gpu=index,memory.total,memory.free,utilization.gpu",
+          "--format=csv,noheader,nounits"
+        ],
+        "timeoutMs": 10000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "C:\\Windows\\System32\\tasklist.exe",
+        "args": [
+          "/FI",
+          "IMAGENAME eq Unity.exe",
+          "/FO",
+          "CSV",
+          "/NH"
+        ],
+        "timeoutMs": 5000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      },
+      {
+        "kind": "sleep",
+        "at": 0,
+        "ms": 1000
+      },
+      {
+        "kind": "spawn",
+        "at": 1000,
+        "file": "nvidia-smi",
+        "args": [
+          "--query-gpu=index,memory.total,memory.free,utilization.gpu",
+          "--format=csv,noheader,nounits"
+        ],
+        "timeoutMs": 10000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      }
+    ]
+  },
+  "cold-gpu-second-read-na": {
+    "verdict": {
+      "verdict": "blocked",
+      "pass": false,
+      "path": "cold",
+      "mode": "stop",
+      "reasons": [
+        {
+          "id": "probe_failed",
+          "mode": "stop",
+          "detail": "nvidia-smi utilization '[N/A]' is not a percent",
+          "data": {
+            "probe": "nvidia-smi-utilization",
+            "error": "nvidia-smi utilization '[N/A]' is not a percent"
+          }
+        }
+      ],
+      "notes": [
+        "ocu-model-16k is not loaded",
+        "video memory: free 21.5 GiB minus the model's 18.6 GiB leaves 2.9 GiB (minimum 1.5 GiB)",
+        "no Unity process is running"
+      ],
+      "cacheSec": 0,
+      "checkedAt": "2026-09-17T12:00:00.000Z",
+      "target": {
+        "modelTag": "ocu-model-16k",
+        "numCtx": 16384
+      },
+      "model": {
+        "loaded": false,
+        "state": "not-listed",
+        "contextLength": null,
+        "expiresInSec": null,
+        "sizeVramMiB": 0,
+        "reclaimableMiB": 0,
+        "otherModels": []
+      },
+      "measurements": {
+        "gpu": {
+          "memory": {
+            "ok": true,
+            "totalMiB": 24576,
+            "freeMiB": 22000
+          },
+          "utilization": {
+            "ok": false,
+            "samples": [
+              95
+            ],
+            "error": "nvidia-smi utilization '[N/A]' is not a percent"
+          },
+          "gpuCount": 1
+        },
+        "unity": {
+          "ok": true,
+          "running": false,
+          "detailsRead": true,
+          "editorCount": 0,
+          "cpuSampled": false,
+          "elapsedMs": null,
+          "importProcesses": [],
+          "importCpuPercent": 0,
+          "editors": [],
+          "busiestEditorCpuPercent": 0,
+          "unreadable": []
+        },
+        "loadedModels": []
+      }
+    },
+    "calls": [
+      {
+        "kind": "fetch",
+        "at": 0,
+        "url": "http://127.0.0.1:11434/api/ps"
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "nvidia-smi",
+        "args": [
+          "--query-gpu=index,memory.total,memory.free,utilization.gpu",
+          "--format=csv,noheader,nounits"
+        ],
+        "timeoutMs": 10000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "C:\\Windows\\System32\\tasklist.exe",
+        "args": [
+          "/FI",
+          "IMAGENAME eq Unity.exe",
+          "/FO",
+          "CSV",
+          "/NH"
+        ],
+        "timeoutMs": 5000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      },
+      {
+        "kind": "sleep",
+        "at": 0,
+        "ms": 1000
+      },
+      {
+        "kind": "spawn",
+        "at": 1000,
+        "file": "nvidia-smi",
+        "args": [
+          "--query-gpu=index,memory.total,memory.free,utilization.gpu",
+          "--format=csv,noheader,nounits"
+        ],
+        "timeoutMs": 10000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      }
+    ]
+  },
+  "cold-nvidia-smi-missing": {
+    "verdict": {
+      "verdict": "blocked",
+      "pass": false,
+      "path": "cold",
+      "mode": "stop",
+      "reasons": [
+        {
+          "id": "probe_failed",
+          "mode": "stop",
+          "detail": "nvidia-smi could not start (ENOENT)",
+          "data": {
+            "probe": "nvidia-smi-memory",
+            "error": "nvidia-smi could not start (ENOENT)"
+          }
+        }
+      ],
+      "notes": [
+        "ocu-model-16k is not loaded",
+        "no Unity process is running"
+      ],
+      "cacheSec": 0,
+      "checkedAt": "2026-09-17T12:00:00.000Z",
+      "target": {
+        "modelTag": "ocu-model-16k",
+        "numCtx": 16384
+      },
+      "model": {
+        "loaded": false,
+        "state": "not-listed",
+        "contextLength": null,
+        "expiresInSec": null,
+        "sizeVramMiB": 0,
+        "reclaimableMiB": 0,
+        "otherModels": []
+      },
+      "measurements": {
+        "gpu": {
+          "memory": {
+            "ok": false,
+            "error": "nvidia-smi could not start (ENOENT)"
+          },
+          "utilization": {
+            "ok": false,
+            "samples": [],
+            "error": "nvidia-smi could not start (ENOENT)"
+          },
+          "gpuCount": 0
+        },
+        "unity": {
+          "ok": true,
+          "running": false,
+          "detailsRead": true,
+          "editorCount": 0,
+          "cpuSampled": false,
+          "elapsedMs": null,
+          "importProcesses": [],
+          "importCpuPercent": 0,
+          "editors": [],
+          "busiestEditorCpuPercent": 0,
+          "unreadable": []
+        },
+        "loadedModels": []
+      }
+    },
+    "calls": [
+      {
+        "kind": "fetch",
+        "at": 0,
+        "url": "http://127.0.0.1:11434/api/ps"
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "nvidia-smi",
+        "args": [
+          "--query-gpu=index,memory.total,memory.free,utilization.gpu",
+          "--format=csv,noheader,nounits"
+        ],
+        "timeoutMs": 10000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "C:\\Windows\\System32\\tasklist.exe",
+        "args": [
+          "/FI",
+          "IMAGENAME eq Unity.exe",
+          "/FO",
+          "CSV",
+          "/NH"
+        ],
+        "timeoutMs": 5000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      }
+    ]
+  },
+  "cold-nvidia-smi-timeout": {
+    "verdict": {
+      "verdict": "blocked",
+      "pass": false,
+      "path": "cold",
+      "mode": "stop",
+      "reasons": [
+        {
+          "id": "probe_failed",
+          "mode": "stop",
+          "detail": "nvidia-smi did not answer within 10 s",
+          "data": {
+            "probe": "nvidia-smi-memory",
+            "error": "nvidia-smi did not answer within 10 s"
+          }
+        }
+      ],
+      "notes": [
+        "ocu-model-16k is not loaded",
+        "no Unity process is running"
+      ],
+      "cacheSec": 0,
+      "checkedAt": "2026-09-17T12:00:00.000Z",
+      "target": {
+        "modelTag": "ocu-model-16k",
+        "numCtx": 16384
+      },
+      "model": {
+        "loaded": false,
+        "state": "not-listed",
+        "contextLength": null,
+        "expiresInSec": null,
+        "sizeVramMiB": 0,
+        "reclaimableMiB": 0,
+        "otherModels": []
+      },
+      "measurements": {
+        "gpu": {
+          "memory": {
+            "ok": false,
+            "error": "nvidia-smi did not answer within 10 s"
+          },
+          "utilization": {
+            "ok": false,
+            "samples": [],
+            "error": "nvidia-smi did not answer within 10 s"
+          },
+          "gpuCount": 0
+        },
+        "unity": {
+          "ok": true,
+          "running": false,
+          "detailsRead": true,
+          "editorCount": 0,
+          "cpuSampled": false,
+          "elapsedMs": null,
+          "importProcesses": [],
+          "importCpuPercent": 0,
+          "editors": [],
+          "busiestEditorCpuPercent": 0,
+          "unreadable": []
+        },
+        "loadedModels": []
+      }
+    },
+    "calls": [
+      {
+        "kind": "fetch",
+        "at": 0,
+        "url": "http://127.0.0.1:11434/api/ps"
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "nvidia-smi",
+        "args": [
+          "--query-gpu=index,memory.total,memory.free,utilization.gpu",
+          "--format=csv,noheader,nounits"
+        ],
+        "timeoutMs": 10000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "C:\\Windows\\System32\\tasklist.exe",
+        "args": [
+          "/FI",
+          "IMAGENAME eq Unity.exe",
+          "/FO",
+          "CSV",
+          "/NH"
+        ],
+        "timeoutMs": 5000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      }
+    ]
+  },
+  "cold-nvidia-smi-garbage": {
+    "verdict": {
+      "verdict": "blocked",
+      "pass": false,
+      "path": "cold",
+      "mode": "stop",
+      "reasons": [
+        {
+          "id": "probe_failed",
+          "mode": "stop",
+          "detail": "unexpected nvidia-smi output 'garbage'",
+          "data": {
+            "probe": "nvidia-smi-memory",
+            "error": "unexpected nvidia-smi output 'garbage'"
+          }
+        }
+      ],
+      "notes": [
+        "ocu-model-16k is not loaded",
+        "no Unity process is running"
+      ],
+      "cacheSec": 0,
+      "checkedAt": "2026-09-17T12:00:00.000Z",
+      "target": {
+        "modelTag": "ocu-model-16k",
+        "numCtx": 16384
+      },
+      "model": {
+        "loaded": false,
+        "state": "not-listed",
+        "contextLength": null,
+        "expiresInSec": null,
+        "sizeVramMiB": 0,
+        "reclaimableMiB": 0,
+        "otherModels": []
+      },
+      "measurements": {
+        "gpu": {
+          "memory": {
+            "ok": false,
+            "error": "unexpected nvidia-smi output 'garbage'"
+          },
+          "utilization": {
+            "ok": false,
+            "samples": [],
+            "error": "unexpected nvidia-smi output 'garbage'"
+          },
+          "gpuCount": 0
+        },
+        "unity": {
+          "ok": true,
+          "running": false,
+          "detailsRead": true,
+          "editorCount": 0,
+          "cpuSampled": false,
+          "elapsedMs": null,
+          "importProcesses": [],
+          "importCpuPercent": 0,
+          "editors": [],
+          "busiestEditorCpuPercent": 0,
+          "unreadable": []
+        },
+        "loadedModels": []
+      }
+    },
+    "calls": [
+      {
+        "kind": "fetch",
+        "at": 0,
+        "url": "http://127.0.0.1:11434/api/ps"
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "nvidia-smi",
+        "args": [
+          "--query-gpu=index,memory.total,memory.free,utilization.gpu",
+          "--format=csv,noheader,nounits"
+        ],
+        "timeoutMs": 10000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "C:\\Windows\\System32\\tasklist.exe",
+        "args": [
+          "/FI",
+          "IMAGENAME eq Unity.exe",
+          "/FO",
+          "CSV",
+          "/NH"
+        ],
+        "timeoutMs": 5000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      }
+    ]
+  },
+  "cold-nvidia-smi-empty": {
+    "verdict": {
+      "verdict": "blocked",
+      "pass": false,
+      "path": "cold",
+      "mode": "stop",
+      "reasons": [
+        {
+          "id": "probe_failed",
+          "mode": "stop",
+          "detail": "nvidia-smi printed nothing",
+          "data": {
+            "probe": "nvidia-smi-memory",
+            "error": "nvidia-smi printed nothing"
+          }
+        }
+      ],
+      "notes": [
+        "ocu-model-16k is not loaded",
+        "no Unity process is running"
+      ],
+      "cacheSec": 0,
+      "checkedAt": "2026-09-17T12:00:00.000Z",
+      "target": {
+        "modelTag": "ocu-model-16k",
+        "numCtx": 16384
+      },
+      "model": {
+        "loaded": false,
+        "state": "not-listed",
+        "contextLength": null,
+        "expiresInSec": null,
+        "sizeVramMiB": 0,
+        "reclaimableMiB": 0,
+        "otherModels": []
+      },
+      "measurements": {
+        "gpu": {
+          "memory": {
+            "ok": false,
+            "error": "nvidia-smi printed nothing"
+          },
+          "utilization": {
+            "ok": false,
+            "samples": [],
+            "error": "nvidia-smi printed nothing"
+          },
+          "gpuCount": 0
+        },
+        "unity": {
+          "ok": true,
+          "running": false,
+          "detailsRead": true,
+          "editorCount": 0,
+          "cpuSampled": false,
+          "elapsedMs": null,
+          "importProcesses": [],
+          "importCpuPercent": 0,
+          "editors": [],
+          "busiestEditorCpuPercent": 0,
+          "unreadable": []
+        },
+        "loadedModels": []
+      }
+    },
+    "calls": [
+      {
+        "kind": "fetch",
+        "at": 0,
+        "url": "http://127.0.0.1:11434/api/ps"
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "nvidia-smi",
+        "args": [
+          "--query-gpu=index,memory.total,memory.free,utilization.gpu",
+          "--format=csv,noheader,nounits"
+        ],
+        "timeoutMs": 10000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "C:\\Windows\\System32\\tasklist.exe",
+        "args": [
+          "/FI",
+          "IMAGENAME eq Unity.exe",
+          "/FO",
+          "CSV",
+          "/NH"
+        ],
+        "timeoutMs": 5000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      }
+    ]
+  },
+  "cold-nvidia-smi-no-gpu-0": {
+    "verdict": {
+      "verdict": "blocked",
+      "pass": false,
+      "path": "cold",
+      "mode": "stop",
+      "reasons": [
+        {
+          "id": "probe_failed",
+          "mode": "stop",
+          "detail": "nvidia-smi did not list GPU index 0",
+          "data": {
+            "probe": "nvidia-smi-memory",
+            "error": "nvidia-smi did not list GPU index 0"
+          }
+        }
+      ],
+      "notes": [
+        "ocu-model-16k is not loaded",
+        "no Unity process is running"
+      ],
+      "cacheSec": 0,
+      "checkedAt": "2026-09-17T12:00:00.000Z",
+      "target": {
+        "modelTag": "ocu-model-16k",
+        "numCtx": 16384
+      },
+      "model": {
+        "loaded": false,
+        "state": "not-listed",
+        "contextLength": null,
+        "expiresInSec": null,
+        "sizeVramMiB": 0,
+        "reclaimableMiB": 0,
+        "otherModels": []
+      },
+      "measurements": {
+        "gpu": {
+          "memory": {
+            "ok": false,
+            "error": "nvidia-smi did not list GPU index 0"
+          },
+          "utilization": {
+            "ok": false,
+            "samples": [],
+            "error": "nvidia-smi did not list GPU index 0"
+          },
+          "gpuCount": 0
+        },
+        "unity": {
+          "ok": true,
+          "running": false,
+          "detailsRead": true,
+          "editorCount": 0,
+          "cpuSampled": false,
+          "elapsedMs": null,
+          "importProcesses": [],
+          "importCpuPercent": 0,
+          "editors": [],
+          "busiestEditorCpuPercent": 0,
+          "unreadable": []
+        },
+        "loadedModels": []
+      }
+    },
+    "calls": [
+      {
+        "kind": "fetch",
+        "at": 0,
+        "url": "http://127.0.0.1:11434/api/ps"
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "nvidia-smi",
+        "args": [
+          "--query-gpu=index,memory.total,memory.free,utilization.gpu",
+          "--format=csv,noheader,nounits"
+        ],
+        "timeoutMs": 10000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "C:\\Windows\\System32\\tasklist.exe",
+        "args": [
+          "/FI",
+          "IMAGENAME eq Unity.exe",
+          "/FO",
+          "CSV",
+          "/NH"
+        ],
+        "timeoutMs": 5000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      }
+    ]
+  },
+  "cold-nvidia-smi-two-gpus": {
+    "verdict": {
+      "verdict": "pass",
+      "pass": true,
+      "path": "cold",
+      "mode": null,
+      "reasons": [],
+      "notes": [
+        "ocu-model-16k is not loaded",
+        "video memory: free 21.5 GiB minus the model's 18.6 GiB leaves 2.9 GiB (minimum 1.5 GiB)",
+        "GPU utilization 3% (limit 60%)",
+        "2 GPUs found; only GPU 0 is measured",
+        "no Unity process is running"
+      ],
+      "cacheSec": 3,
+      "checkedAt": "2026-09-17T12:00:00.000Z",
+      "target": {
+        "modelTag": "ocu-model-16k",
+        "numCtx": 16384
+      },
+      "model": {
+        "loaded": false,
+        "state": "not-listed",
+        "contextLength": null,
+        "expiresInSec": null,
+        "sizeVramMiB": 0,
+        "reclaimableMiB": 0,
+        "otherModels": []
+      },
+      "measurements": {
+        "gpu": {
+          "memory": {
+            "ok": true,
+            "totalMiB": 24576,
+            "freeMiB": 22000
+          },
+          "utilization": {
+            "ok": true,
+            "samples": [
+              3
+            ]
+          },
+          "gpuCount": 2
+        },
+        "unity": {
+          "ok": true,
+          "running": false,
+          "detailsRead": true,
+          "editorCount": 0,
+          "cpuSampled": false,
+          "elapsedMs": null,
+          "importProcesses": [],
+          "importCpuPercent": 0,
+          "editors": [],
+          "busiestEditorCpuPercent": 0,
+          "unreadable": []
+        },
+        "loadedModels": []
+      }
+    },
+    "calls": [
+      {
+        "kind": "fetch",
+        "at": 0,
+        "url": "http://127.0.0.1:11434/api/ps"
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "nvidia-smi",
+        "args": [
+          "--query-gpu=index,memory.total,memory.free,utilization.gpu",
+          "--format=csv,noheader,nounits"
+        ],
+        "timeoutMs": 10000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "C:\\Windows\\System32\\tasklist.exe",
+        "args": [
+          "/FI",
+          "IMAGENAME eq Unity.exe",
+          "/FO",
+          "CSV",
+          "/NH"
+        ],
+        "timeoutMs": 5000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      }
+    ]
+  },
+  "cold-utilization-na": {
+    "verdict": {
+      "verdict": "blocked",
+      "pass": false,
+      "path": "cold",
+      "mode": "stop",
+      "reasons": [
+        {
+          "id": "probe_failed",
+          "mode": "stop",
+          "detail": "nvidia-smi utilization '[N/A]' is not a percent",
+          "data": {
+            "probe": "nvidia-smi-utilization",
+            "error": "nvidia-smi utilization '[N/A]' is not a percent"
+          }
+        }
+      ],
+      "notes": [
+        "ocu-model-16k is not loaded",
+        "video memory: free 21.5 GiB minus the model's 18.6 GiB leaves 2.9 GiB (minimum 1.5 GiB)",
+        "no Unity process is running"
+      ],
+      "cacheSec": 0,
+      "checkedAt": "2026-09-17T12:00:00.000Z",
+      "target": {
+        "modelTag": "ocu-model-16k",
+        "numCtx": 16384
+      },
+      "model": {
+        "loaded": false,
+        "state": "not-listed",
+        "contextLength": null,
+        "expiresInSec": null,
+        "sizeVramMiB": 0,
+        "reclaimableMiB": 0,
+        "otherModels": []
+      },
+      "measurements": {
+        "gpu": {
+          "memory": {
+            "ok": true,
+            "totalMiB": 24576,
+            "freeMiB": 22000
+          },
+          "utilization": {
+            "ok": false,
+            "samples": [],
+            "error": "nvidia-smi utilization '[N/A]' is not a percent"
+          },
+          "gpuCount": 1
+        },
+        "unity": {
+          "ok": true,
+          "running": false,
+          "detailsRead": true,
+          "editorCount": 0,
+          "cpuSampled": false,
+          "elapsedMs": null,
+          "importProcesses": [],
+          "importCpuPercent": 0,
+          "editors": [],
+          "busiestEditorCpuPercent": 0,
+          "unreadable": []
+        },
+        "loadedModels": []
+      }
+    },
+    "calls": [
+      {
+        "kind": "fetch",
+        "at": 0,
+        "url": "http://127.0.0.1:11434/api/ps"
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "nvidia-smi",
+        "args": [
+          "--query-gpu=index,memory.total,memory.free,utilization.gpu",
+          "--format=csv,noheader,nounits"
+        ],
+        "timeoutMs": 10000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "C:\\Windows\\System32\\tasklist.exe",
+        "args": [
+          "/FI",
+          "IMAGENAME eq Unity.exe",
+          "/FO",
+          "CSV",
+          "/NH"
+        ],
+        "timeoutMs": 5000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      }
+    ]
+  },
+  "cold-memory-na": {
+    "verdict": {
+      "verdict": "blocked",
+      "pass": false,
+      "path": "cold",
+      "mode": "stop",
+      "reasons": [
+        {
+          "id": "probe_failed",
+          "mode": "stop",
+          "detail": "nvidia-smi memory figures '24576, [N/A]' are not whole MiB",
+          "data": {
+            "probe": "nvidia-smi-memory",
+            "error": "nvidia-smi memory figures '24576, [N/A]' are not whole MiB"
+          }
+        }
+      ],
+      "notes": [
+        "ocu-model-16k is not loaded",
+        "no Unity process is running"
+      ],
+      "cacheSec": 0,
+      "checkedAt": "2026-09-17T12:00:00.000Z",
+      "target": {
+        "modelTag": "ocu-model-16k",
+        "numCtx": 16384
+      },
+      "model": {
+        "loaded": false,
+        "state": "not-listed",
+        "contextLength": null,
+        "expiresInSec": null,
+        "sizeVramMiB": 0,
+        "reclaimableMiB": 0,
+        "otherModels": []
+      },
+      "measurements": {
+        "gpu": {
+          "memory": {
+            "ok": false,
+            "error": "nvidia-smi memory figures '24576, [N/A]' are not whole MiB"
+          },
+          "utilization": {
+            "ok": false,
+            "samples": [],
+            "error": "nvidia-smi memory figures '24576, [N/A]' are not whole MiB"
+          },
+          "gpuCount": 1
+        },
+        "unity": {
+          "ok": true,
+          "running": false,
+          "detailsRead": true,
+          "editorCount": 0,
+          "cpuSampled": false,
+          "elapsedMs": null,
+          "importProcesses": [],
+          "importCpuPercent": 0,
+          "editors": [],
+          "busiestEditorCpuPercent": 0,
+          "unreadable": []
+        },
+        "loadedModels": []
+      }
+    },
+    "calls": [
+      {
+        "kind": "fetch",
+        "at": 0,
+        "url": "http://127.0.0.1:11434/api/ps"
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "nvidia-smi",
+        "args": [
+          "--query-gpu=index,memory.total,memory.free,utilization.gpu",
+          "--format=csv,noheader,nounits"
+        ],
+        "timeoutMs": 10000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "C:\\Windows\\System32\\tasklist.exe",
+        "args": [
+          "/FI",
+          "IMAGENAME eq Unity.exe",
+          "/FO",
+          "CSV",
+          "/NH"
+        ],
+        "timeoutMs": 5000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      }
+    ]
+  },
+  "cold-memory-free-above-total": {
+    "verdict": {
+      "verdict": "blocked",
+      "pass": false,
+      "path": "cold",
+      "mode": "stop",
+      "reasons": [
+        {
+          "id": "probe_failed",
+          "mode": "stop",
+          "detail": "nvidia-smi reports more free memory (30000 MiB) than total (24576 MiB)",
+          "data": {
+            "probe": "nvidia-smi-memory",
+            "error": "nvidia-smi reports more free memory (30000 MiB) than total (24576 MiB)"
+          }
+        }
+      ],
+      "notes": [
+        "ocu-model-16k is not loaded",
+        "no Unity process is running"
+      ],
+      "cacheSec": 0,
+      "checkedAt": "2026-09-17T12:00:00.000Z",
+      "target": {
+        "modelTag": "ocu-model-16k",
+        "numCtx": 16384
+      },
+      "model": {
+        "loaded": false,
+        "state": "not-listed",
+        "contextLength": null,
+        "expiresInSec": null,
+        "sizeVramMiB": 0,
+        "reclaimableMiB": 0,
+        "otherModels": []
+      },
+      "measurements": {
+        "gpu": {
+          "memory": {
+            "ok": false,
+            "error": "nvidia-smi reports more free memory (30000 MiB) than total (24576 MiB)"
+          },
+          "utilization": {
+            "ok": false,
+            "samples": [],
+            "error": "nvidia-smi reports more free memory (30000 MiB) than total (24576 MiB)"
+          },
+          "gpuCount": 1
+        },
+        "unity": {
+          "ok": true,
+          "running": false,
+          "detailsRead": true,
+          "editorCount": 0,
+          "cpuSampled": false,
+          "elapsedMs": null,
+          "importProcesses": [],
+          "importCpuPercent": 0,
+          "editors": [],
+          "busiestEditorCpuPercent": 0,
+          "unreadable": []
+        },
+        "loadedModels": []
+      }
+    },
+    "calls": [
+      {
+        "kind": "fetch",
+        "at": 0,
+        "url": "http://127.0.0.1:11434/api/ps"
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "nvidia-smi",
+        "args": [
+          "--query-gpu=index,memory.total,memory.free,utilization.gpu",
+          "--format=csv,noheader,nounits"
+        ],
+        "timeoutMs": 10000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "C:\\Windows\\System32\\tasklist.exe",
+        "args": [
+          "/FI",
+          "IMAGENAME eq Unity.exe",
+          "/FO",
+          "CSV",
+          "/NH"
+        ],
+        "timeoutMs": 5000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      }
+    ]
+  },
+  "cold-idle-editor": {
+    "verdict": {
+      "verdict": "pass",
+      "pass": true,
+      "path": "cold",
+      "mode": null,
+      "reasons": [],
+      "notes": [
+        "ocu-model-16k is not loaded",
+        "video memory: free 21.5 GiB minus the model's 18.6 GiB leaves 2.9 GiB (minimum 1.5 GiB)",
+        "GPU utilization 3% (limit 60%)",
+        "1 import process(es) at 0% CPU (limit 20%)",
+        "busiest Unity editor at 5.3% CPU (limit 60%)",
+        "1 Unity editor(s) open (maximum 3)"
+      ],
+      "cacheSec": 3,
+      "checkedAt": "2026-09-17T12:00:00.000Z",
+      "target": {
+        "modelTag": "ocu-model-16k",
+        "numCtx": 16384
+      },
+      "model": {
+        "loaded": false,
+        "state": "not-listed",
+        "contextLength": null,
+        "expiresInSec": null,
+        "sizeVramMiB": 0,
+        "reclaimableMiB": 0,
+        "otherModels": []
+      },
+      "measurements": {
+        "gpu": {
+          "memory": {
+            "ok": true,
+            "totalMiB": 24576,
+            "freeMiB": 22000
+          },
+          "utilization": {
+            "ok": true,
+            "samples": [
+              3
+            ]
+          },
+          "gpuCount": 1
+        },
+        "unity": {
+          "ok": true,
+          "running": true,
+          "detailsRead": true,
+          "editorCount": 1,
+          "cpuSampled": true,
+          "elapsedMs": 1512.4,
+          "importProcesses": [
+            {
+              "pid": 70004200,
+              "name": "UnityShaderCompiler.exe",
+              "cpuPercent": 0
+            }
+          ],
+          "importCpuPercent": 0,
+          "editors": [
+            {
+              "pid": 70004100,
+              "name": "Unity.exe",
+              "cpuPercent": 5.3
+            }
+          ],
+          "busiestEditorCpuPercent": 5.3,
+          "unreadable": []
+        },
+        "loadedModels": []
+      }
+    },
+    "calls": [
+      {
+        "kind": "fetch",
+        "at": 0,
+        "url": "http://127.0.0.1:11434/api/ps"
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "nvidia-smi",
+        "args": [
+          "--query-gpu=index,memory.total,memory.free,utilization.gpu",
+          "--format=csv,noheader,nounits"
+        ],
+        "timeoutMs": 10000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "C:\\Windows\\System32\\tasklist.exe",
+        "args": [
+          "/FI",
+          "IMAGENAME eq Unity.exe",
+          "/FO",
+          "CSV",
+          "/NH"
+        ],
+        "timeoutMs": 5000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+        "args": [
+          "-NoProfile",
+          "-NonInteractive",
+          "-Command",
+          "-"
+        ],
+        "timeoutMs": 11500,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": "$ocuSampleMs = 1500; $ocuSampleCpu = $true; $ocuPatterns = @('QXNzZXRJbXBvcnRXb3JrZXI=', 'LWltcG9ydFdvcmtlcg==')"
+      }
+    ]
+  },
+  "cold-import-busy": {
+    "verdict": {
+      "verdict": "blocked",
+      "pass": false,
+      "path": "cold",
+      "mode": "stop",
+      "reasons": [
+        {
+          "id": "import_busy",
+          "mode": "stop",
+          "detail": "Unity asset import running: 2 process(es) at 52.9% CPU over 1512 ms (limit 20%; Unity.exe pid 70004310 33.1%, Unity.exe pid 70004311 19.8%)",
+          "data": {
+            "workers": {
+              "cpuPercent": 52.9,
+              "limitPercent": 20,
+              "processCount": 2
+            },
+            "editor": null
+          }
+        }
+      ],
+      "notes": [
+        "ocu-model-16k is not loaded",
+        "video memory: free 21.5 GiB minus the model's 18.6 GiB leaves 2.9 GiB (minimum 1.5 GiB)",
+        "GPU utilization 3% (limit 60%)",
+        "1 Unity editor(s) open (maximum 3)"
+      ],
+      "cacheSec": 0,
+      "checkedAt": "2026-09-17T12:00:00.000Z",
+      "target": {
+        "modelTag": "ocu-model-16k",
+        "numCtx": 16384
+      },
+      "model": {
+        "loaded": false,
+        "state": "not-listed",
+        "contextLength": null,
+        "expiresInSec": null,
+        "sizeVramMiB": 0,
+        "reclaimableMiB": 0,
+        "otherModels": []
+      },
+      "measurements": {
+        "gpu": {
+          "memory": {
+            "ok": true,
+            "totalMiB": 24576,
+            "freeMiB": 22000
+          },
+          "utilization": {
+            "ok": true,
+            "samples": [
+              3
+            ]
+          },
+          "gpuCount": 1
+        },
+        "unity": {
+          "ok": true,
+          "running": true,
+          "detailsRead": true,
+          "editorCount": 1,
+          "cpuSampled": true,
+          "elapsedMs": 1512.4,
+          "importProcesses": [
+            {
+              "pid": 70004310,
+              "name": "Unity.exe",
+              "cpuPercent": 33.1
+            },
+            {
+              "pid": 70004311,
+              "name": "Unity.exe",
+              "cpuPercent": 19.8
+            }
+          ],
+          "importCpuPercent": 52.9,
+          "editors": [
+            {
+              "pid": 70004100,
+              "name": "Unity.exe",
+              "cpuPercent": 5.3
+            }
+          ],
+          "busiestEditorCpuPercent": 5.3,
+          "unreadable": []
+        },
+        "loadedModels": []
+      }
+    },
+    "calls": [
+      {
+        "kind": "fetch",
+        "at": 0,
+        "url": "http://127.0.0.1:11434/api/ps"
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "nvidia-smi",
+        "args": [
+          "--query-gpu=index,memory.total,memory.free,utilization.gpu",
+          "--format=csv,noheader,nounits"
+        ],
+        "timeoutMs": 10000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "C:\\Windows\\System32\\tasklist.exe",
+        "args": [
+          "/FI",
+          "IMAGENAME eq Unity.exe",
+          "/FO",
+          "CSV",
+          "/NH"
+        ],
+        "timeoutMs": 5000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+        "args": [
+          "-NoProfile",
+          "-NonInteractive",
+          "-Command",
+          "-"
+        ],
+        "timeoutMs": 11500,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": "$ocuSampleMs = 1500; $ocuSampleCpu = $true; $ocuPatterns = @('QXNzZXRJbXBvcnRXb3JrZXI=', 'LWltcG9ydFdvcmtlcg==')"
+      }
+    ]
+  },
+  "cold-shader-children": {
+    "verdict": {
+      "verdict": "blocked",
+      "pass": false,
+      "path": "cold",
+      "mode": "stop",
+      "reasons": [
+        {
+          "id": "import_busy",
+          "mode": "stop",
+          "detail": "Unity asset import running: 3 process(es) at 79.3% CPU over 1512 ms (limit 20%; UnityShaderCompiler.exe pid 70004210 39.7%, UnityShaderCompiler.exe pid 70004211 39.7%, UnityShaderCompiler.exe pid 70004212 0%); 1 Unity editor(s) busy importing, compiling or in Play Mode at up to 79.3% CPU (limit 60%)",
+          "data": {
+            "workers": {
+              "cpuPercent": 79.3,
+              "limitPercent": 20,
+              "processCount": 3
+            },
+            "editor": {
+              "cpuPercent": 79.3,
+              "limitPercent": 60,
+              "processCount": 1
+            }
+          }
+        }
+      ],
+      "notes": [
+        "ocu-model-16k is not loaded",
+        "video memory: free 21.5 GiB minus the model's 18.6 GiB leaves 2.9 GiB (minimum 1.5 GiB)",
+        "GPU utilization 3% (limit 60%)",
+        "1 Unity editor(s) open (maximum 3)"
+      ],
+      "cacheSec": 0,
+      "checkedAt": "2026-09-17T12:00:00.000Z",
+      "target": {
+        "modelTag": "ocu-model-16k",
+        "numCtx": 16384
+      },
+      "model": {
+        "loaded": false,
+        "state": "not-listed",
+        "contextLength": null,
+        "expiresInSec": null,
+        "sizeVramMiB": 0,
+        "reclaimableMiB": 0,
+        "otherModels": []
+      },
+      "measurements": {
+        "gpu": {
+          "memory": {
+            "ok": true,
+            "totalMiB": 24576,
+            "freeMiB": 22000
+          },
+          "utilization": {
+            "ok": true,
+            "samples": [
+              3
+            ]
+          },
+          "gpuCount": 1
+        },
+        "unity": {
+          "ok": true,
+          "running": true,
+          "detailsRead": true,
+          "editorCount": 1,
+          "cpuSampled": true,
+          "elapsedMs": 1512.4,
+          "importProcesses": [
+            {
+              "pid": 70004210,
+              "name": "UnityShaderCompiler.exe",
+              "cpuPercent": 39.7
+            },
+            {
+              "pid": 70004211,
+              "name": "UnityShaderCompiler.exe",
+              "cpuPercent": 39.7
+            },
+            {
+              "pid": 70004212,
+              "name": "UnityShaderCompiler.exe",
+              "cpuPercent": 0
+            }
+          ],
+          "importCpuPercent": 79.3,
+          "editors": [
+            {
+              "pid": 70004100,
+              "name": "Unity.exe",
+              "cpuPercent": 79.3
+            }
+          ],
+          "busiestEditorCpuPercent": 79.3,
+          "unreadable": []
+        },
+        "loadedModels": []
+      }
+    },
+    "calls": [
+      {
+        "kind": "fetch",
+        "at": 0,
+        "url": "http://127.0.0.1:11434/api/ps"
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "nvidia-smi",
+        "args": [
+          "--query-gpu=index,memory.total,memory.free,utilization.gpu",
+          "--format=csv,noheader,nounits"
+        ],
+        "timeoutMs": 10000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "C:\\Windows\\System32\\tasklist.exe",
+        "args": [
+          "/FI",
+          "IMAGENAME eq Unity.exe",
+          "/FO",
+          "CSV",
+          "/NH"
+        ],
+        "timeoutMs": 5000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+        "args": [
+          "-NoProfile",
+          "-NonInteractive",
+          "-Command",
+          "-"
+        ],
+        "timeoutMs": 11500,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": "$ocuSampleMs = 1500; $ocuSampleCpu = $true; $ocuPatterns = @('QXNzZXRJbXBvcnRXb3JrZXI=', 'LWltcG9ydFdvcmtlcg==')"
+      }
+    ]
+  },
+  "cold-many-editors": {
+    "verdict": {
+      "verdict": "blocked",
+      "pass": false,
+      "path": "cold",
+      "mode": "stop",
+      "reasons": [
+        {
+          "id": "too_many_editors",
+          "mode": "stop",
+          "detail": "4 Unity editors are open (guard.maxUnityEditors 3)",
+          "data": {
+            "editorCount": 4,
+            "maxUnityEditors": 3
+          }
+        }
+      ],
+      "notes": [
+        "ocu-model-16k is not loaded",
+        "video memory: free 21.5 GiB minus the model's 18.6 GiB leaves 2.9 GiB (minimum 1.5 GiB)",
+        "GPU utilization 3% (limit 60%)",
+        "0 import process(es) at 0% CPU (limit 20%)",
+        "busiest Unity editor at 5.3% CPU (limit 60%)"
+      ],
+      "cacheSec": 0,
+      "checkedAt": "2026-09-17T12:00:00.000Z",
+      "target": {
+        "modelTag": "ocu-model-16k",
+        "numCtx": 16384
+      },
+      "model": {
+        "loaded": false,
+        "state": "not-listed",
+        "contextLength": null,
+        "expiresInSec": null,
+        "sizeVramMiB": 0,
+        "reclaimableMiB": 0,
+        "otherModels": []
+      },
+      "measurements": {
+        "gpu": {
+          "memory": {
+            "ok": true,
+            "totalMiB": 24576,
+            "freeMiB": 22000
+          },
+          "utilization": {
+            "ok": true,
+            "samples": [
+              3
+            ]
+          },
+          "gpuCount": 1
+        },
+        "unity": {
+          "ok": true,
+          "running": true,
+          "detailsRead": true,
+          "editorCount": 4,
+          "cpuSampled": true,
+          "elapsedMs": 1512.4,
+          "importProcesses": [],
+          "importCpuPercent": 0,
+          "editors": [
+            {
+              "pid": 70004100,
+              "name": "Unity.exe",
+              "cpuPercent": 5.3
+            },
+            {
+              "pid": 70004101,
+              "name": "Unity.exe",
+              "cpuPercent": 3.3
+            },
+            {
+              "pid": 70004102,
+              "name": "Unity.exe",
+              "cpuPercent": 4
+            },
+            {
+              "pid": 70004103,
+              "name": "Unity.exe",
+              "cpuPercent": 3.3
+            }
+          ],
+          "busiestEditorCpuPercent": 5.3,
+          "unreadable": []
+        },
+        "loadedModels": []
+      }
+    },
+    "calls": [
+      {
+        "kind": "fetch",
+        "at": 0,
+        "url": "http://127.0.0.1:11434/api/ps"
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "nvidia-smi",
+        "args": [
+          "--query-gpu=index,memory.total,memory.free,utilization.gpu",
+          "--format=csv,noheader,nounits"
+        ],
+        "timeoutMs": 10000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "C:\\Windows\\System32\\tasklist.exe",
+        "args": [
+          "/FI",
+          "IMAGENAME eq Unity.exe",
+          "/FO",
+          "CSV",
+          "/NH"
+        ],
+        "timeoutMs": 5000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+        "args": [
+          "-NoProfile",
+          "-NonInteractive",
+          "-Command",
+          "-"
+        ],
+        "timeoutMs": 11500,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": "$ocuSampleMs = 1500; $ocuSampleCpu = $true; $ocuPatterns = @('QXNzZXRJbXBvcnRXb3JrZXI=', 'LWltcG9ydFdvcmtlcg==')"
+      }
+    ]
+  },
+  "cold-unreadable": {
+    "verdict": {
+      "verdict": "blocked",
+      "pass": false,
+      "path": "cold",
+      "mode": "stop",
+      "reasons": [
+        {
+          "id": "probe_failed",
+          "mode": "stop",
+          "detail": "CPU time of 1 Unity process(es) could not be read: Unity.exe pid 70004310: Access is denied",
+          "data": {
+            "probe": "processes",
+            "error": "CPU time of 1 Unity process(es) could not be read: Unity.exe pid 70004310: Access is denied"
+          }
+        },
+        {
+          "id": "import_busy",
+          "mode": "stop",
+          "detail": "Unity asset import running: 1 process(es) at 59.5% CPU over 1512 ms (limit 20%; Unity.exe pid 70004313 59.5%)",
+          "data": {
+            "workers": {
+              "cpuPercent": 59.5,
+              "limitPercent": 20,
+              "processCount": 1
+            },
+            "editor": null
+          }
+        }
+      ],
+      "notes": [
+        "ocu-model-16k is not loaded",
+        "video memory: free 21.5 GiB minus the model's 18.6 GiB leaves 2.9 GiB (minimum 1.5 GiB)",
+        "GPU utilization 3% (limit 60%)",
+        "1 Unity editor(s) open (maximum 3)"
+      ],
+      "cacheSec": 0,
+      "checkedAt": "2026-09-17T12:00:00.000Z",
+      "target": {
+        "modelTag": "ocu-model-16k",
+        "numCtx": 16384
+      },
+      "model": {
+        "loaded": false,
+        "state": "not-listed",
+        "contextLength": null,
+        "expiresInSec": null,
+        "sizeVramMiB": 0,
+        "reclaimableMiB": 0,
+        "otherModels": []
+      },
+      "measurements": {
+        "gpu": {
+          "memory": {
+            "ok": true,
+            "totalMiB": 24576,
+            "freeMiB": 22000
+          },
+          "utilization": {
+            "ok": true,
+            "samples": [
+              3
+            ]
+          },
+          "gpuCount": 1
+        },
+        "unity": {
+          "ok": true,
+          "running": true,
+          "detailsRead": true,
+          "editorCount": 1,
+          "cpuSampled": true,
+          "elapsedMs": 1512.4,
+          "importProcesses": [
+            {
+              "pid": 70004313,
+              "name": "Unity.exe",
+              "cpuPercent": 59.5
+            }
+          ],
+          "importCpuPercent": 59.5,
+          "editors": [
+            {
+              "pid": 70004100,
+              "name": "Unity.exe",
+              "cpuPercent": 5.3
+            }
+          ],
+          "busiestEditorCpuPercent": 5.3,
+          "unreadable": [
+            {
+              "pid": 70004310,
+              "name": "Unity.exe",
+              "kind": "import",
+              "error": "Access is denied"
+            }
+          ]
+        },
+        "loadedModels": []
+      }
+    },
+    "calls": [
+      {
+        "kind": "fetch",
+        "at": 0,
+        "url": "http://127.0.0.1:11434/api/ps"
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "nvidia-smi",
+        "args": [
+          "--query-gpu=index,memory.total,memory.free,utilization.gpu",
+          "--format=csv,noheader,nounits"
+        ],
+        "timeoutMs": 10000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "C:\\Windows\\System32\\tasklist.exe",
+        "args": [
+          "/FI",
+          "IMAGENAME eq Unity.exe",
+          "/FO",
+          "CSV",
+          "/NH"
+        ],
+        "timeoutMs": 5000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+        "args": [
+          "-NoProfile",
+          "-NonInteractive",
+          "-Command",
+          "-"
+        ],
+        "timeoutMs": 11500,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": "$ocuSampleMs = 1500; $ocuSampleCpu = $true; $ocuPatterns = @('QXNzZXRJbXBvcnRXb3JrZXI=', 'LWltcG9ydFdvcmtlcg==')"
+      }
+    ]
+  },
+  "cold-image-name-spellings": {
+    "verdict": {
+      "verdict": "blocked",
+      "pass": false,
+      "path": "cold",
+      "mode": "stop",
+      "reasons": [
+        {
+          "id": "import_busy",
+          "mode": "stop",
+          "detail": "Unity asset import running: 3 process(es) at 142.1% CPU over 1500 ms (limit 20%; UnityShaderCompiler pid 70004109 47.4%, Unity.EXE pid 70004101 47.3%, unityshadercompiler.Exe pid 70004102 47.3%)",
+          "data": {
+            "workers": {
+              "cpuPercent": 142.1,
+              "limitPercent": 20,
+              "processCount": 3
+            },
+            "editor": null
+          }
+        }
+      ],
+      "notes": [
+        "ocu-model-16k is not loaded",
+        "video memory: free 21.5 GiB minus the model's 18.6 GiB leaves 2.9 GiB (minimum 1.5 GiB)",
+        "GPU utilization 3% (limit 60%)",
+        "2 Unity editor(s) open (maximum 3)"
+      ],
+      "cacheSec": 0,
+      "checkedAt": "2026-09-17T12:00:00.000Z",
+      "target": {
+        "modelTag": "ocu-model-16k",
+        "numCtx": 16384
+      },
+      "model": {
+        "loaded": false,
+        "state": "not-listed",
+        "contextLength": null,
+        "expiresInSec": null,
+        "sizeVramMiB": 0,
+        "reclaimableMiB": 0,
+        "otherModels": []
+      },
+      "measurements": {
+        "gpu": {
+          "memory": {
+            "ok": true,
+            "totalMiB": 24576,
+            "freeMiB": 22000
+          },
+          "utilization": {
+            "ok": true,
+            "samples": [
+              3
+            ]
+          },
+          "gpuCount": 1
+        },
+        "unity": {
+          "ok": true,
+          "running": true,
+          "detailsRead": true,
+          "editorCount": 2,
+          "cpuSampled": true,
+          "elapsedMs": 1500,
+          "importProcesses": [
+            {
+              "pid": 70004101,
+              "name": "Unity.EXE",
+              "cpuPercent": 47.3
+            },
+            {
+              "pid": 70004102,
+              "name": "unityshadercompiler.Exe",
+              "cpuPercent": 47.3
+            },
+            {
+              "pid": 70004109,
+              "name": "UnityShaderCompiler",
+              "cpuPercent": 47.4
+            }
+          ],
+          "importCpuPercent": 142.1,
+          "editors": [
+            {
+              "pid": 70004100,
+              "name": "UNITY.EXE",
+              "cpuPercent": 47.3
+            },
+            {
+              "pid": 70004103,
+              "name": "Unity",
+              "cpuPercent": 47.4
+            }
+          ],
+          "busiestEditorCpuPercent": 47.4,
+          "unreadable": []
+        },
+        "loadedModels": []
+      }
+    },
+    "calls": [
+      {
+        "kind": "fetch",
+        "at": 0,
+        "url": "http://127.0.0.1:11434/api/ps"
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "nvidia-smi",
+        "args": [
+          "--query-gpu=index,memory.total,memory.free,utilization.gpu",
+          "--format=csv,noheader,nounits"
+        ],
+        "timeoutMs": 10000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "C:\\Windows\\System32\\tasklist.exe",
+        "args": [
+          "/FI",
+          "IMAGENAME eq Unity.exe",
+          "/FO",
+          "CSV",
+          "/NH"
+        ],
+        "timeoutMs": 5000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+        "args": [
+          "-NoProfile",
+          "-NonInteractive",
+          "-Command",
+          "-"
+        ],
+        "timeoutMs": 11500,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": "$ocuSampleMs = 1500; $ocuSampleCpu = $true; $ocuPatterns = @('QXNzZXRJbXBvcnRXb3JrZXI=', 'LWltcG9ydFdvcmtlcg==')"
+      }
+    ]
+  },
+  "cold-image-name-spellings-no-editor-limit": {
+    "verdict": {
+      "verdict": "blocked",
+      "pass": false,
+      "path": "cold",
+      "mode": "stop",
+      "reasons": [
+        {
+          "id": "import_busy",
+          "mode": "stop",
+          "detail": "Unity asset import running: 3 process(es) at 142.1% CPU over 1500 ms (limit 20%; UnityShaderCompiler pid 70004109 47.4%, Unity.EXE pid 70004101 47.3%, unityshadercompiler.Exe pid 70004102 47.3%)",
+          "data": {
+            "workers": {
+              "cpuPercent": 142.1,
+              "limitPercent": 20,
+              "processCount": 3
+            },
+            "editor": null
+          }
+        }
+      ],
+      "notes": [
+        "ocu-model-16k is not loaded",
+        "video memory: free 21.5 GiB minus the model's 18.6 GiB leaves 2.9 GiB (minimum 1.5 GiB)",
+        "GPU utilization 3% (limit 60%)"
+      ],
+      "cacheSec": 0,
+      "checkedAt": "2026-09-17T12:00:00.000Z",
+      "target": {
+        "modelTag": "ocu-model-16k",
+        "numCtx": 16384
+      },
+      "model": {
+        "loaded": false,
+        "state": "not-listed",
+        "contextLength": null,
+        "expiresInSec": null,
+        "sizeVramMiB": 0,
+        "reclaimableMiB": 0,
+        "otherModels": []
+      },
+      "measurements": {
+        "gpu": {
+          "memory": {
+            "ok": true,
+            "totalMiB": 24576,
+            "freeMiB": 22000
+          },
+          "utilization": {
+            "ok": true,
+            "samples": [
+              3
+            ]
+          },
+          "gpuCount": 1
+        },
+        "unity": {
+          "ok": true,
+          "running": true,
+          "detailsRead": true,
+          "editorCount": 2,
+          "cpuSampled": true,
+          "elapsedMs": 1500,
+          "importProcesses": [
+            {
+              "pid": 70004101,
+              "name": "Unity.EXE",
+              "cpuPercent": 47.3
+            },
+            {
+              "pid": 70004102,
+              "name": "unityshadercompiler.Exe",
+              "cpuPercent": 47.3
+            },
+            {
+              "pid": 70004109,
+              "name": "UnityShaderCompiler",
+              "cpuPercent": 47.4
+            }
+          ],
+          "importCpuPercent": 142.1,
+          "editors": [
+            {
+              "pid": 70004100,
+              "name": "UNITY.EXE",
+              "cpuPercent": 47.3
+            },
+            {
+              "pid": 70004103,
+              "name": "Unity",
+              "cpuPercent": 47.4
+            }
+          ],
+          "busiestEditorCpuPercent": 47.4,
+          "unreadable": []
+        },
+        "loadedModels": []
+      }
+    },
+    "calls": [
+      {
+        "kind": "fetch",
+        "at": 0,
+        "url": "http://127.0.0.1:11434/api/ps"
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "nvidia-smi",
+        "args": [
+          "--query-gpu=index,memory.total,memory.free,utilization.gpu",
+          "--format=csv,noheader,nounits"
+        ],
+        "timeoutMs": 10000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "C:\\Windows\\System32\\tasklist.exe",
+        "args": [
+          "/FI",
+          "IMAGENAME eq Unity.exe",
+          "/FO",
+          "CSV",
+          "/NH"
+        ],
+        "timeoutMs": 5000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+        "args": [
+          "-NoProfile",
+          "-NonInteractive",
+          "-Command",
+          "-"
+        ],
+        "timeoutMs": 11500,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": "$ocuSampleMs = 1500; $ocuSampleCpu = $true; $ocuPatterns = @('QXNzZXRJbXBvcnRXb3JrZXI=', 'LWltcG9ydFdvcmtlcg==')"
+      }
+    ]
+  },
+  "cold-custom-patterns": {
+    "verdict": {
+      "verdict": "pass",
+      "pass": true,
+      "path": "cold",
+      "mode": null,
+      "reasons": [],
+      "notes": [
+        "ocu-model-16k is not loaded",
+        "video memory: free 21.5 GiB minus the model's 18.6 GiB leaves 2.9 GiB (minimum 1.5 GiB)",
+        "GPU utilization 3% (limit 60%)",
+        "0 import process(es) at 0% CPU (limit 20%)",
+        "busiest Unity editor at 5.3% CPU (limit 60%)",
+        "1 Unity editor(s) open (maximum 3)"
+      ],
+      "cacheSec": 3,
+      "checkedAt": "2026-09-17T12:00:00.000Z",
+      "target": {
+        "modelTag": "ocu-model-16k",
+        "numCtx": 16384
+      },
+      "model": {
+        "loaded": false,
+        "state": "not-listed",
+        "contextLength": null,
+        "expiresInSec": null,
+        "sizeVramMiB": 0,
+        "reclaimableMiB": 0,
+        "otherModels": []
+      },
+      "measurements": {
+        "gpu": {
+          "memory": {
+            "ok": true,
+            "totalMiB": 24576,
+            "freeMiB": 22000
+          },
+          "utilization": {
+            "ok": true,
+            "samples": [
+              3
+            ]
+          },
+          "gpuCount": 1
+        },
+        "unity": {
+          "ok": true,
+          "running": true,
+          "detailsRead": true,
+          "editorCount": 1,
+          "cpuSampled": true,
+          "elapsedMs": 1512.4,
+          "importProcesses": [],
+          "importCpuPercent": 0,
+          "editors": [
+            {
+              "pid": 70004100,
+              "name": "Unity.exe",
+              "cpuPercent": 5.3
+            }
+          ],
+          "busiestEditorCpuPercent": 5.3,
+          "unreadable": []
+        },
+        "loadedModels": []
+      }
+    },
+    "calls": [
+      {
+        "kind": "fetch",
+        "at": 0,
+        "url": "http://127.0.0.1:11434/api/ps"
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "nvidia-smi",
+        "args": [
+          "--query-gpu=index,memory.total,memory.free,utilization.gpu",
+          "--format=csv,noheader,nounits"
+        ],
+        "timeoutMs": 10000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "C:\\Windows\\System32\\tasklist.exe",
+        "args": [
+          "/FI",
+          "IMAGENAME eq Unity.exe",
+          "/FO",
+          "CSV",
+          "/NH"
+        ],
+        "timeoutMs": 5000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+        "args": [
+          "-NoProfile",
+          "-NonInteractive",
+          "-Command",
+          "-"
+        ],
+        "timeoutMs": 11500,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": "$ocuSampleMs = 1500; $ocuSampleCpu = $true; $ocuPatterns = @('bm8tc3VjaC13b3JrZXI=')"
+      }
+    ]
+  },
+  "cold-tasklist-missing": {
+    "verdict": {
+      "verdict": "blocked",
+      "pass": false,
+      "path": "cold",
+      "mode": "stop",
+      "reasons": [
+        {
+          "id": "probe_failed",
+          "mode": "stop",
+          "detail": "tasklist could not start (ENOENT)",
+          "data": {
+            "probe": "processes",
+            "error": "tasklist could not start (ENOENT)"
+          }
+        }
+      ],
+      "notes": [
+        "ocu-model-16k is not loaded",
+        "video memory: free 21.5 GiB minus the model's 18.6 GiB leaves 2.9 GiB (minimum 1.5 GiB)",
+        "GPU utilization 3% (limit 60%)"
+      ],
+      "cacheSec": 0,
+      "checkedAt": "2026-09-17T12:00:00.000Z",
+      "target": {
+        "modelTag": "ocu-model-16k",
+        "numCtx": 16384
+      },
+      "model": {
+        "loaded": false,
+        "state": "not-listed",
+        "contextLength": null,
+        "expiresInSec": null,
+        "sizeVramMiB": 0,
+        "reclaimableMiB": 0,
+        "otherModels": []
+      },
+      "measurements": {
+        "gpu": {
+          "memory": {
+            "ok": true,
+            "totalMiB": 24576,
+            "freeMiB": 22000
+          },
+          "utilization": {
+            "ok": true,
+            "samples": [
+              3
+            ]
+          },
+          "gpuCount": 1
+        },
+        "unity": {
+          "ok": false,
+          "error": "tasklist could not start (ENOENT)"
+        },
+        "loadedModels": []
+      }
+    },
+    "calls": [
+      {
+        "kind": "fetch",
+        "at": 0,
+        "url": "http://127.0.0.1:11434/api/ps"
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "nvidia-smi",
+        "args": [
+          "--query-gpu=index,memory.total,memory.free,utilization.gpu",
+          "--format=csv,noheader,nounits"
+        ],
+        "timeoutMs": 10000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "C:\\Windows\\System32\\tasklist.exe",
+        "args": [
+          "/FI",
+          "IMAGENAME eq Unity.exe",
+          "/FO",
+          "CSV",
+          "/NH"
+        ],
+        "timeoutMs": 5000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      }
+    ]
+  },
+  "cold-tasklist-garbage": {
+    "verdict": {
+      "verdict": "blocked",
+      "pass": false,
+      "path": "cold",
+      "mode": "stop",
+      "reasons": [
+        {
+          "id": "probe_failed",
+          "mode": "stop",
+          "detail": "unexpected tasklist output 'something else'",
+          "data": {
+            "probe": "processes",
+            "error": "unexpected tasklist output 'something else'"
+          }
+        }
+      ],
+      "notes": [
+        "ocu-model-16k is not loaded",
+        "video memory: free 21.5 GiB minus the model's 18.6 GiB leaves 2.9 GiB (minimum 1.5 GiB)",
+        "GPU utilization 3% (limit 60%)"
+      ],
+      "cacheSec": 0,
+      "checkedAt": "2026-09-17T12:00:00.000Z",
+      "target": {
+        "modelTag": "ocu-model-16k",
+        "numCtx": 16384
+      },
+      "model": {
+        "loaded": false,
+        "state": "not-listed",
+        "contextLength": null,
+        "expiresInSec": null,
+        "sizeVramMiB": 0,
+        "reclaimableMiB": 0,
+        "otherModels": []
+      },
+      "measurements": {
+        "gpu": {
+          "memory": {
+            "ok": true,
+            "totalMiB": 24576,
+            "freeMiB": 22000
+          },
+          "utilization": {
+            "ok": true,
+            "samples": [
+              3
+            ]
+          },
+          "gpuCount": 1
+        },
+        "unity": {
+          "ok": false,
+          "error": "unexpected tasklist output 'something else'"
+        },
+        "loadedModels": []
+      }
+    },
+    "calls": [
+      {
+        "kind": "fetch",
+        "at": 0,
+        "url": "http://127.0.0.1:11434/api/ps"
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "nvidia-smi",
+        "args": [
+          "--query-gpu=index,memory.total,memory.free,utilization.gpu",
+          "--format=csv,noheader,nounits"
+        ],
+        "timeoutMs": 10000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "C:\\Windows\\System32\\tasklist.exe",
+        "args": [
+          "/FI",
+          "IMAGENAME eq Unity.exe",
+          "/FO",
+          "CSV",
+          "/NH"
+        ],
+        "timeoutMs": 5000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      }
+    ]
+  },
+  "cold-tasklist-other-program": {
+    "verdict": {
+      "verdict": "blocked",
+      "pass": false,
+      "path": "cold",
+      "mode": "stop",
+      "reasons": [
+        {
+          "id": "probe_failed",
+          "mode": "stop",
+          "detail": "unexpected tasklist row '\"notepad.exe\",\"5100\",\"Console\",\"1\",\"1 K\"'",
+          "data": {
+            "probe": "processes",
+            "error": "unexpected tasklist row '\"notepad.exe\",\"5100\",\"Console\",\"1\",\"1 K\"'"
+          }
+        }
+      ],
+      "notes": [
+        "ocu-model-16k is not loaded",
+        "video memory: free 21.5 GiB minus the model's 18.6 GiB leaves 2.9 GiB (minimum 1.5 GiB)",
+        "GPU utilization 3% (limit 60%)"
+      ],
+      "cacheSec": 0,
+      "checkedAt": "2026-09-17T12:00:00.000Z",
+      "target": {
+        "modelTag": "ocu-model-16k",
+        "numCtx": 16384
+      },
+      "model": {
+        "loaded": false,
+        "state": "not-listed",
+        "contextLength": null,
+        "expiresInSec": null,
+        "sizeVramMiB": 0,
+        "reclaimableMiB": 0,
+        "otherModels": []
+      },
+      "measurements": {
+        "gpu": {
+          "memory": {
+            "ok": true,
+            "totalMiB": 24576,
+            "freeMiB": 22000
+          },
+          "utilization": {
+            "ok": true,
+            "samples": [
+              3
+            ]
+          },
+          "gpuCount": 1
+        },
+        "unity": {
+          "ok": false,
+          "error": "unexpected tasklist row '\"notepad.exe\",\"5100\",\"Console\",\"1\",\"1 K\"'"
+        },
+        "loadedModels": []
+      }
+    },
+    "calls": [
+      {
+        "kind": "fetch",
+        "at": 0,
+        "url": "http://127.0.0.1:11434/api/ps"
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "nvidia-smi",
+        "args": [
+          "--query-gpu=index,memory.total,memory.free,utilization.gpu",
+          "--format=csv,noheader,nounits"
+        ],
+        "timeoutMs": 10000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "C:\\Windows\\System32\\tasklist.exe",
+        "args": [
+          "/FI",
+          "IMAGENAME eq Unity.exe",
+          "/FO",
+          "CSV",
+          "/NH"
+        ],
+        "timeoutMs": 5000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      }
+    ]
+  },
+  "cold-powershell-failure-json": {
+    "verdict": {
+      "verdict": "blocked",
+      "pass": false,
+      "path": "cold",
+      "mode": "stop",
+      "reasons": [
+        {
+          "id": "probe_failed",
+          "mode": "stop",
+          "detail": "powershell.exe process probe exited with code 1: Access denied by the CIM service",
+          "data": {
+            "probe": "processes",
+            "error": "powershell.exe process probe exited with code 1: Access denied by the CIM service"
+          }
+        }
+      ],
+      "notes": [
+        "ocu-model-16k is not loaded",
+        "video memory: free 21.5 GiB minus the model's 18.6 GiB leaves 2.9 GiB (minimum 1.5 GiB)",
+        "GPU utilization 3% (limit 60%)"
+      ],
+      "cacheSec": 0,
+      "checkedAt": "2026-09-17T12:00:00.000Z",
+      "target": {
+        "modelTag": "ocu-model-16k",
+        "numCtx": 16384
+      },
+      "model": {
+        "loaded": false,
+        "state": "not-listed",
+        "contextLength": null,
+        "expiresInSec": null,
+        "sizeVramMiB": 0,
+        "reclaimableMiB": 0,
+        "otherModels": []
+      },
+      "measurements": {
+        "gpu": {
+          "memory": {
+            "ok": true,
+            "totalMiB": 24576,
+            "freeMiB": 22000
+          },
+          "utilization": {
+            "ok": true,
+            "samples": [
+              3
+            ]
+          },
+          "gpuCount": 1
+        },
+        "unity": {
+          "ok": false,
+          "error": "powershell.exe process probe exited with code 1: Access denied by the CIM service"
+        },
+        "loadedModels": []
+      }
+    },
+    "calls": [
+      {
+        "kind": "fetch",
+        "at": 0,
+        "url": "http://127.0.0.1:11434/api/ps"
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "nvidia-smi",
+        "args": [
+          "--query-gpu=index,memory.total,memory.free,utilization.gpu",
+          "--format=csv,noheader,nounits"
+        ],
+        "timeoutMs": 10000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "C:\\Windows\\System32\\tasklist.exe",
+        "args": [
+          "/FI",
+          "IMAGENAME eq Unity.exe",
+          "/FO",
+          "CSV",
+          "/NH"
+        ],
+        "timeoutMs": 5000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+        "args": [
+          "-NoProfile",
+          "-NonInteractive",
+          "-Command",
+          "-"
+        ],
+        "timeoutMs": 11500,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": "$ocuSampleMs = 1500; $ocuSampleCpu = $true; $ocuPatterns = @('QXNzZXRJbXBvcnRXb3JrZXI=', 'LWltcG9ydFdvcmtlcg==')"
+      }
+    ]
+  },
+  "cold-powershell-no-json": {
+    "verdict": {
+      "verdict": "blocked",
+      "pass": false,
+      "path": "cold",
+      "mode": "stop",
+      "reasons": [
+        {
+          "id": "probe_failed",
+          "mode": "stop",
+          "detail": "powershell.exe process probe printed no JSON: nothing useful",
+          "data": {
+            "probe": "processes",
+            "error": "powershell.exe process probe printed no JSON: nothing useful"
+          }
+        }
+      ],
+      "notes": [
+        "ocu-model-16k is not loaded",
+        "video memory: free 21.5 GiB minus the model's 18.6 GiB leaves 2.9 GiB (minimum 1.5 GiB)",
+        "GPU utilization 3% (limit 60%)"
+      ],
+      "cacheSec": 0,
+      "checkedAt": "2026-09-17T12:00:00.000Z",
+      "target": {
+        "modelTag": "ocu-model-16k",
+        "numCtx": 16384
+      },
+      "model": {
+        "loaded": false,
+        "state": "not-listed",
+        "contextLength": null,
+        "expiresInSec": null,
+        "sizeVramMiB": 0,
+        "reclaimableMiB": 0,
+        "otherModels": []
+      },
+      "measurements": {
+        "gpu": {
+          "memory": {
+            "ok": true,
+            "totalMiB": 24576,
+            "freeMiB": 22000
+          },
+          "utilization": {
+            "ok": true,
+            "samples": [
+              3
+            ]
+          },
+          "gpuCount": 1
+        },
+        "unity": {
+          "ok": false,
+          "error": "powershell.exe process probe printed no JSON: nothing useful"
+        },
+        "loadedModels": []
+      }
+    },
+    "calls": [
+      {
+        "kind": "fetch",
+        "at": 0,
+        "url": "http://127.0.0.1:11434/api/ps"
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "nvidia-smi",
+        "args": [
+          "--query-gpu=index,memory.total,memory.free,utilization.gpu",
+          "--format=csv,noheader,nounits"
+        ],
+        "timeoutMs": 10000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "C:\\Windows\\System32\\tasklist.exe",
+        "args": [
+          "/FI",
+          "IMAGENAME eq Unity.exe",
+          "/FO",
+          "CSV",
+          "/NH"
+        ],
+        "timeoutMs": 5000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+        "args": [
+          "-NoProfile",
+          "-NonInteractive",
+          "-Command",
+          "-"
+        ],
+        "timeoutMs": 11500,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": "$ocuSampleMs = 1500; $ocuSampleCpu = $true; $ocuPatterns = @('QXNzZXRJbXBvcnRXb3JrZXI=', 'LWltcG9ydFdvcmtlcg==')"
+      }
+    ]
+  },
+  "cold-powershell-bad-schema": {
+    "verdict": {
+      "verdict": "blocked",
+      "pass": false,
+      "path": "cold",
+      "mode": "stop",
+      "reasons": [
+        {
+          "id": "probe_failed",
+          "mode": "stop",
+          "detail": "process probe output is malformed (unknown schema)",
+          "data": {
+            "probe": "processes",
+            "error": "process probe output is malformed (unknown schema)"
+          }
+        }
+      ],
+      "notes": [
+        "ocu-model-16k is not loaded",
+        "video memory: free 21.5 GiB minus the model's 18.6 GiB leaves 2.9 GiB (minimum 1.5 GiB)",
+        "GPU utilization 3% (limit 60%)"
+      ],
+      "cacheSec": 0,
+      "checkedAt": "2026-09-17T12:00:00.000Z",
+      "target": {
+        "modelTag": "ocu-model-16k",
+        "numCtx": 16384
+      },
+      "model": {
+        "loaded": false,
+        "state": "not-listed",
+        "contextLength": null,
+        "expiresInSec": null,
+        "sizeVramMiB": 0,
+        "reclaimableMiB": 0,
+        "otherModels": []
+      },
+      "measurements": {
+        "gpu": {
+          "memory": {
+            "ok": true,
+            "totalMiB": 24576,
+            "freeMiB": 22000
+          },
+          "utilization": {
+            "ok": true,
+            "samples": [
+              3
+            ]
+          },
+          "gpuCount": 1
+        },
+        "unity": {
+          "ok": false,
+          "error": "process probe output is malformed (unknown schema)"
+        },
+        "loadedModels": []
+      }
+    },
+    "calls": [
+      {
+        "kind": "fetch",
+        "at": 0,
+        "url": "http://127.0.0.1:11434/api/ps"
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "nvidia-smi",
+        "args": [
+          "--query-gpu=index,memory.total,memory.free,utilization.gpu",
+          "--format=csv,noheader,nounits"
+        ],
+        "timeoutMs": 10000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "C:\\Windows\\System32\\tasklist.exe",
+        "args": [
+          "/FI",
+          "IMAGENAME eq Unity.exe",
+          "/FO",
+          "CSV",
+          "/NH"
+        ],
+        "timeoutMs": 5000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+        "args": [
+          "-NoProfile",
+          "-NonInteractive",
+          "-Command",
+          "-"
+        ],
+        "timeoutMs": 11500,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": "$ocuSampleMs = 1500; $ocuSampleCpu = $true; $ocuPatterns = @('QXNzZXRJbXBvcnRXb3JrZXI=', 'LWltcG9ydFdvcmtlcg==')"
+      }
+    ]
+  },
+  "cold-powershell-timeout": {
+    "verdict": {
+      "verdict": "blocked",
+      "pass": false,
+      "path": "cold",
+      "mode": "stop",
+      "reasons": [
+        {
+          "id": "probe_failed",
+          "mode": "stop",
+          "detail": "powershell.exe process probe did not answer within 11.5 s",
+          "data": {
+            "probe": "processes",
+            "error": "powershell.exe process probe did not answer within 11.5 s"
+          }
+        }
+      ],
+      "notes": [
+        "ocu-model-16k is not loaded",
+        "video memory: free 21.5 GiB minus the model's 18.6 GiB leaves 2.9 GiB (minimum 1.5 GiB)",
+        "GPU utilization 3% (limit 60%)"
+      ],
+      "cacheSec": 0,
+      "checkedAt": "2026-09-17T12:00:00.000Z",
+      "target": {
+        "modelTag": "ocu-model-16k",
+        "numCtx": 16384
+      },
+      "model": {
+        "loaded": false,
+        "state": "not-listed",
+        "contextLength": null,
+        "expiresInSec": null,
+        "sizeVramMiB": 0,
+        "reclaimableMiB": 0,
+        "otherModels": []
+      },
+      "measurements": {
+        "gpu": {
+          "memory": {
+            "ok": true,
+            "totalMiB": 24576,
+            "freeMiB": 22000
+          },
+          "utilization": {
+            "ok": true,
+            "samples": [
+              3
+            ]
+          },
+          "gpuCount": 1
+        },
+        "unity": {
+          "ok": false,
+          "error": "powershell.exe process probe did not answer within 11.5 s"
+        },
+        "loadedModels": []
+      }
+    },
+    "calls": [
+      {
+        "kind": "fetch",
+        "at": 0,
+        "url": "http://127.0.0.1:11434/api/ps"
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "nvidia-smi",
+        "args": [
+          "--query-gpu=index,memory.total,memory.free,utilization.gpu",
+          "--format=csv,noheader,nounits"
+        ],
+        "timeoutMs": 10000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "C:\\Windows\\System32\\tasklist.exe",
+        "args": [
+          "/FI",
+          "IMAGENAME eq Unity.exe",
+          "/FO",
+          "CSV",
+          "/NH"
+        ],
+        "timeoutMs": 5000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+        "args": [
+          "-NoProfile",
+          "-NonInteractive",
+          "-Command",
+          "-"
+        ],
+        "timeoutMs": 11500,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": "$ocuSampleMs = 1500; $ocuSampleCpu = $true; $ocuPatterns = @('QXNzZXRJbXBvcnRXb3JrZXI=', 'LWltcG9ydFdvcmtlcg==')"
+      }
+    ]
+  },
+  "cold-everything-wrong": {
+    "verdict": {
+      "verdict": "blocked",
+      "pass": false,
+      "path": "cold",
+      "mode": "stop",
+      "reasons": [
+        {
+          "id": "vram_low",
+          "mode": "stop",
+          "detail": "not enough video memory: free 14.6 GiB minus the model's 18.6 GiB leaves -3.9 GiB (minimum 1.5 GiB)",
+          "data": {
+            "freeMiB": 15000,
+            "reclaimableMiB": 0,
+            "availableMiB": 15000,
+            "modelVramMiB": 19000,
+            "freeAfterLoadMiB": -4000,
+            "minFreeVramAfterLoadMiB": 1500
+          }
+        },
+        {
+          "id": "gpu_busy",
+          "mode": "stop",
+          "detail": "GPU utilization stayed high: 95% then 96% (limit 60%)",
+          "data": {
+            "samples": [
+              95,
+              96
+            ],
+            "maxGpuUtilPercent": 60
+          }
+        },
+        {
+          "id": "import_busy",
+          "mode": "stop",
+          "detail": "Unity asset import running: 2 process(es) at 52.9% CPU over 1512 ms (limit 20%; Unity.exe pid 70004310 33.1%, Unity.exe pid 70004311 19.8%)",
+          "data": {
+            "workers": {
+              "cpuPercent": 52.9,
+              "limitPercent": 20,
+              "processCount": 2
+            },
+            "editor": null
+          }
+        }
+      ],
+      "notes": [
+        "ocu-model-16k is not loaded",
+        "1 Unity editor(s) open (maximum 3)"
+      ],
+      "cacheSec": 0,
+      "checkedAt": "2026-09-17T12:00:00.000Z",
+      "target": {
+        "modelTag": "ocu-model-16k",
+        "numCtx": 16384
+      },
+      "model": {
+        "loaded": false,
+        "state": "not-listed",
+        "contextLength": null,
+        "expiresInSec": null,
+        "sizeVramMiB": 0,
+        "reclaimableMiB": 0,
+        "otherModels": []
+      },
+      "measurements": {
+        "gpu": {
+          "memory": {
+            "ok": true,
+            "totalMiB": 24576,
+            "freeMiB": 15000
+          },
+          "utilization": {
+            "ok": true,
+            "samples": [
+              95,
+              96
+            ]
+          },
+          "gpuCount": 1
+        },
+        "unity": {
+          "ok": true,
+          "running": true,
+          "detailsRead": true,
+          "editorCount": 1,
+          "cpuSampled": true,
+          "elapsedMs": 1512.4,
+          "importProcesses": [
+            {
+              "pid": 70004310,
+              "name": "Unity.exe",
+              "cpuPercent": 33.1
+            },
+            {
+              "pid": 70004311,
+              "name": "Unity.exe",
+              "cpuPercent": 19.8
+            }
+          ],
+          "importCpuPercent": 52.9,
+          "editors": [
+            {
+              "pid": 70004100,
+              "name": "Unity.exe",
+              "cpuPercent": 5.3
+            }
+          ],
+          "busiestEditorCpuPercent": 5.3,
+          "unreadable": []
+        },
+        "loadedModels": []
+      }
+    },
+    "calls": [
+      {
+        "kind": "fetch",
+        "at": 0,
+        "url": "http://127.0.0.1:11434/api/ps"
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "nvidia-smi",
+        "args": [
+          "--query-gpu=index,memory.total,memory.free,utilization.gpu",
+          "--format=csv,noheader,nounits"
+        ],
+        "timeoutMs": 10000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "C:\\Windows\\System32\\tasklist.exe",
+        "args": [
+          "/FI",
+          "IMAGENAME eq Unity.exe",
+          "/FO",
+          "CSV",
+          "/NH"
+        ],
+        "timeoutMs": 5000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      },
+      {
+        "kind": "sleep",
+        "at": 0,
+        "ms": 1000
+      },
+      {
+        "kind": "spawn",
+        "at": 1000,
+        "file": "nvidia-smi",
+        "args": [
+          "--query-gpu=index,memory.total,memory.free,utilization.gpu",
+          "--format=csv,noheader,nounits"
+        ],
+        "timeoutMs": 10000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      },
+      {
+        "kind": "spawn",
+        "at": 1000,
+        "file": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+        "args": [
+          "-NoProfile",
+          "-NonInteractive",
+          "-Command",
+          "-"
+        ],
+        "timeoutMs": 11500,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": "$ocuSampleMs = 1500; $ocuSampleCpu = $true; $ocuPatterns = @('QXNzZXRJbXBvcnRXb3JrZXI=', 'LWltcG9ydFdvcmtlcg==')"
+      }
+    ]
+  },
+  "cold-adapter-none": {
+    "verdict": {
+      "verdict": "pass",
+      "pass": true,
+      "path": "cold",
+      "mode": null,
+      "reasons": [],
+      "notes": [
+        "ocu-model-16k is not loaded",
+        "GPU checks are off (guard.adapter none)",
+        "1 import process(es) at 0% CPU (limit 20%)",
+        "busiest Unity editor at 5.3% CPU (limit 60%)",
+        "1 Unity editor(s) open (maximum 3)"
+      ],
+      "cacheSec": 3,
+      "checkedAt": "2026-09-17T12:00:00.000Z",
+      "target": {
+        "modelTag": "ocu-model-16k",
+        "numCtx": 16384
+      },
+      "model": {
+        "loaded": false,
+        "state": "not-listed",
+        "contextLength": null,
+        "expiresInSec": null,
+        "sizeVramMiB": 0,
+        "reclaimableMiB": 0,
+        "otherModels": []
+      },
+      "measurements": {
+        "gpu": null,
+        "unity": {
+          "ok": true,
+          "running": true,
+          "detailsRead": true,
+          "editorCount": 1,
+          "cpuSampled": true,
+          "elapsedMs": 1512.4,
+          "importProcesses": [
+            {
+              "pid": 70004200,
+              "name": "UnityShaderCompiler.exe",
+              "cpuPercent": 0
+            }
+          ],
+          "importCpuPercent": 0,
+          "editors": [
+            {
+              "pid": 70004100,
+              "name": "Unity.exe",
+              "cpuPercent": 5.3
+            }
+          ],
+          "busiestEditorCpuPercent": 5.3,
+          "unreadable": []
+        },
+        "loadedModels": []
+      }
+    },
+    "calls": [
+      {
+        "kind": "fetch",
+        "at": 0,
+        "url": "http://127.0.0.1:11434/api/ps"
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "C:\\Windows\\System32\\tasklist.exe",
+        "args": [
+          "/FI",
+          "IMAGENAME eq Unity.exe",
+          "/FO",
+          "CSV",
+          "/NH"
+        ],
+        "timeoutMs": 5000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+        "args": [
+          "-NoProfile",
+          "-NonInteractive",
+          "-Command",
+          "-"
+        ],
+        "timeoutMs": 11500,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": "$ocuSampleMs = 1500; $ocuSampleCpu = $true; $ocuPatterns = @('QXNzZXRJbXBvcnRXb3JrZXI=', 'LWltcG9ydFdvcmtlcg==')"
+      }
+    ]
+  },
+  "cold-requested-while-loaded": {
+    "verdict": {
+      "verdict": "pass",
+      "pass": true,
+      "path": "cold",
+      "mode": null,
+      "reasons": [],
+      "notes": [
+        "ocu-model-16k is loaded, but the check was asked to judge a new load",
+        "video memory: free 21.5 GiB plus 18.1 GiB the loaded model releases minus the model's 18.6 GiB leaves 21.0 GiB (minimum 1.5 GiB)",
+        "GPU utilization 3% (limit 60%)",
+        "no Unity process is running"
+      ],
+      "cacheSec": 3,
+      "checkedAt": "2026-09-17T12:00:00.000Z",
+      "target": {
+        "modelTag": "ocu-model-16k",
+        "numCtx": 16384
+      },
+      "model": {
+        "loaded": false,
+        "state": "cold-requested",
+        "contextLength": 16384,
+        "expiresInSec": 1800,
+        "sizeVramMiB": 18500,
+        "reclaimableMiB": 18500,
+        "otherModels": []
+      },
+      "measurements": {
+        "gpu": {
+          "memory": {
+            "ok": true,
+            "totalMiB": 24576,
+            "freeMiB": 22000
+          },
+          "utilization": {
+            "ok": true,
+            "samples": [
+              3
+            ]
+          },
+          "gpuCount": 1
+        },
+        "unity": {
+          "ok": true,
+          "running": false,
+          "detailsRead": true,
+          "editorCount": 0,
+          "cpuSampled": false,
+          "elapsedMs": null,
+          "importProcesses": [],
+          "importCpuPercent": 0,
+          "editors": [],
+          "busiestEditorCpuPercent": 0,
+          "unreadable": []
+        },
+        "loadedModels": [
+          {
+            "name": "ocu-model-16k:latest",
+            "model": "ocu-model-16k:latest",
+            "contextLength": 16384,
+            "expiresAt": "2026-09-17T12:30:00.000Z",
+            "sizeVramBytes": 19398656000
+          }
+        ]
+      }
+    },
+    "calls": [
+      {
+        "kind": "fetch",
+        "at": 0,
+        "url": "http://127.0.0.1:11434/api/ps"
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "nvidia-smi",
+        "args": [
+          "--query-gpu=index,memory.total,memory.free,utilization.gpu",
+          "--format=csv,noheader,nounits"
+        ],
+        "timeoutMs": 10000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "C:\\Windows\\System32\\tasklist.exe",
+        "args": [
+          "/FI",
+          "IMAGENAME eq Unity.exe",
+          "/FO",
+          "CSV",
+          "/NH"
+        ],
+        "timeoutMs": 5000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      }
+    ]
+  },
+  "loaded-clear": {
+    "verdict": {
+      "verdict": "pass",
+      "pass": true,
+      "path": "loaded",
+      "mode": null,
+      "reasons": [],
+      "notes": [
+        "ocu-model-16k is loaded at context 16384 (unloads in 1800 s); no extra video memory is needed",
+        "no Unity process is running"
+      ],
+      "cacheSec": 15,
+      "checkedAt": "2026-09-17T12:00:00.000Z",
+      "target": {
+        "modelTag": "ocu-model-16k",
+        "numCtx": 16384
+      },
+      "model": {
+        "loaded": true,
+        "state": "loaded",
+        "contextLength": 16384,
+        "expiresInSec": 1800,
+        "sizeVramMiB": 18500,
+        "reclaimableMiB": 18500,
+        "otherModels": []
+      },
+      "measurements": {
+        "gpu": null,
+        "unity": {
+          "ok": true,
+          "running": false,
+          "detailsRead": true,
+          "editorCount": 0,
+          "cpuSampled": false,
+          "elapsedMs": null,
+          "importProcesses": [],
+          "importCpuPercent": 0,
+          "editors": [],
+          "busiestEditorCpuPercent": 0,
+          "unreadable": []
+        },
+        "loadedModels": [
+          {
+            "name": "ocu-model-16k:latest",
+            "model": "ocu-model-16k:latest",
+            "contextLength": 16384,
+            "expiresAt": "2026-09-17T12:30:00.000Z",
+            "sizeVramBytes": 19398656000
+          }
+        ]
+      }
+    },
+    "calls": [
+      {
+        "kind": "fetch",
+        "at": 0,
+        "url": "http://127.0.0.1:11434/api/ps"
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "C:\\Windows\\System32\\tasklist.exe",
+        "args": [
+          "/FI",
+          "IMAGENAME eq Unity.exe",
+          "/FO",
+          "CSV",
+          "/NH"
+        ],
+        "timeoutMs": 5000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      }
+    ]
+  },
+  "loaded-import-busy": {
+    "verdict": {
+      "verdict": "blocked",
+      "pass": false,
+      "path": "loaded",
+      "mode": "retry",
+      "reasons": [
+        {
+          "id": "import_busy",
+          "mode": "retry",
+          "detail": "Unity asset import running: 2 process(es) at 52.9% CPU over 1512 ms (limit 20%; Unity.exe pid 70004310 33.1%, Unity.exe pid 70004311 19.8%)",
+          "data": {
+            "workers": {
+              "cpuPercent": 52.9,
+              "limitPercent": 20,
+              "processCount": 2
+            },
+            "editor": null
+          }
+        }
+      ],
+      "notes": [
+        "ocu-model-16k is loaded at context 16384 (unloads in 1800 s); no extra video memory is needed",
+        "1 Unity editor(s) open (maximum 3)"
+      ],
+      "cacheSec": 0,
+      "checkedAt": "2026-09-17T12:00:00.000Z",
+      "target": {
+        "modelTag": "ocu-model-16k",
+        "numCtx": 16384
+      },
+      "model": {
+        "loaded": true,
+        "state": "loaded",
+        "contextLength": 16384,
+        "expiresInSec": 1800,
+        "sizeVramMiB": 18500,
+        "reclaimableMiB": 18500,
+        "otherModels": []
+      },
+      "measurements": {
+        "gpu": null,
+        "unity": {
+          "ok": true,
+          "running": true,
+          "detailsRead": true,
+          "editorCount": 1,
+          "cpuSampled": true,
+          "elapsedMs": 1512.4,
+          "importProcesses": [
+            {
+              "pid": 70004310,
+              "name": "Unity.exe",
+              "cpuPercent": 33.1
+            },
+            {
+              "pid": 70004311,
+              "name": "Unity.exe",
+              "cpuPercent": 19.8
+            }
+          ],
+          "importCpuPercent": 52.9,
+          "editors": [
+            {
+              "pid": 70004100,
+              "name": "Unity.exe",
+              "cpuPercent": 5.3
+            }
+          ],
+          "busiestEditorCpuPercent": 5.3,
+          "unreadable": []
+        },
+        "loadedModels": [
+          {
+            "name": "ocu-model-16k:latest",
+            "model": "ocu-model-16k:latest",
+            "contextLength": 16384,
+            "expiresAt": "2026-09-17T12:30:00.000Z",
+            "sizeVramBytes": 19398656000
+          }
+        ]
+      }
+    },
+    "calls": [
+      {
+        "kind": "fetch",
+        "at": 0,
+        "url": "http://127.0.0.1:11434/api/ps"
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "C:\\Windows\\System32\\tasklist.exe",
+        "args": [
+          "/FI",
+          "IMAGENAME eq Unity.exe",
+          "/FO",
+          "CSV",
+          "/NH"
+        ],
+        "timeoutMs": 5000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+        "args": [
+          "-NoProfile",
+          "-NonInteractive",
+          "-Command",
+          "-"
+        ],
+        "timeoutMs": 11500,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": "$ocuSampleMs = 1500; $ocuSampleCpu = $true; $ocuPatterns = @('QXNzZXRJbXBvcnRXb3JrZXI=', 'LWltcG9ydFdvcmtlcg==')"
+      }
+    ]
+  },
+  "loaded-import-allowed": {
+    "verdict": {
+      "verdict": "pass",
+      "pass": true,
+      "path": "loaded",
+      "mode": null,
+      "reasons": [],
+      "notes": [
+        "ocu-model-16k is loaded at context 16384 (unloads in 1800 s); no extra video memory is needed",
+        "1 Unity editor(s) open (maximum 3)",
+        "import activity is not checked while the model is loaded (guard.importWhileLoaded allow)"
+      ],
+      "cacheSec": 15,
+      "checkedAt": "2026-09-17T12:00:00.000Z",
+      "target": {
+        "modelTag": "ocu-model-16k",
+        "numCtx": 16384
+      },
+      "model": {
+        "loaded": true,
+        "state": "loaded",
+        "contextLength": 16384,
+        "expiresInSec": 1800,
+        "sizeVramMiB": 18500,
+        "reclaimableMiB": 18500,
+        "otherModels": []
+      },
+      "measurements": {
+        "gpu": null,
+        "unity": {
+          "ok": true,
+          "running": true,
+          "detailsRead": true,
+          "editorCount": 1,
+          "cpuSampled": false,
+          "elapsedMs": null,
+          "importProcesses": [
+            {
+              "pid": 70004310,
+              "name": "Unity.exe",
+              "cpuPercent": null
+            },
+            {
+              "pid": 70004311,
+              "name": "Unity.exe",
+              "cpuPercent": null
+            }
+          ],
+          "importCpuPercent": null,
+          "editors": [
+            {
+              "pid": 70004100,
+              "name": "Unity.exe",
+              "cpuPercent": null
+            }
+          ],
+          "busiestEditorCpuPercent": null,
+          "unreadable": []
+        },
+        "loadedModels": [
+          {
+            "name": "ocu-model-16k:latest",
+            "model": "ocu-model-16k:latest",
+            "contextLength": 16384,
+            "expiresAt": "2026-09-17T12:30:00.000Z",
+            "sizeVramBytes": 19398656000
+          }
+        ]
+      }
+    },
+    "calls": [
+      {
+        "kind": "fetch",
+        "at": 0,
+        "url": "http://127.0.0.1:11434/api/ps"
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "C:\\Windows\\System32\\tasklist.exe",
+        "args": [
+          "/FI",
+          "IMAGENAME eq Unity.exe",
+          "/FO",
+          "CSV",
+          "/NH"
+        ],
+        "timeoutMs": 5000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+        "args": [
+          "-NoProfile",
+          "-NonInteractive",
+          "-Command",
+          "-"
+        ],
+        "timeoutMs": 10000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": "$ocuSampleMs = 1500; $ocuSampleCpu = $false; $ocuPatterns = @('QXNzZXRJbXBvcnRXb3JrZXI=', 'LWltcG9ydFdvcmtlcg==')"
+      }
+    ]
+  },
+  "loaded-import-allowed-no-editor-limit": {
+    "verdict": {
+      "verdict": "pass",
+      "pass": true,
+      "path": "loaded",
+      "mode": null,
+      "reasons": [],
+      "notes": [
+        "ocu-model-16k is loaded at context 16384 (unloads in 1800 s); no extra video memory is needed",
+        "import activity is not checked while the model is loaded (guard.importWhileLoaded allow)"
+      ],
+      "cacheSec": 15,
+      "checkedAt": "2026-09-17T12:00:00.000Z",
+      "target": {
+        "modelTag": "ocu-model-16k",
+        "numCtx": 16384
+      },
+      "model": {
+        "loaded": true,
+        "state": "loaded",
+        "contextLength": 16384,
+        "expiresInSec": 1800,
+        "sizeVramMiB": 18500,
+        "reclaimableMiB": 18500,
+        "otherModels": []
+      },
+      "measurements": {
+        "gpu": null,
+        "unity": {
+          "ok": true,
+          "running": true,
+          "detailsRead": false,
+          "editorCount": null,
+          "cpuSampled": false,
+          "elapsedMs": null,
+          "importProcesses": [],
+          "importCpuPercent": null,
+          "editors": [],
+          "busiestEditorCpuPercent": null,
+          "unreadable": []
+        },
+        "loadedModels": [
+          {
+            "name": "ocu-model-16k:latest",
+            "model": "ocu-model-16k:latest",
+            "contextLength": 16384,
+            "expiresAt": "2026-09-17T12:30:00.000Z",
+            "sizeVramBytes": 19398656000
+          }
+        ]
+      }
+    },
+    "calls": [
+      {
+        "kind": "fetch",
+        "at": 0,
+        "url": "http://127.0.0.1:11434/api/ps"
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "C:\\Windows\\System32\\tasklist.exe",
+        "args": [
+          "/FI",
+          "IMAGENAME eq Unity.exe",
+          "/FO",
+          "CSV",
+          "/NH"
+        ],
+        "timeoutMs": 5000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      }
+    ]
+  },
+  "loaded-many-editors": {
+    "verdict": {
+      "verdict": "blocked",
+      "pass": false,
+      "path": "loaded",
+      "mode": "stop",
+      "reasons": [
+        {
+          "id": "too_many_editors",
+          "mode": "stop",
+          "detail": "4 Unity editors are open (guard.maxUnityEditors 3)",
+          "data": {
+            "editorCount": 4,
+            "maxUnityEditors": 3
+          }
+        }
+      ],
+      "notes": [
+        "ocu-model-16k is loaded at context 16384 (unloads in 1800 s); no extra video memory is needed",
+        "0 import process(es) at 0% CPU (limit 20%)",
+        "busiest Unity editor at 5.3% CPU (limit 60%)"
+      ],
+      "cacheSec": 0,
+      "checkedAt": "2026-09-17T12:00:00.000Z",
+      "target": {
+        "modelTag": "ocu-model-16k",
+        "numCtx": 16384
+      },
+      "model": {
+        "loaded": true,
+        "state": "loaded",
+        "contextLength": 16384,
+        "expiresInSec": 1800,
+        "sizeVramMiB": 18500,
+        "reclaimableMiB": 18500,
+        "otherModels": []
+      },
+      "measurements": {
+        "gpu": null,
+        "unity": {
+          "ok": true,
+          "running": true,
+          "detailsRead": true,
+          "editorCount": 4,
+          "cpuSampled": true,
+          "elapsedMs": 1512.4,
+          "importProcesses": [],
+          "importCpuPercent": 0,
+          "editors": [
+            {
+              "pid": 70004100,
+              "name": "Unity.exe",
+              "cpuPercent": 5.3
+            },
+            {
+              "pid": 70004101,
+              "name": "Unity.exe",
+              "cpuPercent": 3.3
+            },
+            {
+              "pid": 70004102,
+              "name": "Unity.exe",
+              "cpuPercent": 4
+            },
+            {
+              "pid": 70004103,
+              "name": "Unity.exe",
+              "cpuPercent": 3.3
+            }
+          ],
+          "busiestEditorCpuPercent": 5.3,
+          "unreadable": []
+        },
+        "loadedModels": [
+          {
+            "name": "ocu-model-16k:latest",
+            "model": "ocu-model-16k:latest",
+            "contextLength": 16384,
+            "expiresAt": "2026-09-17T12:30:00.000Z",
+            "sizeVramBytes": 19398656000
+          }
+        ]
+      }
+    },
+    "calls": [
+      {
+        "kind": "fetch",
+        "at": 0,
+        "url": "http://127.0.0.1:11434/api/ps"
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "C:\\Windows\\System32\\tasklist.exe",
+        "args": [
+          "/FI",
+          "IMAGENAME eq Unity.exe",
+          "/FO",
+          "CSV",
+          "/NH"
+        ],
+        "timeoutMs": 5000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+        "args": [
+          "-NoProfile",
+          "-NonInteractive",
+          "-Command",
+          "-"
+        ],
+        "timeoutMs": 11500,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": "$ocuSampleMs = 1500; $ocuSampleCpu = $true; $ocuPatterns = @('QXNzZXRJbXBvcnRXb3JrZXI=', 'LWltcG9ydFdvcmtlcg==')"
+      }
+    ]
+  },
+  "loaded-tasklist-missing": {
+    "verdict": {
+      "verdict": "blocked",
+      "pass": false,
+      "path": "loaded",
+      "mode": "stop",
+      "reasons": [
+        {
+          "id": "probe_failed",
+          "mode": "stop",
+          "detail": "tasklist could not start (ENOENT)",
+          "data": {
+            "probe": "processes",
+            "error": "tasklist could not start (ENOENT)"
+          }
+        }
+      ],
+      "notes": [
+        "ocu-model-16k is loaded at context 16384 (unloads in 1800 s); no extra video memory is needed"
+      ],
+      "cacheSec": 0,
+      "checkedAt": "2026-09-17T12:00:00.000Z",
+      "target": {
+        "modelTag": "ocu-model-16k",
+        "numCtx": 16384
+      },
+      "model": {
+        "loaded": true,
+        "state": "loaded",
+        "contextLength": 16384,
+        "expiresInSec": 1800,
+        "sizeVramMiB": 18500,
+        "reclaimableMiB": 18500,
+        "otherModels": []
+      },
+      "measurements": {
+        "gpu": null,
+        "unity": {
+          "ok": false,
+          "error": "tasklist could not start (ENOENT)"
+        },
+        "loadedModels": [
+          {
+            "name": "ocu-model-16k:latest",
+            "model": "ocu-model-16k:latest",
+            "contextLength": 16384,
+            "expiresAt": "2026-09-17T12:30:00.000Z",
+            "sizeVramBytes": 19398656000
+          }
+        ]
+      }
+    },
+    "calls": [
+      {
+        "kind": "fetch",
+        "at": 0,
+        "url": "http://127.0.0.1:11434/api/ps"
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "C:\\Windows\\System32\\tasklist.exe",
+        "args": [
+          "/FI",
+          "IMAGENAME eq Unity.exe",
+          "/FO",
+          "CSV",
+          "/NH"
+        ],
+        "timeoutMs": 5000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      }
+    ]
+  },
+  "loaded-other-context": {
+    "verdict": {
+      "verdict": "pass",
+      "pass": true,
+      "path": "cold",
+      "mode": null,
+      "reasons": [],
+      "notes": [
+        "ocu-model-16k is loaded at context 8192, not 16384; the next request reloads it",
+        "video memory: free 21.5 GiB minus the model's 18.6 GiB leaves 2.9 GiB (minimum 1.5 GiB)",
+        "GPU utilization 3% (limit 60%)",
+        "no Unity process is running"
+      ],
+      "cacheSec": 3,
+      "checkedAt": "2026-09-17T12:00:00.000Z",
+      "target": {
+        "modelTag": "ocu-model-16k",
+        "numCtx": 16384
+      },
+      "model": {
+        "loaded": false,
+        "state": "other-context",
+        "contextLength": 8192,
+        "expiresInSec": 1800,
+        "sizeVramMiB": 18500,
+        "reclaimableMiB": 0,
+        "otherModels": []
+      },
+      "measurements": {
+        "gpu": {
+          "memory": {
+            "ok": true,
+            "totalMiB": 24576,
+            "freeMiB": 22000
+          },
+          "utilization": {
+            "ok": true,
+            "samples": [
+              3
+            ]
+          },
+          "gpuCount": 1
+        },
+        "unity": {
+          "ok": true,
+          "running": false,
+          "detailsRead": true,
+          "editorCount": 0,
+          "cpuSampled": false,
+          "elapsedMs": null,
+          "importProcesses": [],
+          "importCpuPercent": 0,
+          "editors": [],
+          "busiestEditorCpuPercent": 0,
+          "unreadable": []
+        },
+        "loadedModels": [
+          {
+            "name": "ocu-model-16k:latest",
+            "model": "ocu-model-16k:latest",
+            "contextLength": 8192,
+            "expiresAt": "2026-09-17T12:30:00.000Z",
+            "sizeVramBytes": 19398656000
+          }
+        ]
+      }
+    },
+    "calls": [
+      {
+        "kind": "fetch",
+        "at": 0,
+        "url": "http://127.0.0.1:11434/api/ps"
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "nvidia-smi",
+        "args": [
+          "--query-gpu=index,memory.total,memory.free,utilization.gpu",
+          "--format=csv,noheader,nounits"
+        ],
+        "timeoutMs": 10000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "C:\\Windows\\System32\\tasklist.exe",
+        "args": [
+          "/FI",
+          "IMAGENAME eq Unity.exe",
+          "/FO",
+          "CSV",
+          "/NH"
+        ],
+        "timeoutMs": 5000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      }
+    ]
+  },
+  "loaded-expiring": {
+    "verdict": {
+      "verdict": "pass",
+      "pass": true,
+      "path": "cold",
+      "mode": null,
+      "reasons": [],
+      "notes": [
+        "ocu-model-16k unloads in less than the keep-alive margin (unloads in 30 s); checked as a new load",
+        "video memory: free 21.5 GiB plus 18.1 GiB the loaded model releases minus the model's 18.6 GiB leaves 21.0 GiB (minimum 1.5 GiB)",
+        "GPU utilization 3% (limit 60%)",
+        "no Unity process is running"
+      ],
+      "cacheSec": 3,
+      "checkedAt": "2026-09-17T12:00:00.000Z",
+      "target": {
+        "modelTag": "ocu-model-16k",
+        "numCtx": 16384
+      },
+      "model": {
+        "loaded": false,
+        "state": "expiring",
+        "contextLength": 16384,
+        "expiresInSec": 30,
+        "sizeVramMiB": 18500,
+        "reclaimableMiB": 18500,
+        "otherModels": []
+      },
+      "measurements": {
+        "gpu": {
+          "memory": {
+            "ok": true,
+            "totalMiB": 24576,
+            "freeMiB": 22000
+          },
+          "utilization": {
+            "ok": true,
+            "samples": [
+              3
+            ]
+          },
+          "gpuCount": 1
+        },
+        "unity": {
+          "ok": true,
+          "running": false,
+          "detailsRead": true,
+          "editorCount": 0,
+          "cpuSampled": false,
+          "elapsedMs": null,
+          "importProcesses": [],
+          "importCpuPercent": 0,
+          "editors": [],
+          "busiestEditorCpuPercent": 0,
+          "unreadable": []
+        },
+        "loadedModels": [
+          {
+            "name": "ocu-model-16k:latest",
+            "model": "ocu-model-16k:latest",
+            "contextLength": 16384,
+            "expiresAt": "2026-09-17T12:00:30.000Z",
+            "sizeVramBytes": 19398656000
+          }
+        ]
+      }
+    },
+    "calls": [
+      {
+        "kind": "fetch",
+        "at": 0,
+        "url": "http://127.0.0.1:11434/api/ps"
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "nvidia-smi",
+        "args": [
+          "--query-gpu=index,memory.total,memory.free,utilization.gpu",
+          "--format=csv,noheader,nounits"
+        ],
+        "timeoutMs": 10000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "C:\\Windows\\System32\\tasklist.exe",
+        "args": [
+          "/FI",
+          "IMAGENAME eq Unity.exe",
+          "/FO",
+          "CSV",
+          "/NH"
+        ],
+        "timeoutMs": 5000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      }
+    ]
+  },
+  "loaded-other-model": {
+    "verdict": {
+      "verdict": "pass",
+      "pass": true,
+      "path": "cold",
+      "mode": null,
+      "reasons": [],
+      "notes": [
+        "ocu-model-16k is not loaded",
+        "other loaded models: someone-else:7b; their video memory is not counted as free",
+        "video memory: free 21.5 GiB minus the model's 18.6 GiB leaves 2.9 GiB (minimum 1.5 GiB)",
+        "GPU utilization 3% (limit 60%)",
+        "no Unity process is running"
+      ],
+      "cacheSec": 3,
+      "checkedAt": "2026-09-17T12:00:00.000Z",
+      "target": {
+        "modelTag": "ocu-model-16k",
+        "numCtx": 16384
+      },
+      "model": {
+        "loaded": false,
+        "state": "not-listed",
+        "contextLength": null,
+        "expiresInSec": null,
+        "sizeVramMiB": 0,
+        "reclaimableMiB": 0,
+        "otherModels": [
+          "someone-else:7b"
+        ]
+      },
+      "measurements": {
+        "gpu": {
+          "memory": {
+            "ok": true,
+            "totalMiB": 24576,
+            "freeMiB": 22000
+          },
+          "utilization": {
+            "ok": true,
+            "samples": [
+              3
+            ]
+          },
+          "gpuCount": 1
+        },
+        "unity": {
+          "ok": true,
+          "running": false,
+          "detailsRead": true,
+          "editorCount": 0,
+          "cpuSampled": false,
+          "elapsedMs": null,
+          "importProcesses": [],
+          "importCpuPercent": 0,
+          "editors": [],
+          "busiestEditorCpuPercent": 0,
+          "unreadable": []
+        },
+        "loadedModels": [
+          {
+            "name": "someone-else:7b",
+            "model": "someone-else:7b",
+            "contextLength": 16384,
+            "expiresAt": "2026-09-17T12:30:00.000Z",
+            "sizeVramBytes": 19398656000
+          }
+        ]
+      }
+    },
+    "calls": [
+      {
+        "kind": "fetch",
+        "at": 0,
+        "url": "http://127.0.0.1:11434/api/ps"
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "nvidia-smi",
+        "args": [
+          "--query-gpu=index,memory.total,memory.free,utilization.gpu",
+          "--format=csv,noheader,nounits"
+        ],
+        "timeoutMs": 10000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "C:\\Windows\\System32\\tasklist.exe",
+        "args": [
+          "/FI",
+          "IMAGENAME eq Unity.exe",
+          "/FO",
+          "CSV",
+          "/NH"
+        ],
+        "timeoutMs": 5000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      }
+    ]
+  },
+  "ollama-unreachable": {
+    "verdict": {
+      "verdict": "blocked",
+      "pass": false,
+      "path": "cold",
+      "mode": "stop",
+      "reasons": [
+        {
+          "id": "ollama_unreachable",
+          "mode": "stop",
+          "detail": "GET /api/ps failed (ECONNREFUSED)",
+          "data": {
+            "error": "GET /api/ps failed (ECONNREFUSED)"
+          }
+        }
+      ],
+      "notes": [
+        "Ollama did not answer, so the model counts as not loaded",
+        "video memory: free 21.5 GiB minus the model's 18.6 GiB leaves 2.9 GiB (minimum 1.5 GiB)",
+        "GPU utilization 3% (limit 60%)",
+        "no Unity process is running"
+      ],
+      "cacheSec": 0,
+      "checkedAt": "2026-09-17T12:00:00.000Z",
+      "target": {
+        "modelTag": "ocu-model-16k",
+        "numCtx": 16384
+      },
+      "model": {
+        "loaded": false,
+        "state": "unreadable",
+        "contextLength": null,
+        "expiresInSec": null,
+        "sizeVramMiB": 0,
+        "reclaimableMiB": 0,
+        "otherModels": []
+      },
+      "measurements": {
+        "gpu": {
+          "memory": {
+            "ok": true,
+            "totalMiB": 24576,
+            "freeMiB": 22000
+          },
+          "utilization": {
+            "ok": true,
+            "samples": [
+              3
+            ]
+          },
+          "gpuCount": 1
+        },
+        "unity": {
+          "ok": true,
+          "running": false,
+          "detailsRead": true,
+          "editorCount": 0,
+          "cpuSampled": false,
+          "elapsedMs": null,
+          "importProcesses": [],
+          "importCpuPercent": 0,
+          "editors": [],
+          "busiestEditorCpuPercent": 0,
+          "unreadable": []
+        },
+        "loadedModels": []
+      }
+    },
+    "calls": [
+      {
+        "kind": "fetch",
+        "at": 0,
+        "url": "http://127.0.0.1:11434/api/ps"
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "nvidia-smi",
+        "args": [
+          "--query-gpu=index,memory.total,memory.free,utilization.gpu",
+          "--format=csv,noheader,nounits"
+        ],
+        "timeoutMs": 10000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "C:\\Windows\\System32\\tasklist.exe",
+        "args": [
+          "/FI",
+          "IMAGENAME eq Unity.exe",
+          "/FO",
+          "CSV",
+          "/NH"
+        ],
+        "timeoutMs": 5000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      }
+    ]
+  },
+  "ollama-http-500": {
+    "verdict": {
+      "verdict": "blocked",
+      "pass": false,
+      "path": "cold",
+      "mode": "stop",
+      "reasons": [
+        {
+          "id": "ollama_unreachable",
+          "mode": "stop",
+          "detail": "GET /api/ps answered HTTP status 500",
+          "data": {
+            "error": "GET /api/ps answered HTTP status 500"
+          }
+        }
+      ],
+      "notes": [
+        "Ollama did not answer, so the model counts as not loaded",
+        "video memory: free 21.5 GiB minus the model's 18.6 GiB leaves 2.9 GiB (minimum 1.5 GiB)",
+        "GPU utilization 3% (limit 60%)",
+        "no Unity process is running"
+      ],
+      "cacheSec": 0,
+      "checkedAt": "2026-09-17T12:00:00.000Z",
+      "target": {
+        "modelTag": "ocu-model-16k",
+        "numCtx": 16384
+      },
+      "model": {
+        "loaded": false,
+        "state": "unreadable",
+        "contextLength": null,
+        "expiresInSec": null,
+        "sizeVramMiB": 0,
+        "reclaimableMiB": 0,
+        "otherModels": []
+      },
+      "measurements": {
+        "gpu": {
+          "memory": {
+            "ok": true,
+            "totalMiB": 24576,
+            "freeMiB": 22000
+          },
+          "utilization": {
+            "ok": true,
+            "samples": [
+              3
+            ]
+          },
+          "gpuCount": 1
+        },
+        "unity": {
+          "ok": true,
+          "running": false,
+          "detailsRead": true,
+          "editorCount": 0,
+          "cpuSampled": false,
+          "elapsedMs": null,
+          "importProcesses": [],
+          "importCpuPercent": 0,
+          "editors": [],
+          "busiestEditorCpuPercent": 0,
+          "unreadable": []
+        },
+        "loadedModels": []
+      }
+    },
+    "calls": [
+      {
+        "kind": "fetch",
+        "at": 0,
+        "url": "http://127.0.0.1:11434/api/ps"
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "nvidia-smi",
+        "args": [
+          "--query-gpu=index,memory.total,memory.free,utilization.gpu",
+          "--format=csv,noheader,nounits"
+        ],
+        "timeoutMs": 10000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "C:\\Windows\\System32\\tasklist.exe",
+        "args": [
+          "/FI",
+          "IMAGENAME eq Unity.exe",
+          "/FO",
+          "CSV",
+          "/NH"
+        ],
+        "timeoutMs": 5000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      }
+    ]
+  },
+  "ollama-no-models-list": {
+    "verdict": {
+      "verdict": "blocked",
+      "pass": false,
+      "path": "cold",
+      "mode": "stop",
+      "reasons": [
+        {
+          "id": "ollama_unreachable",
+          "mode": "stop",
+          "detail": "/api/ps answer has no models list",
+          "data": {
+            "error": "/api/ps answer has no models list"
+          }
+        }
+      ],
+      "notes": [
+        "Ollama did not answer, so the model counts as not loaded",
+        "video memory: free 21.5 GiB minus the model's 18.6 GiB leaves 2.9 GiB (minimum 1.5 GiB)",
+        "GPU utilization 3% (limit 60%)",
+        "no Unity process is running"
+      ],
+      "cacheSec": 0,
+      "checkedAt": "2026-09-17T12:00:00.000Z",
+      "target": {
+        "modelTag": "ocu-model-16k",
+        "numCtx": 16384
+      },
+      "model": {
+        "loaded": false,
+        "state": "unreadable",
+        "contextLength": null,
+        "expiresInSec": null,
+        "sizeVramMiB": 0,
+        "reclaimableMiB": 0,
+        "otherModels": []
+      },
+      "measurements": {
+        "gpu": {
+          "memory": {
+            "ok": true,
+            "totalMiB": 24576,
+            "freeMiB": 22000
+          },
+          "utilization": {
+            "ok": true,
+            "samples": [
+              3
+            ]
+          },
+          "gpuCount": 1
+        },
+        "unity": {
+          "ok": true,
+          "running": false,
+          "detailsRead": true,
+          "editorCount": 0,
+          "cpuSampled": false,
+          "elapsedMs": null,
+          "importProcesses": [],
+          "importCpuPercent": 0,
+          "editors": [],
+          "busiestEditorCpuPercent": 0,
+          "unreadable": []
+        },
+        "loadedModels": []
+      }
+    },
+    "calls": [
+      {
+        "kind": "fetch",
+        "at": 0,
+        "url": "http://127.0.0.1:11434/api/ps"
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "nvidia-smi",
+        "args": [
+          "--query-gpu=index,memory.total,memory.free,utilization.gpu",
+          "--format=csv,noheader,nounits"
+        ],
+        "timeoutMs": 10000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      },
+      {
+        "kind": "spawn",
+        "at": 0,
+        "file": "C:\\Windows\\System32\\tasklist.exe",
+        "args": [
+          "/FI",
+          "IMAGENAME eq Unity.exe",
+          "/FO",
+          "CSV",
+          "/NH"
+        ],
+        "timeoutMs": 5000,
+        "platform": "win32",
+        "windowsVerbatimArguments": false,
+        "input": null
+      }
+    ]
+  },
+  "remote-blocked": {
+    "verdict": {
+      "verdict": "blocked",
+      "pass": false,
+      "path": "remote",
+      "mode": "stop",
+      "reasons": [
+        {
+          "id": "remote_unguarded",
+          "mode": "stop",
+          "detail": "Ollama at 192.168.1.20 is not on this computer, so video memory and Unity activity cannot be checked",
+          "data": {
+            "host": "192.168.1.20"
+          }
+        }
+      ],
+      "notes": [],
+      "cacheSec": 0,
+      "checkedAt": "2026-09-17T12:00:00.000Z",
+      "target": {
+        "modelTag": "ocu-model-16k",
+        "numCtx": 16384
+      },
+      "model": {
+        "loaded": false,
+        "state": "unreadable",
+        "contextLength": null,
+        "expiresInSec": null,
+        "sizeVramMiB": 0,
+        "reclaimableMiB": 0,
+        "otherModels": []
+      },
+      "measurements": {
+        "gpu": null,
+        "unity": null,
+        "loadedModels": []
+      }
+    },
+    "calls": []
+  },
+  "remote-unguarded": {
+    "verdict": {
+      "verdict": "pass",
+      "pass": true,
+      "path": "remote",
+      "mode": null,
+      "reasons": [],
+      "notes": [
+        "Ollama at 192.168.1.20 is not on this computer; the guard is off (guard.remote unguarded)"
+      ],
+      "cacheSec": 3,
+      "checkedAt": "2026-09-17T12:00:00.000Z",
+      "target": {
+        "modelTag": "ocu-model-16k",
+        "numCtx": 16384
+      },
+      "model": {
+        "loaded": false,
+        "state": "unreadable",
+        "contextLength": null,
+        "expiresInSec": null,
+        "sizeVramMiB": 0,
+        "reclaimableMiB": 0,
+        "otherModels": []
+      },
+      "measurements": {
+        "gpu": null,
+        "unity": null,
+        "loadedModels": []
+      }
+    },
+    "calls": []
+  },
+  "settings-invalid": {
+    "verdict": {
+      "verdict": "blocked",
+      "pass": false,
+      "path": "cold",
+      "mode": "stop",
+      "reasons": [
+        {
+          "id": "probe_failed",
+          "mode": "stop",
+          "detail": "guard.modelVramMiB must be between 1 and 1048576",
+          "data": {
+            "probe": "settings",
+            "error": "guard.modelVramMiB must be between 1 and 1048576"
+          }
+        }
+      ],
+      "notes": [],
+      "cacheSec": 0,
+      "checkedAt": "2026-09-17T12:00:00.000Z",
+      "target": {
+        "modelTag": "ocu-model-16k",
+        "numCtx": 16384
+      },
+      "model": {
+        "loaded": false,
+        "state": "unreadable",
+        "contextLength": null,
+        "expiresInSec": null,
+        "sizeVramMiB": 0,
+        "reclaimableMiB": 0,
+        "otherModels": []
+      },
+      "measurements": {
+        "gpu": null,
+        "unity": null,
+        "loadedModels": []
+      }
+    },
+    "calls": []
+  },
+  "target-invalid": {
+    "verdict": {
+      "verdict": "blocked",
+      "pass": false,
+      "path": "cold",
+      "mode": "stop",
+      "reasons": [
+        {
+          "id": "probe_failed",
+          "mode": "stop",
+          "detail": "the context size is not a positive integer",
+          "data": {
+            "probe": "settings",
+            "error": "the context size is not a positive integer"
+          }
+        }
+      ],
+      "notes": [],
+      "cacheSec": 0,
+      "checkedAt": "2026-09-17T12:00:00.000Z",
+      "target": {
+        "modelTag": "ocu-model-16k",
+        "numCtx": -1
+      },
+      "model": {
+        "loaded": false,
+        "state": "unreadable",
+        "contextLength": null,
+        "expiresInSec": null,
+        "sizeVramMiB": 0,
+        "reclaimableMiB": 0,
+        "otherModels": []
+      },
+      "measurements": {
+        "gpu": null,
+        "unity": null,
+        "loadedModels": []
+      }
+    },
+    "calls": []
+  }
+}

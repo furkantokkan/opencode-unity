@@ -71,7 +71,7 @@ export async function run(context, dependencies = {}) {
   const warnings = [];
   /** @type {string[]} */
   const notices = [];
-  const loaded = await loadConfig(paths.config);
+  const loaded = await loadConfig(paths.config, { platform });
   const compat = loadCompat();
   const ollamaClient = dependencies.ollamaClient ?? createOllamaClient({ baseUrl: loaded.config.ollama.baseUrl });
   const preflight = dependencies.preflight ?? (await runPreflight({ platform, env, nodeVersion: process.versions.node, compat, ollama: ollamaClient, signal: context.signal }));

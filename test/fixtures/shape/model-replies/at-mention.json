@@ -1,0 +1,1 @@
+{"goal":"Fix the broken inventory as described in @Assets/Secret.cs","files":["Assets/Game/Inventory/InventoryView.cs"],"search":"","done":"The inventory refresh works; see @unity-editor for checks.","open":["is @Assets/Secret.cs still used?"]}

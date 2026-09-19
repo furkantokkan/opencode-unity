@@ -7,6 +7,7 @@ import path from 'node:path';
 import { describe, it } from 'node:test';
 import { main } from '../../src/cli/main.js';
 import { COMMANDS } from '../../src/cli/registry.js';
+import { CliError } from '../../src/cli/exit-codes.js';
 import { DEEP_NOTICE, run as runDoctor } from '../../src/commands/doctor.js';
 import { copyFixture } from '../helpers/fixture-fs.mjs';
 import { useSandbox } from '../helpers/sandbox.mjs';
@@ -43,8 +44,9 @@ function blockedProbes() {
  * @param {boolean} [options.interactive]
  * @param {Record<string, any>} [options.deps]
  * @param {(sandbox: import('../helpers/sandbox.mjs').Sandbox) => Promise<void>} [options.prepare]
+ * @param {typeof import('../../src/selftest/diagnostics.js').runDiagnostics} [options.diagnostics]
  */
-async function runCli(t, { argv, facts = MAC_FACTS, env = {}, installed = false, interactive = false, deps = {}, prepare }) {
+async function runCli(t, { argv, facts = MAC_FACTS, env = {}, installed = false, interactive = false, deps = {}, prepare, diagnostics }) {
   const sandbox = await useSandbox(t, 'doctor-command');
   const project = await copyFixture('unity-projects/u6-urp-ugui-git', sandbox.path('project'));
   await fs.mkdir(sandbox.productHome, { recursive: true });
@@ -71,7 +73,7 @@ async function runCli(t, { argv, facts = MAC_FACTS, env = {}, installed = false,
     platformFacts: facts,
     interactive,
     stdin: /** @type {any} */ (null),
-    loadCommand: async () => ({ run: (/** @type {any} */ context) => runDoctor(context, { deps: doctorDeps }) }),
+    loadCommand: async () => ({ run: (/** @type {any} */ context) => runDoctor(context, { deps: doctorDeps, diagnostics }) }),
   });
   return { exitCode, stdout: stdout.text(), stderr: stderr.text(), sandbox, project };
 }
@@ -234,16 +236,32 @@ describe('doctor --explain', () => {
   });
 });
 
-describe('doctor modes that need a later step', () => {
+describe('doctor isolated diagnostics', () => {
+  it('dry-run describes the diagnostic without launching OpenCode', async (t) => {
+    const result = await runCli(t, { argv: ['doctor', '--capture', '--dry-run', '--json'], diagnostics: async () => { throw new Error('unexpected launch'); } });
+    assert.equal(result.exitCode, 0);
+    assert.equal(JSON.parse(result.stdout).data.dryRun, true);
+  });
   for (const flag of ['--capture', '--selftest']) {
-    it(`${flag} exits 8 and names what is missing`, async (t) => {
-      const result = await runCli(t, { argv: ['doctor', flag, '--json'] });
-      assert.equal(result.exitCode, 8);
+    it(`${flag} requires an installed executable`, async (t) => {
+      const result = await runCli(t, { argv: ['doctor', flag, '--json'], diagnostics: async () => {
+        throw new CliError('OpenCode is not installed for this user', { exitCode: 1, code: 'opencode_missing' });
+      } });
+      assert.equal(result.exitCode, 1);
       const envelope = JSON.parse(result.stdout);
-      assert.equal(envelope.code, 'prerequisite_missing');
-      assert.match(envelope.message, /not available in this build/);
+      assert.equal(envelope.code, 'opencode_missing');
+      assert.match(envelope.message, /not installed/);
     });
   }
+  it('returns diagnostic failures in the envelope and leaves static collection unused', async (t) => {
+    const result = await runCli(t, { argv: ['doctor', '--selftest', '--json'], diagnostics: async (options) => {
+      assert.equal(options.selftest, true);
+      return { ok: false, opencodeVersion: '1.18.31', mode: 'selftest', scenarios: [{ id: 'C1', title: 'request', ok: false, checks: [{ id: 'sampling', ok: false, message: 'mismatch' }] }] };
+    }, deps: { run: async () => { throw new Error('static collection ran'); } } });
+    assert.equal(result.exitCode, 5);
+    assert.equal(JSON.parse(result.stdout).data.scenarios[0].checks[0].id, 'sampling');
+    assert.match(result.stderr, /no real model is loaded/);
+  });
 });
 
 describe('doctor --deep', () => {
@@ -306,7 +324,7 @@ describe('the registry entry', () => {
   it('names only the exit codes the command can produce', () => {
     const doctor = COMMANDS.find((command) => command.name === 'doctor');
     assert.ok(doctor);
-    // 8 is --capture and --selftest reporting `prerequisite_missing` until they land.
+    // 8 refuses an unverified OpenCode version unless --experimental is explicit.
     for (const code of [0, 1, 5, 7, 8]) assert.ok(doctor.exitCodes.includes(code), `exit ${code}`);
   });
 });

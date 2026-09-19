@@ -41,12 +41,16 @@ import {
   verifyConfigShape,
   verifyInstructionFiles,
   verifyNonNegotiableRules,
+  verifyNetworkPermission,
+  verifyToolPermission,
   verifyPluginLoaded,
   verifyVisibleTools,
 } from '../opencode/effective-config.js';
 import { buildLaunchContent, renderLaunchContentEnv, renderLaunchContentFile } from '../opencode/content.js';
 import { buildEditorLaunchInput, buildEditorLocalRecord, requireEditorAgent, resolveRecordedEditorAgent } from '../opencode/editor.js';
 import { buildLaunchEnv, describeLaunchEnv } from '../opencode/launch-env.js';
+import { buildNetworkPolicy, NETWORK_ENV, NETWORK_BASH_ENV } from '../network/render.js';
+import { NETWORK_ASK_PROGRAMS } from '../../plugin/opencode-unity-lib/shell-classify.js';
 import { requireOpencode, readOpencodeVersion } from '../opencode/locate.js';
 import { DEFAULT_AGENT, EDITOR_AGENT, buildUnityCodePermission } from '../opencode/render.js';
 import { recordProject, writeLocalState } from '../project/local.js';
@@ -390,17 +394,20 @@ async function refreshEditorRecord(project, editor) {
  */
 export function buildLaunch({ session, project, agent, cliContext, editor }) {
   const editorInput = buildEditorLaunchInput(editor);
+  const network = buildNetworkPolicy({ config: session.config, settings: project.settings, hubUrl: editor.hubUrl ?? null });
   const permission = buildUnityCodePermission({
     vcsKind: project.projectJson?.vcs?.kind ?? null,
-    bashMode: project.settings.bashMode ?? session.config.safety.bashMode,
+    bashMode: network.bash === 'ask' ? 'ask' : project.settings.bashMode ?? session.config.safety.bashMode,
     csprojNames: listCsprojNames(project),
     safety: session.config.safety,
+    extensions: { unitynet: network.permission, ...(network.bash === 'ask' ? { componentBashAllow: Object.fromEntries(NETWORK_ASK_PROGRAMS.map((name) => [`${name} *`, 'ask'])) } : {}) },
   });
   const content = buildLaunchContent({
     factsPath: project.paths.facts,
     unityCodePermission: permission,
     ...editorInput,
   });
+  content.permission = { unitynet: { '*': 'deny' } };
   const env = buildLaunchEnv({
     env: session.env,
     home: session.home,
@@ -410,6 +417,8 @@ export function buildLaunch({ session, project, agent, cliContext, editor }) {
     configContent: renderLaunchContentEnv(content),
     disableProjectConfig: cliContext.options.noProjectConfig === true || session.config.start.projectConfig === 'disable',
   });
+  env.env[NETWORK_ENV] = JSON.stringify(network.policy);
+  env.env[NETWORK_BASH_ENV] = network.bash;
   return { content, env, editorAgent: editorInput.editorAgent, permission };
 }
 
@@ -423,7 +432,7 @@ export async function verifyLaunch({ session, project, agent, launch, binary, ve
   const key = buildVerifyCacheKey({
     opencodeVersion: versions.opencode,
     profileHash: hashProfile(session),
-    contentHash: sha256Hex(JSON.stringify(launch.content)),
+    contentHash: sha256Hex(JSON.stringify([launch.content, launch.env.env[NETWORK_ENV], launch.env.env[NETWORK_BASH_ENV]])),
     projectConfigFiles: listProjectConfigFiles(project),
     directoryListings: listConfigDirectories(session, project),
     authMtimeMs: readAuthMtime(session),
@@ -450,6 +459,8 @@ export async function verifyLaunch({ session, project, agent, launch, binary, ve
   const checks = [
     verifyPluginLoaded({ exitCode: agentProbe.exitCode ?? 1, timedOut: agentProbe.timedOut, stderr: agentProbe.stderr }),
     verifyNonNegotiableRules({ permission: agentJson?.permission ?? [], caseInsensitive }),
+    verifyNetworkPermission(agentJson?.permission, launch.permission.unitynet, caseInsensitive),
+    ...(launch.env.env[NETWORK_BASH_ENV] === 'ask' ? [verifyToolPermission(agentJson?.permission, launch.permission.bash, 'bash', caseInsensitive)] : []),
     verifyConfigShape({
       config: configJson ?? {},
       expected: {

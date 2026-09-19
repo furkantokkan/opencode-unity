@@ -87,6 +87,7 @@ export const GLOBAL_OPTIONS = Object.freeze([
   { name: 'no-color', type: 'boolean', description: 'Plain output without colors' },
   { name: 'help', type: 'boolean', description: 'Show help' },
   { name: 'version', type: 'boolean', description: 'Show the version' },
+  { name: 'print-platform', type: 'boolean', description: 'Print detected platform facts and command support tiers without starting a model' },
 ]);
 
 const PATH_POSITIONAL = Object.freeze({ name: 'path', description: 'Project directory (default: --project or the current directory)' });
@@ -94,8 +95,31 @@ const PATH_POSITIONAL = Object.freeze({ name: 'path', description: 'Project dire
 const AUTO_APPROVAL_REASON =
   'start refuses auto-approval flags: dangerous actions are denied and every remaining ask must reach you';
 
+/** @type {readonly OptionSpec[]} */
+const HOST_OPTIONS = [
+  { name: 'host', type: 'list', choices: ['claude', 'codex', 'auto'], required: true, description: 'Host skills to manage' },
+  { name: 'host-home', type: 'string', valueName: 'dir', description: 'Host home directory (default: the user home)' },
+];
+
 /** @type {readonly CommandSpec[]} */
 export const COMMANDS = Object.freeze([
+  {
+    name: 'host', group: 'advanced', module: '../commands/host.js',
+    summary: 'Install, verify, update or remove managed Claude and Codex skills',
+    positionals: [], options: [],
+    subcommands: ['install', 'verify', 'update', 'uninstall'].map((name) => ({ name, summary: `${name} the selected host skills`, positionals: [], options: HOST_OPTIONS })),
+    exitCodes: [EXIT.OK, EXIT.USAGE, EXIT.VALIDATION, EXIT.CHECK_FAILED, EXIT.RUNTIME, EXIT.CONSENT_REQUIRED, EXIT.INTERRUPTED],
+  },
+  {
+    name: 'shape',
+    group: 'everyday',
+    summary: 'Check a request and, when needed, rewrite it once with the guarded local model',
+    description: 'Returns the original request if rewriting fails. Writes no files. --no-model checks readiness without calling Ollama.',
+    module: '../commands/shape.js',
+    positionals: [{ name: 'text', required: true, description: 'Request text, @file, or - for standard input' }],
+    options: [{ name: 'no-model', type: 'boolean', description: 'Check readiness without calling the model' }],
+    exitCodes: [EXIT.OK, EXIT.USAGE, EXIT.RUNTIME, EXIT.UNSUPPORTED],
+  },
   {
     name: 'doctor',
     group: 'everyday',
@@ -106,15 +130,14 @@ export const COMMANDS = Object.freeze([
     options: [
       { name: 'profile', type: 'boolean', description: 'Analyze the opencode-unity clean-room profile for this project' },
       { name: 'deep', type: 'boolean', description: 'Also run opencode debug config and debug agent' },
-      { name: 'capture', type: 'boolean', description: 'Record the exact first request against a local mock endpoint (not available in this build; exits 8)' },
-      { name: 'selftest', type: 'boolean', description: 'Run mock end-to-end scenarios with the installed OpenCode (not available in this build; exits 8)' },
+      { name: 'capture', type: 'boolean', description: 'Capture redacted request metadata with real OpenCode and a local mock endpoint' },
+      { name: 'selftest', type: 'boolean', description: 'Run bounded mock end-to-end scenarios with the installed OpenCode' },
       { name: 'logs', type: 'string', valueName: 'path', description: 'Ollama server log to read' },
       { name: 'markdown', type: 'boolean', description: 'Issue-ready report (implies --redact)' },
       { name: 'redact', type: 'boolean', description: 'Remove user, machine, path, project, email and key values' },
       { name: 'strict', type: 'boolean', description: 'Warnings also fail' },
       { name: 'explain', type: 'string', valueName: 'check-id', description: "Print one check's rationale and fix" },
     ],
-    // Exit 8 stays while --capture and --selftest report `prerequisite_missing`; it goes once they land.
     exitCodes: [EXIT.OK, EXIT.USAGE, EXIT.CHECK_FAILED, EXIT.RUNTIME, EXIT.UNSUPPORTED],
   },
   {
@@ -128,7 +151,7 @@ export const COMMANDS = Object.freeze([
       { name: 'no-model', type: 'boolean', description: 'Skip the model pull and create' },
       { name: 'ollama-env', type: 'boolean', description: 'Preselect the Ollama server environment item' },
       { name: 'terminal', type: 'boolean', description: 'Preselect the Windows Terminal fragment' },
-      { name: 'host', type: 'list', valueName: 'ids', choices: ['claude', 'codex', 'antigravity', 'auto'], description: 'Name the host integration for these tools; the host command group is planned, so this preview prints how to copy the preview host files' },
+      { name: 'host', type: 'list', valueName: 'ids', choices: ['claude', 'codex', 'antigravity', 'auto'], description: 'Install managed Claude/Codex skills; Antigravity prints manual installation guidance' },
       { name: 'delegate', type: 'list', valueName: 'targets', choices: ['claude', 'codex'], description: 'Deprecated alias of --host' },
       { name: 'migrate', type: 'boolean', description: 'Migrate an earlier installation (used by upgrade)' },
     ],
@@ -213,7 +236,7 @@ export const COMMANDS = Object.freeze([
   {
     name: 'bench',
     group: 'advanced',
-    summary: 'Run guarded reliability benchmarks on the bundled sample project',
+    summary: 'Measure guarded local edits or run explicit mock protocol checks',
     module: '../commands/bench.js',
     positionals: [
       { name: 'suite', required: true, choices: ['toolcalls', 'edits', 'editor', 'guard', 'budget', 'all'], description: 'Benchmark suite' },
@@ -221,8 +244,9 @@ export const COMMANDS = Object.freeze([
     options: [
       { name: 'runs', type: 'integer', valueName: 'n', min: 1, max: 1000, description: 'Runs per task (default 20)' },
       { name: 'temperature', type: 'number', valueName: 't', min: 0, max: 2, description: 'Sampling temperature override' },
+      { name: 'mock', type: 'boolean', description: 'Run guard, budget or all protocol scenarios with real OpenCode and mock endpoints; no model reliability claim' },
     ],
-    exitCodes: [EXIT.OK, EXIT.BLOCKED, EXIT.CHECK_FAILED, EXIT.RUNTIME],
+    exitCodes: [EXIT.OK, EXIT.USAGE, EXIT.BLOCKED, EXIT.VALIDATION, EXIT.CHECK_FAILED, EXIT.RUNTIME, EXIT.UNSUPPORTED, EXIT.INTERRUPTED],
   },
   {
     name: 'delegate',
@@ -289,7 +313,7 @@ export const COMMANDS = Object.freeze([
       },
       {
         name: 'ledger',
-        summary: 'Job counts, tokens, durations and estimated paid tokens avoided',
+        summary: 'Job counts, local tokens and estimated source-input reduction before review overhead',
         positionals: [],
         options: [{ name: 'since', type: 'string', valueName: 'duration', description: 'Only jobs newer than this, for example 7d' }],
       },

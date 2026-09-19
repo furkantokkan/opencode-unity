@@ -1,0 +1,20 @@
+{
+  "note": "Three files are called Config.cs.",
+  "text": "update Config.cs",
+  "reply": {
+    "goal": "Update the audio Config constants.",
+    "files": [
+      "Assets/Game/Audio/Config.cs"
+    ],
+    "search": "",
+    "done": "The audio constants hold the new values.",
+    "open": [
+      "which of the three Config.cs files is meant?"
+    ]
+  },
+  "expect": {
+    "status": "shaped",
+    "verdict": "needs_shaping",
+    "reason": null
+  }
+}

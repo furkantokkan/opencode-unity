@@ -11,9 +11,12 @@ import { useSandbox } from '../../helpers/sandbox.mjs';
 import { loadCompat } from '../../../src/core/profile.js';
 import { BINARY_ENV_NAME } from '../../../src/opencode/locate.js';
 import { buildUnityCodePermission } from '../../../src/opencode/render.js';
+import { DEFAULT_CONFIG } from '../../../src/core/config.js';
+import { buildNetworkPolicy } from '../../../src/network/render.js';
 import { createCommandHarness, createRunner, MODEL_TAG, NOW_MS } from './helpers.mjs';
 
 const TESTED_OPENCODE = loadCompat().opencode.tested;
+const NETWORK_PERMISSION = buildNetworkPolicy({ config: DEFAULT_CONFIG, settings: { editor: { enabled: false, trust: false, allowPlayMode: false }, bashMode: null } }).permission;
 /** The hub MCP for Unity's configurator records; it is only read, never contacted. */
 const HUB_URL = 'http://127.0.0.1:8090/mcp';
 
@@ -105,7 +108,7 @@ function createEditorRunner(ready) {
   };
   return createRunner({
     '--version': { stdout: `${TESTED_OPENCODE}\n` },
-    'debug agent unity-code': { stdout: JSON.stringify({ permission: buildUnityCodePermission({}) }) },
+    'debug agent unity-code': { stdout: JSON.stringify({ permission: buildUnityCodePermission({ extensions: { unitynet: NETWORK_PERMISSION } }) }) },
     'debug config': { stdout: JSON.stringify(config) },
   });
 }
@@ -128,7 +131,7 @@ async function prepareStart(t, { version = TESTED_OPENCODE, agentJson, configJso
   const binary = path.join(harness.sandbox.dirs.bin, process.platform === 'win32' ? 'opencode.exe' : 'opencode');
   await fs.writeFile(binary, 'not a real binary', 'utf8');
 
-  const agent = agentJson ?? { name: 'unity-code', model: `opencode-unity/${MODEL_TAG}`, permission: buildUnityCodePermission({}), tools: {} };
+  const agent = agentJson ?? { name: 'unity-code', model: `opencode-unity/${MODEL_TAG}`, permission: buildUnityCodePermission({ extensions: { unitynet: NETWORK_PERMISSION } }), tools: {} };
   const config = configJson ?? {
     model: `opencode-unity/${MODEL_TAG}`,
     small_model: `opencode-unity/${MODEL_TAG}`,
@@ -624,7 +627,7 @@ describe('commands/start: launch', () => {
     };
     const runner = createRunner({
       '--version': { stdout: `${TESTED_OPENCODE}\n` },
-      'debug agent unity-code': { stdout: JSON.stringify({ permission: buildUnityCodePermission({}) }) },
+      'debug agent unity-code': { stdout: JSON.stringify({ permission: buildUnityCodePermission({ extensions: { unitynet: NETWORK_PERMISSION } }) }) },
       'debug config': { stdout: JSON.stringify(config) },
     });
     const result = await ready.start({ deps: { run: runner.run } });

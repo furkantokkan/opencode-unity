@@ -26,8 +26,6 @@ export const ALLOWED = [
   { pathPrefix: 'src/core/exec.js', reason: 'PATH and PATHEXT resolution, which is what an executable extension means' },
   { pathPrefix: 'plugin/opencode-unity-lib/guard/probes/', reason: 'the probe layer measures one platform each (CP-D2)' },
   { pathPrefix: 'plugin/opencode-unity-lib/shell-classify.js', reason: 'the Windows shell grammar, which has to name executable suffixes to deny them' },
-  // S23 moves the Windows image-name rule into the win32 probe; drop this entry with that step.
-  { pathPrefix: 'plugin/opencode-unity-lib/guard/unity-processes.js', reason: 'the win32 process-name rule, until S23 moves it behind the probe interface' },
 ];
 
 /** @type {ReadonlyArray<{ rule: string, pattern: RegExp }>} */
@@ -260,6 +258,7 @@ describe('the allow-list', () => {
     assert.equal(isAllowed('src/core/paths.js'), true);
     assert.equal(isAllowed('plugin/opencode-unity-lib/guard/probes/processes-win32.js'), true);
     assert.equal(isAllowed('plugin/opencode-unity-lib/guard/collect.js'), false);
+    assert.equal(isAllowed('plugin/opencode-unity-lib/guard/unity-processes.js'), false, 'the image-name rule lives in the win32 probe');
     assert.equal(isAllowed('src/core/config.js'), false);
   });
 });

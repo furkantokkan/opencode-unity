@@ -1,0 +1,18 @@
+{
+  "note": "A request in German: never matches the English verb list, so it is shaped, and the rewrite is English.",
+  "text": "Das Inventar in InventoryView flackert bei jedem Frame",
+  "reply": {
+    "goal": "Stop the InventoryView inventory from flickering every frame.",
+    "files": [
+      "Assets/Game/Inventory/InventoryView.cs"
+    ],
+    "search": "",
+    "done": "The inventory draws once per change instead of every frame.",
+    "open": []
+  },
+  "expect": {
+    "status": "shaped",
+    "verdict": "needs_shaping",
+    "reason": null
+  }
+}

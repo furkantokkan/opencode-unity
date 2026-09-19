@@ -93,13 +93,16 @@ export async function readLedger(ledgerPath) {
  * @property {number} summaryChars
  * @property {number} seconds
  * @property {number} estimatedPaidTokensAvoided
+ * @property {number} estimatedInputTokensAvoided
+ * @property {number} usableLocalTokens
  * @property {string} estimateNote
  */
 
 /**
- * Spec 12.2: the estimate is the prompt and output tokens the local model processed for jobs whose
- * result an orchestrator could use. Failed and refused jobs sent it back to doing the work itself, so
- * they save nothing. It is always an estimate and never a currency.
+ * Estimate source-text reduction, not cloud billing: subtract the returned summary before dividing
+ * by 3.5 characters/token. Handoff, verification, caching and model-specific tokenization are not
+ * observable here. Local model tokens remain a separate measured counter. Partial or failed jobs
+ * receive no source-reduction credit. The old JSON field stays as an API alias.
  * @param {readonly LedgerEntry[]} entries
  * @param {{ since?: string, now?: () => number }} [options]
  * @returns {LedgerSummary}
@@ -118,7 +121,9 @@ export function summarizeLedger(entries, { since, now = Date.now } = {}) {
     summaryChars: 0,
     seconds: 0,
     estimatedPaidTokensAvoided: 0,
-    estimateNote: 'estimate: prompt and output tokens the local model processed for usable jobs; not a currency',
+    estimatedInputTokensAvoided: 0,
+    usableLocalTokens: 0,
+    estimateNote: 'estimate: max(0, source characters - summary characters) / 3.5 for completed usable jobs, before handoff and verification overhead; not measured cloud billing or a currency. estimatedPaidTokensAvoided is a legacy alias.',
   };
   for (const entry of entries) {
     const time = Date.parse(entry.timestamp);
@@ -137,9 +142,13 @@ export function summarizeLedger(entries, { since, now = Date.now } = {}) {
     summary.localInputChars += toCount(entry.localInputChars);
     summary.summaryChars += toCount(entry.summaryChars);
     summary.seconds += toCount(entry.seconds);
-    if (USABLE_STATUSES.includes(status)) summary.estimatedPaidTokensAvoided += promptTokens + outputTokens;
+    if (USABLE_STATUSES.includes(status)) summary.usableLocalTokens += promptTokens + outputTokens;
+    if (['ok', 'dry_run', 'applied'].includes(status)) {
+      summary.estimatedInputTokensAvoided += Math.floor(Math.max(0, toCount(entry.localInputChars) - toCount(entry.summaryChars)) / 3.5);
+    }
   }
   summary.seconds = Math.round(summary.seconds * 10) / 10;
+  summary.estimatedPaidTokensAvoided = summary.estimatedInputTokensAvoided;
   return summary;
 }
 
@@ -160,7 +169,8 @@ export function renderLedgerText(summary, ledgerPath) {
     `local input characters: ${summary.localInputChars}`,
     `characters returned to the caller: ${summary.summaryChars}`,
     `local model seconds: ${summary.seconds}`,
-    `paid tokens avoided (estimate): ~${summary.estimatedPaidTokensAvoided} - ${summary.estimateNote}`,
+    `usable local tokens: ${summary.usableLocalTokens}`,
+    `source input tokens avoided (estimate): ~${summary.estimatedInputTokensAvoided} - ${summary.estimateNote}`,
   );
   return lines.join('\n');
 }
