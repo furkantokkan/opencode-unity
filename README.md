@@ -50,6 +50,10 @@ opencode-unity doctor
 opencode-unity start
 ```
 
+This opens an interactive OpenCode session using the local model; Claude Code or Codex is not needed.
+With the default preset, OpenCode shows `Unity-Code` and `ocu-qwen3-coder-30b-16k`. The model tag uses
+Qwen3-Coder 30B weights with our context and sampling settings; it is not a separately trained model.
+
 Give the `unity-code` agent a small task and the relevant file, for example:
 
 ```text
@@ -80,14 +84,15 @@ The CLI has no runtime dependencies. OpenCode and Ollama run as separate tools.
 ### Already using a coding agent?
 
 After setup, Claude Code and the experimental Codex and Antigravity integrations can call the same
-local model for bounded tasks. A request can be as small as:
+local model for bounded tasks. For example, summarize several named files:
 
 ```powershell
-opencode-unity delegate ask --task "Summarize the public methods and their side effects" --files Assets/Scripts/PlayerController.cs --json
+opencode-unity delegate ask --task "Summarize the public methods and their side effects by file" --files Assets/Scripts/PlayerController.cs Assets/Scripts/EnemyController.cs --json
 ```
 
 The calling agent gets a compact JSON result and reviews the output. Good starting tasks include
-file summaries, API inventories, and mechanical edits with an exact specification.
+file summaries, API inventories, and mechanical edits with an exact specification. Small tasks can
+cost more context to hand off and verify than they save; see [when labor is worth using](#is-local-labor-worth-using).
 [Set up your agent integration →](#use-it-from-claude-code-codex-or-antigravity)
 
 **Want local AI to be part of your Unity workflow? [Star the project](https://github.com/furkantokkan/opencode-unity)
@@ -354,6 +359,28 @@ spec, boilerplate and first drafts. Keep debugging, design, security, deploys an
 roughly two files to the paid agent. The local model gets no tools and no network; it reads the files you
 name and returns text.
 
+### Is local labor worth using?
+
+Use it selectively for large, clearly specified tasks whose output the calling agent can check cheaply.
+The calling agent still owns planning and verification. A completed local request alone does not prove
+that the result is correct or that it saved cloud tokens.
+
+| Work | Suggested approach |
+|---|---|
+| Summaries of many files, per-file inventories, repetitive edits with exact instructions | Try local labor, then review the result and verify any edits. |
+| Small edits or questions that the calling agent can answer with little source context | Keep the work with the calling agent to avoid handoff overhead. |
+| Root-cause debugging, architecture, security, deployment or Unity serialized assets | Keep these with the calling agent; they are outside the delegate skill's scope. |
+
+In the [separate-session trial](docs/evidence/delegation-measurement.md), the local request used
+**6,177 local tokens** and finished in **32.808 seconds**. Its summary was incomplete. Including
+preparation, handoff and verification gave **0 estimated net tokens avoided** and zero usable savings
+credit. Actual cloud billing savings remain unmeasured. This supports a selective trial for larger
+repetitive jobs, not a claim that delegation always saves tokens.
+
+For your own jobs, compare equivalent tasks and include handoff, review and retry costs. The ledger's
+source-input reduction is an estimate before those costs, not measured net savings. See the
+[token accounting rules](docs/token-accounting.md).
+
 ### Managed host skills
 
 Install the Claude or Codex skill, then start a new host session:
@@ -399,18 +426,29 @@ assets with the host.
 
 The user owns both switches. They persist across terminal and host sessions; no profile rebuild is needed:
 
-```text
+```powershell
+# Allow new labor jobs
 opencode-unity delegate on
+
+# Refuse new labor jobs
 opencode-unity delegate off
-opencode-unity delegate status
+
+# Show switches, active jobs and recent results
+opencode-unity delegate status --json
+
+# Enable or disable automatic monitor windows
 opencode-unity delegate monitor --auto on
 opencode-unity delegate monitor --auto off
+
+# Open a monitor manually
 opencode-unity delegate monitor --window
 ```
 
 `on`/`off` control new jobs. Off returns exit 8 with `do_it_yourself` before contacting Ollama, and does
-not cancel a job already running or unload its model. History, status and backup restoration remain
-available. Use `opencode-unity stop` after work finishes if you also want to free the model's VRAM.
+not cancel a job already running or unload its model. It also does not close or disable an interactive
+OpenCode session launched with `opencode-unity start`; direct chat and delegated labor are separate
+entry points. History, status and backup restoration remain available. Use `opencode-unity stop`
+after work finishes if you also want to free the model's VRAM.
 
 Automatic CMD monitoring is **off by default**. Opting in opens one visible Windows CMD window when
 a job starts; later jobs reuse it. Close the window or press Ctrl+C to stop watching. Use `monitor
