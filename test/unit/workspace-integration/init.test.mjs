@@ -15,8 +15,8 @@ import { createNodeFsView } from '../../../src/unity/fs-view.js';
 const fixtures = fileURLToPath(new URL('../../fixtures/workspaces/', import.meta.url));
 const noProcess = { run: async () => { throw new Error('Workspace init must not launch a process'); } };
 
-async function workspaceHarness(t, fixture = 'standalone-node-service') {
-  const harness = await createCommandHarness(t, { fixture: null, ollama: false });
+async function workspaceHarness(t, fixture = 'standalone-node-service', ollama = false) {
+  const harness = await createCommandHarness(t, { fixture: null, ollama });
   await fs.cp(path.join(fixtures, fixture), harness.projectRoot, { recursive: true });
   return harness;
 }
@@ -58,7 +58,7 @@ describe('workspace init integration', () => {
   });
 
   it('builds a read-only launch for an initialized standalone service', async (t) => {
-    const harness = await workspaceHarness(t);
+    const harness = await workspaceHarness(t, 'standalone-node-service', true);
     const initialized = await harness.run('init', { deps: noProcess });
     assert.equal(initialized.exitCode, 0, initialized.message);
     const before = await snapshotTree(harness.projectRoot);
