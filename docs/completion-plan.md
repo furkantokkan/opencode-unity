@@ -1,4 +1,4 @@
-# Completion status — preview.7
+# Completion status — preview.8
 
 Updated 2026-09-19. The Windows preview integrates the remaining implementation slices from the original unfinished checkout. The original source worktree is preserved. The integration starts from preview.5 commit `85b80c69d9444f13b9dbe972f7fce2ae2cb89827`.
 
@@ -22,9 +22,11 @@ Updated 2026-09-19. The Windows preview integrates the remaining implementation 
 - Real OpenCode 1.18.31: **6 permission contracts**, **8 diagnostic scenarios**, and **2 network scenarios** passed. The enabled network scenario made exactly one loopback HTTP request and returned the result to the model turn.
 - Enabled package round trip passed: pack, install, setup, init, launch inspection, diagnosis and uninstall.
 - Typecheck, lint, release prechecks and generated documents passed. GitHub CI and the release workflow supply the cross-platform result for the published tag.
-- [Validation and original-change inventory](evidence/preview-6-validation.json). The earlier [config-only snapshot](evidence/config-v2-integration.json) is historical and its deferred labels are superseded here.
+- [Final validation](evidence/preview-8-validation.json) and [original-change inventory](evidence/preview-6-validation.json). The earlier [config-only snapshot](evidence/config-v2-integration.json) is historical and its deferred labels are superseded here.
 
-The preview.6 release workflow stopped before publication because portable tests assumed Windows defaults, found a locally installed OpenCode instead of an isolated fixture, and used mock requests without an active timeout handle. Preview.7 corrects these test harness assumptions; all 91 focused regression tests passed locally. The separate-session trial and task-specific accounting will follow the installed artifact. A pre-release health check returned `gpu_guard_blocked/import_busy`; it triggered no model job or automatic retry.
+The preview.6 and preview.7 workflows stopped before publication because portable tests assumed Windows defaults, found a local OpenCode instead of an isolated fixture, and omitted mock timeout/server handles. The corrected implementation passed all eight jobs in [CI run 35466304801](https://github.com/furkantokkan/opencode-unity/actions/runs/35466304801), including four Windows/Ubuntu Node 22/24 suites, macOS smoke, lint, actual OpenCode contracts and the package round trip. Preview.8 packages this result.
+
+A separate Codex session ran one real preview.7 delegation job: 5,967 input plus 210 output tokens in 32.808 seconds. Command execution succeeded but the summary was semantically partial. Raw source-text reduction was estimated at 4,554 tokens before overhead; the net estimate and usable savings credit were both **0** after preparation and verification. No repeated model job was used to improve the reported result. See the [measurement report](evidence/delegation-measurement.md) and its detailed session record. Delegation code is unchanged between that trial and preview.8.
 
 ## Remaining stable-release and hardware gates
 
@@ -32,7 +34,7 @@ The preview.6 release workflow stopped before publication because portable tests
 2. Larger reference-hardware native-tool reliability runs and live toolcall/editor benchmark suites. Mock protocol success does not satisfy this gate.
 3. Automatic insertion of shaping into interactive sessions; execution of reserved `project.verify` and additional `safety.multiplayerProtectedGlobs` policy. The current release documents these as reserved rather than claiming protection it does not implement.
 4. Antigravity managed installation and an explicit visible monitor-window check in a real host UI.
-5. Stable npm publication after these acceptance gates. Preview.7 is distributed as a GitHub prerelease.
+5. Stable npm publication after these acceptance gates. Preview.8 is distributed as a GitHub prerelease.
 
 Historical spike files remain research material in the original checkout; their release-facing diagnostic requirements are implemented in the bounded runtime harness. They are not silently promoted into supported features.
 

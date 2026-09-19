@@ -5,9 +5,9 @@ All notable changes to this project are documented here. The format follows
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html). While the version is `0.y.z`, a minor release
 may change the CLI or the config schema, with automatic migrations and a Breaking section.
 
-## [0.1.0-preview.7] - 2026-09-19
+## [0.1.0-preview.8] - 2026-09-19
 
-The preview.6 tag was not published: CI found platform-dependent test defaults, a missing isolated OpenCode fixture and unreferenced mock timeout handles. Preview.7 fixes those test harness assumptions and includes the integrations below. Runtime protections and platform restrictions remain unchanged.
+The preview.6 and preview.7 tags were not published: CI found platform-dependent test defaults, missing isolated OpenCode/Ollama fixtures and unreferenced mock timeout handles. Preview.8 fixes those test harness assumptions and includes the integrations below. Runtime protections and platform restrictions remain unchanged.
 
 ### Added
 
@@ -27,6 +27,7 @@ The preview.6 tag was not published: CI found platform-dependent test defaults, 
 
 - Windows remains the model-execution platform. Linux/macOS hardware probes, broad native-tool reliability evidence and stable npm publication remain future release gates.
 - See [completion status](docs/completion-plan.md), [diagnostics](docs/diagnostics.md) and [network policy](docs/network-policy.md) for validation and scope.
+- A [separate-session trial](docs/evidence/delegation-measurement.md) used 6,177 real local tokens; its incomplete summary and preparation/verification overhead yielded zero usable net savings credit. Historical gross source reduction is reported separately, without cloud billing claims.
 
 ## [0.1.0-preview.5] - 2026-09-19
 

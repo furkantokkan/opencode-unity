@@ -1,0 +1,41 @@
+{
+  "release": "v0.1.0-preview.8",
+  "date": "2026-09-19",
+  "testedImplementationCommit": "49a51cb92048be194ea38ca1c35890a758d24865",
+  "ci": {
+    "url": "https://github.com/furkantokkan/opencode-unity/actions/runs/35466304801",
+    "status": "success",
+    "jobs": ["lint", "unit (windows-latest, node 22)", "unit (windows-latest, node 24)", "unit (ubuntu-latest, node 22)", "unit (ubuntu-latest, node 24)", "macos-smoke", "contract", "package"]
+  },
+  "localValidation": {
+    "fullCandidateSuite": { "tests": 3864, "passed": 3864, "failed": 0, "skipped": 0 },
+    "criticalCoverage": { "lines": 99.55, "branches": 93.78, "functions": 97.61, "requiredLines": 90 },
+    "portableFixtureRegressionTests": 91,
+    "serviceFixtureTests": 19,
+    "finalVersionAndDocumentTests": 31,
+    "realOpenCodePermissionContracts": 6,
+    "realOpenCodeDiagnosticScenarios": 8,
+    "realOpenCodeNetworkScenarios": 2,
+    "enabledPackageRoundtrip": "PASS",
+    "typecheck": "PASS",
+    "lintAndReleasePrechecks": "PASS",
+    "personalDataScan": { "findings": 0, "privateDenylistTerms": 7 }
+  },
+  "separateSession": {
+    "testedVersion": "0.1.0-preview.7",
+    "testedCommit": "d6d4942ee965fb33745e47113274e524f9e10b46",
+    "jobId": "20260919-200522-ask-d5088f",
+    "inputTokens": 5967,
+    "outputTokens": 210,
+    "durationMs": 32808,
+    "commandStatus": "ok",
+    "semanticStatus": "partial",
+    "netEstimatedInputTokensAvoided": 0,
+    "usableSavingsCredit": 0,
+    "cloudBillingSavings": "UNMEASURED",
+    "details": "separate-session-preview-7.json",
+    "runtimeEquivalence": "No src/ or plugin/ changes between the trial and this release; subsequent changes are portable test fixtures, version labels and documentation."
+  },
+  "scope": "Windows preview. Mock protocol tests do not establish real-model tool reliability or non-Windows hardware support. Preview.6 and preview.7 release workflows refused publication; tags were not rewritten.",
+  "history": ["config-v2-integration.json", "preview-6-validation.json"]
+}

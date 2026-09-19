@@ -1,0 +1,206 @@
+{
+  "schemaVersion": 1,
+  "trial": "separate-session-preview-7",
+  "jobCompletedAtUtc": "2026-09-19T20:05:55.246Z",
+  "version": "0.1.0-preview.7",
+  "tag": "v0.1.0-preview.7",
+  "testedCommit": "d6d4942ee965fb33745e47113274e524f9e10b46",
+  "worktree": {
+    "initialStatus": "clean",
+    "checkout": "detached tag",
+    "productionChanges": false,
+    "evidenceFilesOnly": true
+  },
+  "result": {
+    "commandExecution": "passed",
+    "semanticSummary": "partial",
+    "usableSavingsCreditTokens": 0
+  },
+  "commands": [
+    {
+      "command": "git status --short",
+      "exitCode": 0,
+      "result": "clean before checkout and evidence writes"
+    },
+    {
+      "command": "git fetch origin --tags",
+      "exitCode": 0,
+      "result": "completed"
+    },
+    {
+      "command": "git switch --detach v0.1.0-preview.7",
+      "exitCode": 0,
+      "result": "detached at testedCommit"
+    },
+    {
+      "command": "opencode-unity --version",
+      "exitCode": 0,
+      "result": "0.1.0-preview.7; checkout package version also matches"
+    },
+    {
+      "command": "opencode-unity delegate ask --help",
+      "exitCode": 0,
+      "result": "confirmed --max-output <n>"
+    },
+    {
+      "command": "opencode-unity host verify --host codex --json",
+      "exitCode": 0,
+      "result": "current; installed skill hash matches release; owned=false"
+    },
+    {
+      "command": "opencode-unity delegate status --json",
+      "exitCode": 0,
+      "result": "enabled; automatic monitor enabled; monitor closed; lock free; no active jobs; historical job excluded"
+    },
+    {
+      "command": "opencode-unity --print-platform --json",
+      "exitCode": 0,
+      "result": "win32/x64, PowerShell; supported OS; host, delegate and shape-no-model tiers full"
+    },
+    {
+      "command": "opencode-unity shape \"Summarize the exported functions in src/delegate/ledger.js without changing files\" --no-model --json",
+      "exitCode": 0,
+      "result": "passthrough; needs_shaping; reason=no_model; modelCall=false; durationMs=46"
+    },
+    {
+      "command": "opencode-unity delegate health --json",
+      "exitCode": 0,
+      "result": "one initial check; ready; guard passed on cold path; lock free; model installed but unloaded; existing allowOffload warning"
+    },
+    {
+      "command": "opencode-unity delegate ask --task \"Summarize the exported functions, file ownership rules and token-accounting formula in these two JavaScript modules in at most eight concise bullets; cite file and function names. Do not propose changes.\" --files src/hosts/install.js src/delegate/ledger.js --max-output 600 --json",
+      "exitCode": 0,
+      "result": "one ask; status=ok; semantic verification partial; no retry"
+    }
+  ],
+  "localJob": {
+    "jobId": "20260919-200522-ask-d5088f",
+    "status": "ok",
+    "askAttempts": 1,
+    "healthChecks": 1,
+    "promptTokensEstimate": 6231,
+    "promptTokensActual": 5967,
+    "outputTokensActual": 210,
+    "totalTokensActual": 6177,
+    "maxOutputTokens": 600,
+    "durationMs": 32808,
+    "ledgerSeconds": 32.8,
+    "fileCount": 2,
+    "localInputChars": 16933,
+    "returnedSummaryChars": 993,
+    "returnedAnswerChars": 993,
+    "returnedEnvelopeChars": 1624,
+    "summaryTruncated": false,
+    "returnedBulletCount": 8,
+    "ledgerMatchedRecords": 1,
+    "historicalJobsIncluded": 0
+  },
+  "sources": [
+    {
+      "file": "src/hosts/install.js",
+      "chars": 9640
+    },
+    {
+      "file": "src/delegate/ledger.js",
+      "chars": 7293
+    }
+  ],
+  "verification": {
+    "fullSourcesReadBeforeAsk": false,
+    "sourceExcerptChars": 15016,
+    "sourceExcerptReadChars": [
+      3952,
+      11064
+    ],
+    "matchingLedgerRecordReadChars": 233,
+    "findings": [
+      {
+        "result": "pass",
+        "claim": "Eight bullets, no proposed changes, no truncation, output below 600 tokens."
+      },
+      {
+        "result": "pass",
+        "claim": "Host export list, preservation of user edits and hash-checked uninstall are supported.",
+        "references": [
+          "src/hosts/install.js:12-154",
+          "buildHostInstallStep",
+          "buildHostUninstallPlan",
+          "verifyHostSkills"
+        ]
+      },
+      {
+        "result": "partial",
+        "claim": "All six ledger exports were omitted: parseSince, appendLedger, parseLedger, readLedger, summarizeLedger, renderLedgerText.",
+        "references": [
+          "src/delegate/ledger.js:34,48,57,75,110,160"
+        ]
+      },
+      {
+        "result": "partial",
+        "claim": "The summary misleadingly calls source-input reduction avoided paid tokens and omits Math.floor. The source explicitly disclaims measured cloud billing.",
+        "references": [
+          "src/delegate/ledger.js:102-105,146-151",
+          "summarizeLedger"
+        ]
+      },
+      {
+        "result": "partial",
+        "claim": "Only job/status counts are grouped by command/status; token and duration totals are global.",
+        "references": [
+          "src/delegate/ledger.js:128-150",
+          "summarizeLedger"
+        ]
+      }
+    ],
+    "ownershipClarification": "verifyHostSkills derives ownership from a matching manifest entry; createdBy records origin. buildHostUninstallPlan additionally requires an unchanged hash. Current manually copied skills are not claimed by buildHostInstallStep."
+  },
+  "accounting": {
+    "ledgerFormula": "For each entry with a valid timestamp in range and status in ['ok', 'dry_run', 'applied']: floor(max(0, toCount(entry.localInputChars) - toCount(entry.summaryChars)) / 3.5); sum per entry. estimatedPaidTokensAvoided is a legacy alias of estimatedInputTokensAvoided.",
+    "netEstimateFormula": "floor(max(0, sourceChars - summaryChars - handoffPromptChars - envelopeCharsBeyondSummary - verificationReadChars - skillReadChars - preflightReadChars) / 3.5)",
+    "operands": {
+      "sourceChars": 16933,
+      "summaryChars": 993,
+      "handoffPromptChars": 316,
+      "envelopeCharsBeyondSummary": 631,
+      "verificationReadChars": 15249,
+      "skillReadChars": 6769,
+      "preflightReadChars": 57375
+    },
+    "rawTextReductionTokensEstimate": 4554,
+    "rawTextReductionIsSavingsCredit": false,
+    "estimatedNetSourceInputTokensReduction": 0,
+    "usableNetSavingsCreditTokens": 0,
+    "actualCloudBillingSavings": null,
+    "actualCloudBillingSavingsStatus": "unmeasured without a matched baseline",
+    "characterUnit": "UTF-16 code units; decoded file content for source and skill; captured text for command reads",
+    "definitions": {
+      "sourceChars": "Sum of the two complete source lengths measured without returning their contents before delegation; agrees with this job's ledger.",
+      "summaryChars": "Decoded returned summary; matches answerChars and this job's ledger.",
+      "handoffPromptChars": "Entire exact ask command string, including the 203-character task, file arguments and flags.",
+      "envelopeCharsBeyondSummary": "Captured JSON line length including newline (1624), minus decoded summary length (993); includes serialization overhead.",
+      "verificationReadChars": "Two targeted source-read outputs, including file/line prefixes and newlines (15016), plus the selected job ledger record (233).",
+      "skillReadChars": "Installed SKILL.md content read once; 6769 characters.",
+      "preflightReadChars": "Initial inventory, tool discovery metadata, ancestor instructions/version/help, checkout metadata and five CLI preflight outputs. Read strings counted once, including duplicated human-readable/JSON payloads."
+    },
+    "preflightReadComponents": {
+      "initialInventory": 521,
+      "toolDiscoveryMetadata": 16101,
+      "ancestorInstructionsVersionAndHelp": 27669,
+      "fetch": 0,
+      "checkoutAndSourceLengths": 284,
+      "hostVerify": 499,
+      "delegateStatus": 1054,
+      "platform": 10002,
+      "shapeNoModel": 549,
+      "health": 696
+    }
+  },
+  "limitations": [
+    "One successful command execution with a semantically partial summary; not evidence of fully usable summarization.",
+    "No retry, alternate runner, guard override, preference change, Unity process change or additional model job.",
+    "Character-based estimates are not tokenizer measurements, whole-session savings, cloud billing savings or currency; context caching and a matched baseline were not measured.",
+    "The net estimate includes the recorded reads and handoff, but excludes inherited conversation text, tool-call wrappers, commentary, evidence authoring and final evidence validation. Adding those costs cannot increase the zero estimate.",
+    "Platform tier labels are reported support metadata, not empirical validation of every command.",
+    "CLI-managed runtime records may be created by the requested commands; project file edits are limited to the two evidence artifacts."
+  ]
+}

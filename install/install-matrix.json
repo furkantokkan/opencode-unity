@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
-  "cliVersion": "0.1.0-preview.7",
+  "cliVersion": "0.1.0-preview.8",
   "pins": {
-    "opencodeUnity": "0.1.0-preview.7",
+    "opencodeUnity": "0.1.0-preview.8",
     "opencode": "1.18.31",
     "ollama": "0.34.1",
     "node": ">=22",
@@ -100,12 +100,12 @@
       "manifestKinds": [
         "npmGlobal"
       ],
-      "expect": "opencode-unity 0.1.0-preview.7; npm owns this bootstrap installation, not the product install manifest",
+      "expect": "opencode-unity 0.1.0-preview.8; npm owns this bootstrap installation, not the product install manifest",
       "commands": {
-        "powershell": "npm install -g 'https://github.com/furkantokkan/opencode-unity/releases/download/v0.1.0-preview.7/opencode-unity-0.1.0-preview.7.tgz'",
-        "cmd": "npm install -g \"https://github.com/furkantokkan/opencode-unity/releases/download/v0.1.0-preview.7/opencode-unity-0.1.0-preview.7.tgz\"",
-        "zsh": "npm install -g 'https://github.com/furkantokkan/opencode-unity/releases/download/v0.1.0-preview.7/opencode-unity-0.1.0-preview.7.tgz'",
-        "bash": "npm install -g 'https://github.com/furkantokkan/opencode-unity/releases/download/v0.1.0-preview.7/opencode-unity-0.1.0-preview.7.tgz'"
+        "powershell": "npm install -g 'https://github.com/furkantokkan/opencode-unity/releases/download/v0.1.0-preview.8/opencode-unity-0.1.0-preview.8.tgz'",
+        "cmd": "npm install -g \"https://github.com/furkantokkan/opencode-unity/releases/download/v0.1.0-preview.8/opencode-unity-0.1.0-preview.8.tgz\"",
+        "zsh": "npm install -g 'https://github.com/furkantokkan/opencode-unity/releases/download/v0.1.0-preview.8/opencode-unity-0.1.0-preview.8.tgz'",
+        "bash": "npm install -g 'https://github.com/furkantokkan/opencode-unity/releases/download/v0.1.0-preview.8/opencode-unity-0.1.0-preview.8.tgz'"
       },
       "pin": "exact",
       "onFail": {
@@ -119,7 +119,7 @@
       "why": "Confirm the executable matches this documented release.",
       "readOnly": true,
       "persistent": false,
-      "expect": "0.1.0-preview.7",
+      "expect": "0.1.0-preview.8",
       "commands": {
         "powershell": "opencode-unity --version",
         "cmd": "opencode-unity --version",

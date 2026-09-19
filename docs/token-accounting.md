@@ -14,4 +14,4 @@ This estimate assumes the caller would otherwise read all named source files. It
 
 Actual cloud token or monetary savings require a matched baseline, cloud usage records, tokenizer and billing/cache information. Local token counts alone cannot supply that comparison. Reports must label source-text estimates and measured counts separately; percentages apply only to the stated workload, never to the entire development session.
 
-The separate-session release trial is recorded in the [completion status](completion-plan.md). A busy Unity Editor can prevent an eligible local task from starting; such a refusal is reported without retrying automatically or weakening the guard.
+The [measurement report](evidence/delegation-measurement.md) records a separate-session real job, semantic verification and all estimate operands. Its 6,177 measured local tokens yielded zero estimated net reduction after overhead, and the incomplete summary received zero usable credit. A busy Unity Editor can also prevent an eligible task from starting; such a refusal is reported without retrying automatically or weakening the guard.

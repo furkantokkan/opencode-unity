@@ -2,11 +2,11 @@
 
 # Installation matrix
 
-This page targets **opencode-unity 0.1.0-preview.7**. Commands are generated and checked against the shipped CLI registry.
+This page targets **opencode-unity 0.1.0-preview.8**. Commands are generated and checked against the shipped CLI registry.
 
 | Input | Pin |
 |---|---|
-| CLI | 0.1.0-preview.7 |
+| CLI | 0.1.0-preview.8 |
 | OpenCode tested version | 1.18.31 |
 | Ollama tested version | 0.34.1 |
 | Node requirement | >=22 |
@@ -24,8 +24,8 @@ Replace `./Your project` with the intended project path. The quotes preserve pat
 | Step | Effect | What to check |
 |---|---|---|
 | Check Node | Read-only | Node >=22; install a supported Node release before continuing if needed |
-| Install the exact CLI release | Persistent | opencode-unity 0.1.0-preview.7; npm owns this bootstrap installation, not the product install manifest |
-| Check the installed CLI | Read-only | 0.1.0-preview.7 |
+| Install the exact CLI release | Persistent | opencode-unity 0.1.0-preview.8; npm owns this bootstrap installation, not the product install manifest |
+| Check the installed CLI | Read-only | 0.1.0-preview.8 |
 | Run static diagnostics | Read-only | Review every finding; a missing prerequisite is a diagnostic result, not a successful runtime test |
 | Preview Windows setup | Read-only | A dry-run plan with no files, environment changes, package installs or model pulls applied |
 | Configure Windows runtime | Persistent | Review the 19 GiB base-model download and each requested change before accepting |
@@ -44,7 +44,7 @@ Replace `./Your project` with the intended project path. The quotes preserve pat
 node --version
 
 # Install the exact CLI release: persistent change; approve before running
-npm install -g 'https://github.com/furkantokkan/opencode-unity/releases/download/v0.1.0-preview.7/opencode-unity-0.1.0-preview.7.tgz'
+npm install -g 'https://github.com/furkantokkan/opencode-unity/releases/download/v0.1.0-preview.8/opencode-unity-0.1.0-preview.8.tgz'
 
 # Check the installed CLI: read-only
 opencode-unity --version
@@ -79,7 +79,7 @@ REM Check Node: read-only
 node --version
 
 REM Install the exact CLI release: persistent change; approve before running
-npm install -g "https://github.com/furkantokkan/opencode-unity/releases/download/v0.1.0-preview.7/opencode-unity-0.1.0-preview.7.tgz"
+npm install -g "https://github.com/furkantokkan/opencode-unity/releases/download/v0.1.0-preview.8/opencode-unity-0.1.0-preview.8.tgz"
 
 REM Check the installed CLI: read-only
 opencode-unity --version
@@ -116,7 +116,7 @@ This page covers doctor, project facts and host skill files; it does not promise
 node --version
 
 # Install the exact CLI release: persistent change; approve before running
-npm install -g 'https://github.com/furkantokkan/opencode-unity/releases/download/v0.1.0-preview.7/opencode-unity-0.1.0-preview.7.tgz'
+npm install -g 'https://github.com/furkantokkan/opencode-unity/releases/download/v0.1.0-preview.8/opencode-unity-0.1.0-preview.8.tgz'
 
 # Check the installed CLI: read-only
 opencode-unity --version
@@ -151,7 +151,7 @@ This page covers doctor, project facts and host skill files; Linux GPU/runtime v
 node --version
 
 # Install the exact CLI release: persistent change; approve before running
-npm install -g 'https://github.com/furkantokkan/opencode-unity/releases/download/v0.1.0-preview.7/opencode-unity-0.1.0-preview.7.tgz'
+npm install -g 'https://github.com/furkantokkan/opencode-unity/releases/download/v0.1.0-preview.8/opencode-unity-0.1.0-preview.8.tgz'
 
 # Check the installed CLI: read-only
 opencode-unity --version
