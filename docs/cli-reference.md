@@ -251,6 +251,44 @@ opencode-unity delegate <subcommand> [options]
 
 Hand bulk, low-ambiguity work to the guarded local model (Claude Code, Codex).
 
+### delegate on
+
+```text
+opencode-unity delegate on [options]
+```
+
+Allow new delegated jobs (user-controlled, persistent).
+
+### delegate off
+
+```text
+opencode-unity delegate off [options]
+```
+
+Refuse new delegated jobs without cancelling work already running.
+
+### delegate status
+
+```text
+opencode-unity delegate status [options]
+```
+
+Show the switches, active jobs and recent results without contacting Ollama.
+
+### delegate monitor
+
+```text
+opencode-unity delegate monitor [options]
+```
+
+Watch delegated jobs, or configure the optional Windows CMD window.
+
+| Flag | Description |
+|---|---|
+| `--window` | Open one visible Windows CMD monitor and return |
+| `--auto <on\|off>` | Persist the automatic monitor-window preference (user-controlled) |
+| `--interval <seconds>` | Watch interval (default 2) (range 1 to 3600) |
+
 ### delegate health
 
 ```text

@@ -5,7 +5,7 @@ description: Preview. Hand token-heavy, low-ambiguity Unity and C# work (multi-f
 
 # opencode-unity delegate (preview)
 
-This is a preview host file for opencode-unity 0.1.0-preview.4. It tells you, the host agent, when and
+This is a preview host file for opencode-unity 0.1.0-preview.5. It tells you, the host agent, when and
 how to hand work to a local model through `opencode-unity delegate`, and how to read what comes back.
 opencode-unity is MIT licensed and runs on this machine. It is unofficial and not affiliated with
 OpenCode, Ollama or Unity Technologies.
@@ -27,6 +27,11 @@ OpenCode, Ollama or Unity Technologies.
 
 ## Protocol
 
+0. If this CLI is installed, prefer it for eligible labor without waiting for an explicit delegation
+   request. First check that it is on PATH; if absent, use the host's other configured workflow.
+   A refusal or OFF state is not permission to use another local runner or change a switch.
+   Only change `delegate on/off` or `delegate monitor --auto on/off` when the user asks.
+   Announce the handoff briefly, then report the returned job id and result status.
 1. Run `opencode-unity delegate health --json` first. Continue only when `ok` is `true`. If it reports
    `ollama_unreachable` or a permission error while Ollama is running, your command sandbox may be
    blocking the local server or the opencode-unity home directory: tell the user, and do the work
@@ -48,6 +53,13 @@ OpenCode, Ollama or Unity Technologies.
 8. After two failed attempts at the same task, do it yourself.
 
 ## Commands
+
+User controls: `opencode-unity delegate on` / `opencode-unity delegate off` persist across sessions.
+`opencode-unity delegate monitor --auto on` opts into one visible Windows CMD monitor per home;
+`opencode-unity delegate monitor --auto off` stops opening it automatically. Closing the window
+stops watching, not work. `opencode-unity delegate monitor --window` opens it manually.
+The window shows job metadata and completed token counts, not streamed model text.
+Use `opencode-unity delegate status --json` for switches, active jobs and recent results.
 
 Always pass `--json`. Standard output is then one JSON line; human text goes to standard error.
 

@@ -232,6 +232,17 @@ export const COMMANDS = Object.freeze([
     positionals: [],
     options: [],
     subcommands: [
+      { name: 'on', summary: 'Allow new delegated jobs (user-controlled, persistent)', positionals: [], options: [] },
+      { name: 'off', summary: 'Refuse new delegated jobs without cancelling work already running', positionals: [], options: [] },
+      { name: 'status', summary: 'Show the switches, active jobs and recent results without contacting Ollama', positionals: [], options: [] },
+      {
+        name: 'monitor', summary: 'Watch delegated jobs, or configure the optional Windows CMD window', positionals: [],
+        options: [
+          { name: 'window', type: 'boolean', description: 'Open one visible Windows CMD monitor and return' },
+          { name: 'auto', type: 'string', valueName: 'on|off', choices: ['on', 'off'], description: 'Persist the automatic monitor-window preference (user-controlled)' },
+          { name: 'interval', type: 'integer', valueName: 'seconds', min: 1, max: 3600, description: 'Watch interval (default 2)' },
+        ],
+      },
       { name: 'health', summary: 'Check Ollama, the model tag, the guard verdict and the lock holder', positionals: [], options: [] },
       {
         name: 'ask',

@@ -54,7 +54,7 @@ export const DEFAULT_PRESET_ID = 'nvidia-24gb-qwen3-coder-30b-16k';
  * @property {{ reserveTokens: number, charsPerToken: number, safetyMargin: number, calibrationClamp: number[], prefixTargetTokens: AgentTokens, prefixFailTokens: AgentTokens }} budget
  * @property {{ bashMode: 'allowlist' | 'ask', readLimitLines: number, extraProtectedEditGlobs: string[], extraProtectedReadGlobs: string[] }} safety
  * @property {{ warm: boolean, pane: 'auto' | 'never', agent: 'unity-code' | 'unity-editor', projectConfig: 'load' | 'disable' }} start
- * @property {{ temperature: number, maxOutputTokens: number, lockTimeoutSec: number, requestTimeoutSec: number, checkTimeoutSec: number, checkCommandPrefixes: string[], extraSensitivePatterns: string[] }} delegate
+ * @property {{ enabled: boolean, monitorWindow: boolean, temperature: number, maxOutputTokens: number, lockTimeoutSec: number, requestTimeoutSec: number, checkTimeoutSec: number, checkCommandPrefixes: string[], extraSensitivePatterns: string[] }} delegate
  * @property {Record<string, ProjectSettings>} projects
  * @property {{ platforms: boolean, presets: boolean, untestedVersions: boolean }} experimental
  */
@@ -112,6 +112,8 @@ export const DEFAULT_CONFIG = deepFreeze({
     projectConfig: 'load',
   },
   delegate: {
+    enabled: true,
+    monitorWindow: false,
     temperature: 0.2,
     maxOutputTokens: 2048,
     lockTimeoutSec: 900,

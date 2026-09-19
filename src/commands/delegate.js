@@ -19,7 +19,10 @@ import { runAsk } from '../delegate/ask.js';
 import { recoverUnfinishedApplies } from '../delegate/apply.js';
 import { runEdit, runApply } from '../delegate/edit.js';
 import { runHealth } from '../delegate/health.js';
-import { appendLedger, readLedger, renderLedgerText, summarizeLedger } from '../delegate/ledger.js';
+import { appendLedger } from '../delegate/ledger.js';
+import { runDelegateControl } from '../delegate/controls.js';
+import { markActive } from '../delegate/monitor.js';
+import { openDelegateWindow } from '../terminal/delegate-window.js';
 import { runMap } from '../delegate/map.js';
 import { createModelTarget } from '../delegate/model.js';
 import { attachOrchestratorAction, buildJobResult, createJob, renderJobMeta, writeJobFile } from '../delegate/results.js';
@@ -63,13 +66,13 @@ import { createSensitiveMatcher } from '../network/sensitive.js';
  * @property {import('../../plugin/opencode-unity-lib/guard/collect.js').GuardProbes} [probes]
  * @property {() => number} [now]
  * @property {() => string} [randomHex]
+ * @property {typeof openDelegateWindow} [openWindow]
  */
 
 const JOB_HANDLERS = Object.freeze({ ask: runAsk, map: runMap, edit: runEdit, apply: runApply });
 
-// These two read what earlier jobs left behind and never touch the model, so a note about the profile
-// would only be noise in their output.
-const SUBCOMMANDS_WITHOUT_A_MODEL = Object.freeze(['ledger', 'restore']);
+// Restoring backups does not use the model, so profile warnings would only be noise.
+const SUBCOMMANDS_WITHOUT_A_MODEL = Object.freeze(['restore']);
 
 /**
  * @param {import('../cli/main.js').CommandContext} cliContext
@@ -79,9 +82,12 @@ const SUBCOMMANDS_WITHOUT_A_MODEL = Object.freeze(['ledger', 'restore']);
 export async function run(cliContext, dependencies = {}) {
   const subcommand = cliContext.subcommand;
   if (!subcommand) throw usageError("delegate needs a subcommand; run 'opencode-unity help delegate'");
+  if (['on', 'off', 'status', 'monitor', 'ledger'].includes(subcommand)) {
+    const paths = getHomePaths(getHomeDir({ env: cliContext.env, platform: cliContext.platform }), { platform: cliContext.platform });
+    return runDelegateControl(cliContext, paths, dependencies);
+  }
   const context = await createDelegateContext(cliContext, dependencies);
   if (subcommand === 'health') return withWarnings(context, await runHealth(context));
-  if (subcommand === 'ledger') return withWarnings(context, await runLedger(context));
   if (subcommand === 'restore') return withWarnings(context, runRestore(context));
   return runJob(context, dependencies);
 }
@@ -97,7 +103,7 @@ export async function createDelegateContext(cliContext, dependencies = {}) {
   const home = getHomeDir({ env: cliContext.env, platform });
   const paths = getHomePaths(home, { platform });
   const { config, warnings } = await loadConfig(paths.config);
-  assertDelegationEnabled(config);
+  if (cliContext.subcommand !== 'restore') assertDelegationEnabled(config);
   const { profile, warnings: profileWarnings } = await loadDelegateProfile({ paths, config, cliVersion: cliContext.version, home, platform });
   const delegate = config.delegate;
   const requestedOutput = readPositiveInteger(cliContext.options.maxOutput) ?? delegate.maxOutputTokens;
@@ -177,6 +183,29 @@ async function runJob(context, dependencies) {
     randomHex: dependencies.randomHex,
   });
   job.warnings.push(...context.warnings);
+  const removeActive = await markActive(context.ledgerPath, job, context.target.modelTag);
+  try {
+    if (context.config.delegate.monitorWindow) {
+      try {
+        const paths = getHomePaths(getHomeDir({ env: context.env, platform: context.platform }), { platform: context.platform });
+        const window = await (dependencies.openWindow ?? openDelegateWindow)({ paths, env: context.env, platform: context.platform });
+        if (!window.opened && !/already open|Another job/.test(window.message)) job.warnings.push(window.message);
+      } catch (error) {
+        job.warnings.push(`Delegate monitor could not open: ${error.message}. The job continues.`);
+      }
+    }
+    return await executeJob(context, job, handler);
+  } finally {
+    await removeActive();
+  }
+}
+
+/**
+ * @param {DelegateContext} context
+ * @param {import('../delegate/results.js').Job} job
+ * @param {typeof runAsk | typeof runMap | typeof runEdit | typeof runApply} handler
+ */
+async function executeJob(context, job, handler) {
   /** @type {import('../delegate/results.js').JobOutcome} */
   let outcome;
   try {
@@ -226,22 +255,12 @@ async function recordJob(context, job, outcome) {
 }
 
 /**
- * @param {DelegateContext} context
- * @returns {Promise<import('../cli/main.js').CommandResult>}
- */
-async function runLedger(context) {
-  const entries = await readLedger(context.ledgerPath);
-  const summary = summarizeLedger(entries, { since: /** @type {string | undefined} */ (context.options.since), now: context.now });
-  return { data: { ledgerPath: context.ledgerPath, ...summary }, message: renderLedgerText(summary, context.ledgerPath) };
-}
-
-/**
  * Spec 12.3 and amendment 36.6: delegation that is switched off refuses with exit 8, so an orchestrator
  * reads one clear "do it yourself" instead of a stack of failed requests.
  * @param {import('../core/config.js').Config} config
  */
 export function assertDelegationEnabled(config) {
-  if (/** @type {{ enabled?: boolean }} */ (config.delegate).enabled === false) {
+  if (config.delegate.enabled === false) {
     throw new CliError('Delegation to the local model is turned off in config.json (delegate.enabled is false)', {
       exitCode: EXIT.UNSUPPORTED,
       code: 'delegate_unsupported',

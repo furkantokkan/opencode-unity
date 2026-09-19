@@ -107,7 +107,7 @@ describe('renderCommandHelp', () => {
   it('lists subcommands for delegate and options for one subcommand', () => {
     const delegate = /** @type {import('../../../src/cli/registry.js').CommandSpec} */ (findCommand('delegate'));
     const text = renderCommandHelp(delegate, undefined, { isAvailable: allAvailable });
-    assert.deepEqual(getFirstWords(getSection(text, 'Subcommands')), ['health', 'ask', 'map', 'edit', 'apply', 'restore', 'ledger']);
+    assert.deepEqual(getFirstWords(getSection(text, 'Subcommands')), ['on', 'off', 'status', 'monitor', 'health', 'ask', 'map', 'edit', 'apply', 'restore', 'ledger']);
     const apply = findSubcommand(delegate, 'apply');
     const applyText = renderCommandHelp(delegate, apply, { isAvailable: allAvailable });
     assert.match(applyText, /opencode-unity delegate apply <reviewId> \[options\]/);

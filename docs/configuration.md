@@ -96,6 +96,8 @@ Preset fields to replace, for example {"model": {"numCtx": 8192}}. Any override 
 
 | Key | Type | Default | Description |
 |---|---|---|---|
+| `delegate.enabled` | boolean | `true` | Allow new delegate jobs. Only the user changes this switch; off does not cancel an existing job. |
+| `delegate.monitorWindow` | boolean | `false` | Open one visible Windows CMD monitor when a delegate job starts. Opt in with delegate monitor --auto on. |
 | `delegate.temperature` | number (0 to 2) | `0.2` | - |
 | `delegate.maxOutputTokens` | integer (1 to 32000) | `2048` | - |
 | `delegate.lockTimeoutSec` | integer (0 to 86400) | `900` | - |

@@ -21,7 +21,7 @@ describe('command registry', () => {
     assert.deepEqual(COMMANDS.map((command) => command.name), [
       'doctor', 'setup', 'init', 'start', 'status', 'guard', 'warm', 'stop', 'bench', 'delegate', 'upgrade', 'uninstall',
     ]);
-    assert.deepEqual(findCommand('delegate')?.subcommands?.map((entry) => entry.name), ['health', 'ask', 'map', 'edit', 'apply', 'restore', 'ledger']);
+    assert.deepEqual(findCommand('delegate')?.subcommands?.map((entry) => entry.name), ['on', 'off', 'status', 'monitor', 'health', 'ask', 'map', 'edit', 'apply', 'restore', 'ledger']);
   });
 
   it('keeps names, descriptions and exit codes well formed', () => {

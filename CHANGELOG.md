@@ -5,6 +5,23 @@ All notable changes to this project are documented here. The format follows
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html). While the version is `0.y.z`, a minor release
 may change the CLI or the config schema, with automatic migrations and a Breaking section.
 
+## [0.1.0-preview.5] - 2026-09-19
+
+### Added
+
+- Persistent user controls: `delegate on`, `off` and `status`. Turning delegation off refuses new
+  jobs before any model call, while history and backup restoration remain available.
+- `delegate monitor` shows running job metadata and recent results. Opt into a shared visible
+  Windows CMD window with `delegate monitor --auto on`; use `--auto off` to disable automatic
+  windows, or `--window` to open one manually. Monitoring never calls the model.
+- Host skill guidance and a copyable standing rule for automatic eligible labor handoff when the
+  CLI is installed, with explicit OFF/refusal handling and job-id reporting.
+
+### Fixed
+
+- The config schema now accepts `delegate.enabled`; the earlier refusal check was unreachable
+  through a valid config. Disabled delegation can still be inspected and re-enabled by its user.
+
 ## [0.1.0-preview.4] - 2026-09-19
 
 The preview.3 tag was not published: its Windows CI run exposed the log-rotation issue fixed here.

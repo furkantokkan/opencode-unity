@@ -245,6 +245,8 @@
       "additionalProperties": false,
       "required": ["temperature", "maxOutputTokens", "lockTimeoutSec", "requestTimeoutSec", "checkTimeoutSec", "checkCommandPrefixes", "extraSensitivePatterns"],
       "properties": {
+        "enabled": { "type": "boolean", "default": true, "description": "Allow new delegate jobs. Only the user changes this switch; off does not cancel an existing job." },
+        "monitorWindow": { "type": "boolean", "default": false, "description": "Open one visible Windows CMD monitor when a delegate job starts. Opt in with delegate monitor --auto on." },
         "temperature": { "type": "number", "minimum": 0, "maximum": 2, "default": 0.2 },
         "maxOutputTokens": { "type": "integer", "minimum": 1, "maximum": 32000, "default": 2048 },
         "lockTimeoutSec": { "type": "integer", "minimum": 0, "maximum": 86400, "default": 900 },

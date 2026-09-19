@@ -1,6 +1,6 @@
 {
   "name": "opencode-unity",
-  "version": "0.1.0-preview.4",
+  "version": "0.1.0-preview.5",
   "description": "Set up and launch OpenCode for Unity C# work with a local model, a GPU guard and a doctor. Unofficial; not affiliated with OpenCode, Ollama or Unity Technologies.",
   "keywords": [
     "opencode",
