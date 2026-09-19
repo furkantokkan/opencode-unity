@@ -260,6 +260,18 @@ export const COMMANDS = Object.freeze([
       { name: 'off', summary: 'Refuse new delegated jobs without cancelling work already running', positionals: [], options: [] },
       { name: 'status', summary: 'Show the switches, active jobs and recent results without contacting Ollama', positionals: [], options: [] },
       {
+        name: 'plan', summary: 'Choose host, ask, map or edit without starting a job or contacting Ollama', positionals: [],
+        options: [
+          { name: 'kind', type: 'string', valueName: 'kind', required: true, choices: ['summary', 'inventory', 'mechanical-edit', 'draft', 'debug', 'design', 'security', 'deploy', 'review', 'unknown'], description: 'Task category selected by the host, not inferred from keywords' },
+          { name: 'task', type: 'string', valueName: 'text|@file', required: true, description: 'Exact task, including required output and verification' },
+          { name: 'files', type: 'variadic', valueName: 'paths|globs...', required: true, description: 'Bounded source files to assess locally' },
+          { name: 'verification', type: 'string', valueName: 'targeted|full|unknown', choices: ['targeted', 'full', 'unknown'], description: 'How much source the host must review; default unknown keeps the task with the host' },
+          { name: 'source-read', type: 'boolean', description: 'The host already read this source; keep the task with the host' },
+          { name: 'tool-sufficient', type: 'boolean', description: 'A search, parser or script already solves the task; skip model work' },
+          { name: 'independent', type: 'boolean', description: 'Per-file results are useful independently; permit map when the combined prompt is too large' },
+        ],
+      },
+      {
         name: 'monitor', summary: 'Watch delegated jobs, or configure the optional Windows CMD window', positionals: [],
         options: [
           { name: 'window', type: 'boolean', description: 'Open one visible Windows CMD monitor and return' },

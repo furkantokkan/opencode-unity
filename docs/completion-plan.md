@@ -1,4 +1,18 @@
-# Completion status — preview.8
+# Completion status — preview.9
+
+## Preview.9 follow-up
+
+- Added advisory `delegate plan` to keep unsuitable work with the host before model inference, prefer
+  one bounded request, and split only independent per-file work that fits the context budget.
+- Updated shipped host skills with source/review cost checks, explicit output coverage and targeted
+  verification. ON/OFF and automatic monitor preferences remain user-controlled and persistent.
+- README and host instructions explain new-session behavior and the distinction between request
+  success, complete output and net savings. See [routing validation](evidence/delegate-routing.md).
+- Local verification passed all 3,885 tests, including 21 routing scenarios, plus typecheck, lint,
+  generated-document checks and release prechecks. CLI smoke checks exercised `ask` and `host`
+  planning decisions without model inference; the release workflow supplies cross-platform evidence.
+
+## Preview.8 baseline
 
 Updated 2026-09-19. The Windows preview integrates the remaining implementation slices from the original unfinished checkout. The original source worktree is preserved. The integration starts from preview.5 commit `85b80c69d9444f13b9dbe972f7fce2ae2cb89827`.
 

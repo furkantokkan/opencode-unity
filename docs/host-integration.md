@@ -19,6 +19,23 @@ file contents against the packaged skill. It does not prove that a running
 host session loaded the skill or that local model inference is available.
 Check `opencode-unity delegate health --json` separately before delegation.
 
+## Task selection in a new session
+
+`delegate on` persists permission to start new jobs. A loaded host skill chooses suitable subtasks;
+it does not forward every user message. The skill now rejects small, already-read, tool-solvable,
+ambiguous or expensive-to-verify work before preflight. Candidates go through the read-only
+`delegate plan` command, then health and the selected `ask`, `map` or `edit` lane. The host supplies
+the task category and verification method; the planner cannot validate natural-language intent.
+See [routing examples and controls](../README.md#route-a-task-before-spending-model-tokens).
+
+Require coverage of the named files and output fields, plus cited evidence or a focused check.
+An incomplete or unsupported answer stays partial even if the model request returned `ok: true`.
+Source-input reduction is not net savings; include review and handoff costs in any comparison.
+
+A new session is ready to use these instructions after `host verify` passes for the installed CLI.
+Whether the host actually follows them is evidenced by its handoff message and a matching job ID in
+`delegate status --json`. The switch alone proves permission, not that a model job ran.
+
 After upgrading the CLI package:
 
 ```sh

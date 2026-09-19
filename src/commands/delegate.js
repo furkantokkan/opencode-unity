@@ -24,6 +24,7 @@ import { runDelegateControl } from '../delegate/controls.js';
 import { markActive } from '../delegate/monitor.js';
 import { openDelegateWindow } from '../terminal/delegate-window.js';
 import { runMap } from '../delegate/map.js';
+import { runPlan } from '../delegate/plan.js';
 import { createModelTarget } from '../delegate/model.js';
 import { attachOrchestratorAction, buildJobResult, createJob, renderJobMeta, writeJobFile } from '../delegate/results.js';
 import { runRestore } from '../delegate/restore.js';
@@ -87,6 +88,7 @@ export async function run(cliContext, dependencies = {}) {
     return runDelegateControl(cliContext, paths, dependencies);
   }
   const context = await createDelegateContext(cliContext, dependencies);
+  if (subcommand === 'plan') return withWarnings(context, await runPlan(context));
   if (subcommand === 'health') return withWarnings(context, await runHealth(context));
   if (subcommand === 'restore') return withWarnings(context, runRestore(context));
   return runJob(context, dependencies);
@@ -161,7 +163,7 @@ export async function createDelegateContext(cliContext, dependencies = {}) {
     requireProject: () => loadProjectFacts({ paths, cwd, platform }),
   };
   // A forced kill leaves an apply journal behind; every later delegate run puts those files back.
-  context.warnings.push(...recoverUnfinishedApplies({ resultsDir: context.resultsDir, now: now() }));
+  if (subcommand !== 'plan') context.warnings.push(...recoverUnfinishedApplies({ resultsDir: context.resultsDir, now: now() }));
   return context;
 }
 

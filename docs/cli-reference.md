@@ -355,6 +355,24 @@ opencode-unity delegate status [options]
 
 Show the switches, active jobs and recent results without contacting Ollama.
 
+### delegate plan
+
+```text
+opencode-unity delegate plan [options]
+```
+
+Choose host, ask, map or edit without starting a job or contacting Ollama.
+
+| Flag | Description |
+|---|---|
+| `--kind <summary\|inventory\|mechanical-edit\|draft\|debug\|design\|security\|deploy\|review\|unknown>` | Task category selected by the host, not inferred from keywords (required) |
+| `--task <text\|@file>` | Exact task, including required output and verification (required) |
+| `--files <paths\|globs...>` | Bounded source files to assess locally (required; takes every value up to the next flag) |
+| `--verification <targeted\|full\|unknown>` | How much source the host must review; default unknown keeps the task with the host |
+| `--source-read` | The host already read this source; keep the task with the host |
+| `--tool-sufficient` | A search, parser or script already solves the task; skip model work |
+| `--independent` | Per-file results are useful independently; permit map when the combined prompt is too large |
+
 ### delegate monitor
 
 ```text

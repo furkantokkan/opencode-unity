@@ -25,7 +25,7 @@ const HOST_FILES = Object.freeze({
 const BYPASS_FLAGS = ['--dangerously-skip-permissions', '--yolo', 'bypassPermissions', 'danger-full-access', 'always-proceed', 'allowNonWorkspaceAccess'];
 
 /** D-H11: the only verbs a standing approval may cover. Nothing that writes, applies or loads unguarded. */
-const READ_ONLY_VERBS = new Set(['doctor', 'status', 'guard', 'delegate health', 'delegate ask', 'delegate map', 'delegate ledger']);
+const READ_ONLY_VERBS = new Set(['doctor', 'status', 'guard', 'delegate plan', 'delegate health', 'delegate ask', 'delegate map', 'delegate ledger']);
 
 /** Antigravity caps a rule file at 12,000 characters (claim 68). */
 const RULE_FILE_LIMIT = 12_000;

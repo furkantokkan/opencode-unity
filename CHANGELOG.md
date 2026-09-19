@@ -5,6 +5,20 @@ All notable changes to this project are documented here. The format follows
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html). While the version is `0.y.z`, a minor release
 may change the CLI or the config schema, with automatic migrations and a Breaking section.
 
+## [0.1.0-preview.9] - 2026-09-19
+
+### Added
+
+- Read-only `delegate plan` routes declared tasks to the host, `ask`, `map` or `edit` using source size, prompt budget, independence and verification scope. It starts no model request or job and does not recover apply journals.
+
+### Changed
+
+- Host skills assess suitability before preflight: keep small, already-read, tool-solvable, ambiguous and expensive-to-review work with the host. Require explicit scope, output coverage and targeted verification for local labor.
+- Prefer one request when the task fits; split only independent per-file work and expose the planned request count. Local answers must identify missing files, fields or uncertain claims.
+- README explains direct OpenCode use, persistent labor and monitor controls, and the recorded zero-net-savings trial. Runtime guards, manual edit review and user-controlled switches remain unchanged.
+
+See [routing validation](docs/evidence/delegate-routing.md) for checks and limits. Routing is advisory: the host declares task intent and remains responsible for verification.
+
 ## [0.1.0-preview.8] - 2026-09-19
 
 The preview.6 and preview.7 tags were not published: CI found platform-dependent test defaults, missing isolated OpenCode/Ollama fixtures and unreferenced mock timeout handles. Preview.8 fixes those test harness assumptions and includes the integrations below. Runtime protections and platform restrictions remain unchanged.
