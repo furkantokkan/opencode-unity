@@ -18,13 +18,14 @@
 // from a plugin hook, so OpenCode's retry classifier never reads them (spec 7.6 governs that path).
 // Product-authored wording here is still held to the same rule by `unit/opencode/retry-safety`, but a
 // name a merged config chose is printed verbatim: the user cannot find the offending entry otherwise.
+import path from 'node:path';
 import { sha256Hex } from '../core/hash.js';
 import { CliError, EXIT } from '../cli/exit-codes.js';
 import { buildRuleset, evaluatePermission, flattenPermission, isPermissionAction } from './permission-eval.js';
 import { DEFAULT_AGENT, PROVIDER_ID } from './render.js';
 import { MCP_SERVER_ID } from './content.js';
 
-export const VERIFY_CACHE_VERSION = 1;
+export const VERIFY_CACHE_VERSION = 2;
 /** Spec 8.2 V-a: `opencode debug agent` gets 60 s and one retry. */
 export const AGENT_PROBE_TIMEOUT_MS = 60000;
 
@@ -96,9 +97,8 @@ export function buildNonNegotiableTuples(extraTuples = []) {
  */
 
 /**
- * V-a: the plugin loaded and the provider was injected. `opencode debug agent <name>` resolves the
- * default model and fails with "Model not found" when the provider is missing, so a clean exit is the
- * proof that the whole chain works (OC `cli/cmd/debug/agent.ts` L4-27, `agent.handler.ts` L67-80).
+ * V-a: the agent probe finished successfully. OpenCode can exit cleanly even when the plugin is
+ * missing; V-d separately requires the profile plugin and its injected provider/model.
  * @param {object} probe
  * @param {number} probe.exitCode
  * @param {boolean} [probe.timedOut]
@@ -197,11 +197,30 @@ export function verifyConfigShape({ config, expected }) {
   addValueFailure(failures, 'enabled_providers', config.enabled_providers, [PROVIDER_ID]);
 
   const fold = expected.caseInsensitivePaths ?? false;
-  const origins = Object.values(config.plugin_origins ?? {}).flat().filter((origin) => typeof origin === 'string');
-  for (const origin of /** @type {string[]} */ (origins)) {
-    if (!isInsideDirectory(origin, expected.profileDir, fold)) {
-      failures.push({ check: 'V-d', rule: 'every plugin comes from the profile directory', effective: origin, expected: expected.profileDir, source: origin });
+  const plugins = Array.isArray(config.plugin) ? config.plugin : [];
+  const pluginPaths = plugins.map((entry) => pluginFilePath(Array.isArray(entry) ? entry[0] : entry));
+  const requiredPlugin = `${expected.profileDir}/plugins/opencode-unity.js`;
+  if (!pluginPaths.some((file) => samePath(file, requiredPlugin, fold))) {
+    failures.push({ check: 'V-d', rule: 'the guard plugin is present in the resolved config', effective: 'missing', expected: requiredPlugin, source: 'the profile plugins directory' });
+  }
+  for (let index = 0; index < pluginPaths.length; index += 1) {
+    const file = pluginPaths[index];
+    if (file === null || !isInsideDirectory(file, expected.profileDir, fold)) {
+      failures.push({ check: 'V-d', rule: 'every plugin comes from the profile directory', effective: file ?? describe(plugins[index]), expected: expected.profileDir, source: file ?? 'the resolved plugin list' });
     }
+  }
+  // OpenCode 1.18.31 reports an array of {spec, source, scope}, not a name-to-paths map.
+  const origins = Array.isArray(config.plugin_origins) ? config.plugin_origins : [];
+  for (const origin of origins) {
+    const file = pluginFilePath(origin?.spec);
+    const source = origin?.source;
+    if (file === null || !isInsideDirectory(file, expected.profileDir, fold)
+      || typeof source !== 'string' || (!samePath(source, expected.profileDir, fold) && !isInsideDirectory(source, expected.profileDir, fold))) {
+      failures.push({ check: 'V-d', rule: 'every plugin origin comes from the profile directory', effective: file ?? describe(origin), expected: expected.profileDir, source: typeof source === 'string' ? source : 'the resolved plugin origins' });
+    }
+  }
+  if (!config.provider?.[PROVIDER_ID]?.models?.[expected.modelTag]) {
+    failures.push({ check: 'V-d', rule: 'the local provider includes the preset model', effective: 'missing', expected: model, source: 'the guard plugin provider hook' });
   }
 
   const instructions = Array.isArray(config.instructions) ? config.instructions : [];
@@ -490,8 +509,20 @@ function samePath(a, b, fold) {
  * @returns {string}
  */
 function normalizePath(value, fold) {
-  const normalized = value.replace(/\\/g, '/');
+  const normalized = path.posix.normalize(value.replace(/\\/g, '/'));
   return fold ? normalized.toLowerCase() : normalized;
+}
+
+/** @param {unknown} spec @returns {string | null} */
+function pluginFilePath(spec) {
+  if (typeof spec !== 'string') return null;
+  try {
+    const url = new URL(spec);
+    if (url.protocol !== 'file:' || url.hostname || url.search || url.hash) return null;
+    return decodeURIComponent(url.pathname).replace(/^\/(?=[a-z]:\/)/i, '');
+  } catch {
+    return null;
+  }
 }
 
 /**

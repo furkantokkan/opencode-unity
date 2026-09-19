@@ -1,6 +1,6 @@
 # Spec 21.3 and 27. A tag publishes only what CI proved: ci.yml runs first, the release metadata is
-# verified, the tarball is built once and the same bytes are published to npm (provenance through
-# trusted publishing, no long-lived token) and attached to the GitHub release with SHA256SUMS.
+# verified, and the tarball is built once and attached to GitHub with SHA256SUMS. Stable tags also
+# publish those same bytes to npm with provenance; preview tags never publish to npm.
 name: release
 
 on:
@@ -45,16 +45,10 @@ jobs:
         env:
           OPENCODE_UNITY_DENYLIST: ${{ secrets.PERSONAL_DATA_DENYLIST }}
 
-  publish:
-    name: publish
+  pack:
+    name: pack
     needs: verify
-    # Previews ship from GitHub only (README: "installed from GitHub, not from npm"; the npm release is
-    # the v0.1 stable gate). A prerelease tag stops after verify; github-release is skipped with it.
-    if: ${{ !contains(github.ref_name, '-') }}
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -62,11 +56,7 @@ jobs:
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: "24"
-          registry-url: https://registry.npmjs.org
           package-manager-cache: false
-      - name: npm must support trusted publishing
-        run: |
-          node -e "const v = process.argv[1].split('-')[0].split('.').map(Number); if (v[0] < 11 || (v[0] === 11 && (v[1] < 5 || (v[1] === 5 && v[2] < 1)))) { console.error('npm >= 11.5.1 is required for trusted publishing, found ' + process.argv[1]); process.exit(1); }" "$(npm --version)"
       - name: Pack the tarball and hash it
         id: pack
         run: |
@@ -74,10 +64,7 @@ jobs:
           sha256sum "$TARBALL" > SHA256SUMS
           cat SHA256SUMS
           echo "tarball=$TARBALL" >> "$GITHUB_OUTPUT"
-          echo "dist_tag=$(node -p "require('./package.json').version.includes('-') ? 'next' : 'latest'")" >> "$GITHUB_OUTPUT"
-      - name: Publish to npm with provenance
-        run: npm publish "${{ steps.pack.outputs.tarball }}" --provenance --access public --tag "${{ steps.pack.outputs.dist_tag }}"
-      - name: Keep the published bytes for the GitHub release
+      - name: Keep the verified bytes for both destinations
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: release-tarball
@@ -86,9 +73,38 @@ jobs:
             SHA256SUMS
           if-no-files-found: error
 
+  publish:
+    name: publish
+    needs: pack
+    # Previews are distributed only through GitHub. Skipping npm must not skip their GitHub release.
+    if: ${{ !contains(github.ref_name, '-') }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24"
+          registry-url: https://registry.npmjs.org
+          package-manager-cache: false
+      - name: npm must support trusted publishing
+        run: |
+          node -e "const v = process.argv[1].split('-')[0].split('.').map(Number); if (v[0] < 11 || (v[0] === 11 && (v[1] < 5 || (v[1] === 5 && v[2] < 1)))) { console.error('npm >= 11.5.1 is required for trusted publishing, found ' + process.argv[1]); process.exit(1); }" "$(npm --version)"
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: release-tarball
+          path: ${{ runner.temp }}/dist
+      - name: Publish the verified tarball to npm with provenance
+        working-directory: ${{ runner.temp }}/dist
+        run: |
+          sha256sum --check SHA256SUMS
+          npm publish ./*.tgz --provenance --access public --tag latest
+
   github-release:
     name: github-release
-    needs: publish
+    needs: [pack, publish]
+    if: ${{ !cancelled() && needs.pack.result == 'success' && (needs.publish.result == 'success' || needs.publish.result == 'skipped') }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -104,6 +120,9 @@ jobs:
         with:
           name: release-tarball
           path: ${{ runner.temp }}/dist
+      - name: Verify the downloaded bytes
+        working-directory: ${{ runner.temp }}/dist
+        run: sha256sum --check SHA256SUMS
       - name: Release notes from the changelog
         run: node scripts/check-package-files.mjs --release --tag "$GITHUB_REF_NAME" --release-notes "$RUNNER_TEMP/notes.md"
       - name: Create the GitHub release
@@ -113,4 +132,4 @@ jobs:
           PRERELEASE=""
           case "$GITHUB_REF_NAME" in *-*) PRERELEASE="--prerelease";; esac
           gh release create "$GITHUB_REF_NAME" "$RUNNER_TEMP"/dist/*.tgz "$RUNNER_TEMP/dist/SHA256SUMS" \
-            --title "$GITHUB_REF_NAME" --notes-file "$RUNNER_TEMP/notes.md" $PRERELEASE
+            --verify-tag --title "$GITHUB_REF_NAME" --notes-file "$RUNNER_TEMP/notes.md" $PRERELEASE

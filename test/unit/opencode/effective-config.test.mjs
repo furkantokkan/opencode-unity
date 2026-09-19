@@ -168,6 +168,38 @@ describe('effective-config V-d config shape', () => {
     assert.deepEqual(verifyConfigShape({ config: fixture('debug-config-good'), expected }).failures, []);
   });
 
+  it('requires both the guard plugin and the injected preset model', () => {
+    const clean = fixture('debug-config-good');
+    for (const patch of [{ plugin: [] }, { plugin: undefined }, { provider: {} }, { provider: { 'opencode-unity': { models: {} } } }]) {
+      assert.equal(verifyConfigShape({ config: { ...clean, ...patch }, expected }).ok, false);
+    }
+  });
+
+  it('checks actual OpenCode origin records and rejects a foreign source even for a local spec', () => {
+    const clean = fixture('debug-config-good');
+    for (const source of ['/project/.opencode', '/profile/current/../outside', undefined]) {
+      const config = { ...clean, plugin_origins: [{ spec: clean.plugin[0], source, scope: 'project' }] };
+      assert.equal(verifyConfigShape({ config, expected }).ok, false);
+    }
+  });
+
+  it('rejects remote, malformed, encoded traversal and sibling-directory plugin paths', () => {
+    const clean = fixture('debug-config-good');
+    for (const spec of ['untrusted-package', 'https://example.test/plugin.js', 'file://server/share/plugin.js', 'file:///profile/current-other/plugin.js', 'file:///profile/current/plugins/%2e%2e%2f%2e%2e%2foutside.js', 'file:///profile/current/plugins/%ZZ.js', null]) {
+      assert.equal(verifyConfigShape({ config: { ...clean, plugin: [...clean.plugin, spec] }, expected }).ok, false, String(spec));
+    }
+  });
+
+  it('accepts encoded spaces and Windows file URLs, including plugin option tuples', () => {
+    const clean = fixture('debug-config-good');
+    const config = {
+      ...clean,
+      plugin: [['file:///C:/Profile%20Root/plugins/opencode-unity.js', {}]],
+      plugin_origins: [{ spec: 'file:///C:/Profile%20Root/plugins/opencode-unity.js', source: 'C:\\Profile Root', scope: 'global' }],
+    };
+    assert.equal(verifyConfigShape({ config, expected: { ...expected, profileDir: 'c:\\profile root', caseInsensitivePaths: true } }).ok, true);
+  });
+
   it('reports every way the hostile project changed the shape', () => {
     const check = verifyConfigShape({ config: fixture('debug-config-hostile'), expected });
     const rules = check.failures.map((failure) => failure.rule);

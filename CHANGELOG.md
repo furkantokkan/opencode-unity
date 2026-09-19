@@ -5,6 +5,43 @@ All notable changes to this project are documented here. The format follows
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html). While the version is `0.y.z`, a minor release
 may change the CLI or the config schema, with automatic migrations and a Breaking section.
 
+## [0.1.0-preview.3] - 2026-09-19
+
+### Fixed
+
+- Startup now requires the guard plugin and its local provider/model in OpenCode's resolved config.
+  A successful agent probe alone could previously accept a missing plugin. Plugin origins now use
+  OpenCode's actual record format, and foreign plugins are refused before the interactive session.
+- The CI contract job now runs real OpenCode tests instead of an empty test glob. The weekly drift
+  check uses that suite instead of a missing fixture-generation script.
+- Preview tags now automatically publish a GitHub prerelease after CI and release checks pass.
+  Previously, skipping npm also skipped the GitHub release job, leaving previews without packages.
+- Package once, attach the installable tarball and `SHA256SUMS`, and verify the downloaded artifact
+  before release. Stable releases reuse the same bytes for npm provenance publishing.
+
+### Changed
+
+- Updated the installation instructions and host skills to this version, with an explicit upgrade
+  path for existing profiles and instructions for installing the GitHub release asset.
+- Added release workflow regression checks for preview publication, failed stable npm publishing,
+  single-build packaging and checksum verification.
+- Added real OpenCode contract checks for a valid profile, disabled sharing, a missing guard plugin
+  and a foreign project plugin, plus unit cases for provider and plugin path validation.
+
+This remains a Windows reference preview. Linux/macOS model-load support, the larger hardware
+benchmark series and the other features in the README roadmap are still pending. The native tool-call
+limitation documented in `docs/evidence/v0.1/reference-rtx3090-16k.md` still applies. No npm package is
+published for this preview.
+
+Install:
+
+```sh
+npm install -g "github:furkantokkan/opencode-unity#v0.1.0-preview.3"
+```
+
+For an existing installation, run `opencode-unity upgrade`, then `opencode-unity doctor`.
+For a first installation, follow the setup steps in the README.
+
 ## [0.1.0-preview.2] - 2026-09-18
 
 ### Added
@@ -83,5 +120,6 @@ release-gate series is not in this preview.
 - opencode-unity is not a sandbox. The permission rules and the shell guard stop the actions they name;
   a compile check runs the project's own MSBuild logic.
 
+[0.1.0-preview.3]: https://github.com/furkantokkan/opencode-unity/releases/tag/v0.1.0-preview.3
 [0.1.0-preview.2]: https://github.com/furkantokkan/opencode-unity/releases/tag/v0.1.0-preview.2
 [0.1.0-preview.1]: https://github.com/furkantokkan/opencode-unity/releases/tag/v0.1.0-preview.1

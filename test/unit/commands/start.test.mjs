@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { describe, it } from 'node:test';
 import { ATTENTION_PAUSE_MS, buildOpencodeArgs, OLLAMA_START_TIMEOUT_MS, spawnOpencode, startDetached } from '../../../src/commands/start.js';
 import { createInterruptController } from '../../../src/cli/signals.js';
@@ -98,7 +99,8 @@ function createEditorRunner(ready) {
     share: 'disabled',
     autoupdate: false,
     instructions: [ready.projectPaths.facts],
-    plugin_origins: {},
+    plugin: [pathToFileURL(path.join(ready.harness.paths.profile(CLI_VERSION).dir, 'plugins', 'opencode-unity.js')).href],
+    provider: { 'opencode-unity': { models: { [MODEL_TAG]: {} } } },
     mcp: { unityMCP: { type: 'remote', url: HUB_URL } },
   };
   return createRunner({
@@ -135,7 +137,9 @@ async function prepareStart(t, { version = TESTED_OPENCODE, agentJson, configJso
     autoupdate: false,
     default_agent: 'unity-code',
     instructions: [projectPaths.facts.replace(/\\/g, '/')],
-    plugin_origins: { 'opencode-unity': [path.join(profileDir, 'plugins', 'opencode-unity.js')] },
+    plugin: [pathToFileURL(path.join(profileDir, 'plugins', 'opencode-unity.js')).href],
+    plugin_origins: [{ spec: pathToFileURL(path.join(profileDir, 'plugins', 'opencode-unity.js')).href, source: profileDir, scope: 'global' }],
+    provider: { 'opencode-unity': { models: { [MODEL_TAG]: {} } } },
     mcp: {},
   };
   const runner = createRunner({

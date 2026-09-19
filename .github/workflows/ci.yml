@@ -133,7 +133,7 @@ jobs:
         if: steps.opencode-cache.outputs.cache-hit != 'true'
         run: npm install --prefix "$env:RUNNER_TEMP/opencode" --no-audit --no-fund opencode-ai@1.18.31
       - name: Contract tests (real OpenCode binary, mock servers)
-        run: node --test "test/contract/**/*.test.mjs"
+        run: npm run test:contract
         env:
           OPENCODE_UNITY_TEST_OPENCODE: ${{ runner.temp }}\opencode\node_modules\opencode-ai\bin\opencode.exe
           OPENCODE_UNITY_TEST_ARTIFACTS: ${{ runner.temp }}\contract-artifacts

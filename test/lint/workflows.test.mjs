@@ -210,6 +210,10 @@ describe('ci.yml jobs', () => {
     assert.match(contract, /opencode-ai@1\.18\.31/);
     assert.match(contract, /uses: actions\/cache@/);
     assert.match(contract, /OPENCODE_UNITY_TEST_OPENCODE: /);
+    assert.match(contract, /run: npm run test:contract/);
+    const manifest = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'package.json'), 'utf8'));
+    assert.equal(manifest.scripts['test:contract'], 'node --test "test/contract/opencode.test.mjs"');
+    assert.ok(fs.existsSync(path.join(REPO_ROOT, 'test/contract/opencode.test.mjs')), 'the contract suite must exist');
     assert.match(contract, /if: failure\(\)\n\s+uses: actions\/upload-artifact@/);
   });
 
@@ -224,11 +228,12 @@ describe('release.yml', () => {
 
   it('runs only on version tags and reuses ci.yml first', () => {
     assert.match(release, /tags: \["v\*\.\*\.\*"\]/);
-    assert.deepEqual(jobIds(release), ['ci', 'verify', 'publish', 'github-release']);
+    assert.deepEqual(jobIds(release), ['ci', 'verify', 'pack', 'publish', 'github-release']);
     assert.match(jobBlock(release, 'ci'), /uses: \.\/\.github\/workflows\/ci\.yml/);
     assert.match(jobBlock(release, 'verify'), /needs: ci/);
-    assert.match(jobBlock(release, 'publish'), /needs: verify/);
-    assert.match(jobBlock(release, 'github-release'), /needs: publish/);
+    assert.match(jobBlock(release, 'pack'), /needs: verify/);
+    assert.match(jobBlock(release, 'publish'), /needs: pack/);
+    assert.match(jobBlock(release, 'github-release'), /needs: \[pack, publish\]/);
     assert.doesNotMatch(release, /cancel-in-progress: true/);
   });
 
@@ -240,18 +245,34 @@ describe('release.yml', () => {
   });
 
   it('publishes the packed bytes with provenance and attaches them to the release', () => {
+    const pack = jobBlock(release, 'pack');
+    assert.match(pack, /npm pack --ignore-scripts/);
+    assert.match(pack, /sha256sum/);
+    assert.match(pack, /uses: actions\/upload-artifact@/);
+    assert.equal((release.match(/npm pack --ignore-scripts/g) ?? []).length, 1);
     const publish = jobBlock(release, 'publish');
     assert.match(publish, /registry-url: https:\/\/registry\.npmjs\.org/);
-    assert.match(publish, /npm pack --ignore-scripts/);
-    assert.match(publish, /sha256sum/);
-    assert.match(publish, /npm publish "\$\{\{ steps\.pack\.outputs\.tarball \}\}" --provenance --access public --tag/);
+    assert.match(publish, /uses: actions\/download-artifact@/);
+    assert.match(publish, /sha256sum --check SHA256SUMS/);
+    assert.match(publish, /npm publish \.\/\*\.tgz --provenance --access public --tag latest/);
     assert.doesNotMatch(publish, /NODE_AUTH_TOKEN|NPM_TOKEN/);
     const githubRelease = jobBlock(release, 'github-release');
     assert.match(githubRelease, /uses: actions\/download-artifact@/);
     assert.match(githubRelease, /--release-notes/);
     assert.match(githubRelease, /gh release create "\$GITHUB_REF_NAME"/);
     assert.match(githubRelease, /SHA256SUMS/);
+    assert.match(githubRelease, /sha256sum --check SHA256SUMS/);
     assert.match(githubRelease, /--prerelease/);
+    assert.match(githubRelease, /--verify-tag/);
+  });
+
+  it('releases previews on GitHub after npm is skipped, but blocks a failed stable publish', () => {
+    assert.match(jobBlock(release, 'publish'), /if: \$\{\{ !contains\(github\.ref_name, '-'\) \}\}/);
+    assert.doesNotMatch(jobBlock(release, 'pack'), /^\s+if:/m);
+    const githubRelease = jobBlock(release, 'github-release');
+    assert.match(githubRelease, /!cancelled\(\)/);
+    assert.match(githubRelease, /needs\.pack\.result == 'success'/);
+    assert.match(githubRelease, /\(needs\.publish\.result == 'success' \|\| needs\.publish\.result == 'skipped'\)/);
   });
 });
 
@@ -267,9 +288,9 @@ describe('contract-latest.yml', () => {
   it('keeps going on failure and files one issue per drifting version', () => {
     const job = jobBlock(drift, 'drift');
     assert.match(job, /id: contract\n\s+continue-on-error: true/);
-    assert.match(job, /id: fixtures\n\s+continue-on-error: true/);
-    assert.match(job, /refresh-opencode-fixtures\.mjs/);
-    assert.match(job, /if: steps\.contract\.outcome == 'failure' \|\| steps\.fixtures\.outcome == 'failure'/);
+    assert.match(job, /run: npm run test:contract/);
+    assert.match(job, /OPENCODE_UNITY_TEST_VERSION: \$\{\{ steps\.version\.outputs\.version \}\}/);
+    assert.match(job, /if: steps\.contract\.outcome == 'failure'/);
     assert.match(job, /gh issue comment/);
     assert.match(job, /gh issue create --title \$title/);
     assert.match(job, /GH_TOKEN: \$\{\{ github\.token \}\}/);

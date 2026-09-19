@@ -47,39 +47,25 @@ jobs:
       - name: Contract tests against the latest version
         id: contract
         continue-on-error: true
-        run: node --test "test/contract/**/*.test.mjs"
+        run: npm run test:contract
         env:
           OPENCODE_UNITY_TEST_OPENCODE: ${{ runner.temp }}\opencode\node_modules\opencode-ai\bin\opencode.exe
           OPENCODE_UNITY_TEST_ARTIFACTS: ${{ runner.temp }}\contract-artifacts
-      - name: Refresh the generated OpenCode fixtures and diff them
-        id: fixtures
-        continue-on-error: true
-        run: |
-          node scripts/refresh-opencode-fixtures.mjs
-          $changes = git status --porcelain -- src/opencode
-          if ($changes) {
-            Write-Output "Generated OpenCode fixtures changed:"
-            Write-Output $changes
-            git --no-pager diff -- src/opencode
-            exit 1
-          }
-      - name: Upload contract artifacts and fixture candidates
+          OPENCODE_UNITY_TEST_VERSION: ${{ steps.version.outputs.version }}
+      - name: Upload captured OpenCode contract output
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: contract-latest-${{ steps.version.outputs.version }}
-          path: |
-            ${{ runner.temp }}/contract-artifacts
-            src/opencode
+          path: ${{ runner.temp }}/contract-artifacts
           if-no-files-found: ignore
           include-hidden-files: true
       - name: Open or update the drift issue
-        if: steps.contract.outcome == 'failure' || steps.fixtures.outcome == 'failure'
+        if: steps.contract.outcome == 'failure'
         env:
           GH_TOKEN: ${{ github.token }}
           VERSION: ${{ steps.version.outputs.version }}
           CONTRACT_OUTCOME: ${{ steps.contract.outcome }}
-          FIXTURES_OUTCOME: ${{ steps.fixtures.outcome }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           $title = "OpenCode drift: $env:VERSION"
@@ -87,13 +73,11 @@ jobs:
           The weekly drift job ran against ``opencode-ai@$env:VERSION`` (tested version: 1.18.31).
 
           - contract suite: $env:CONTRACT_OUTCOME
-          - generated fixtures (schema keys, retry patterns, expected tools): $env:FIXTURES_OUTCOME
 
           Run and artifacts: $env:RUN_URL
 
-          Bumping the tested version is a minor release and needs the checklist in spec section 22:
-          contract green, fixtures regenerated and reviewed, gates G1, G2 and G5 re-run on reference
-          hardware, and a changelog entry.
+          Before changing the tested version, review the captured config and agent output, run all
+          tests and reference hardware checks, update compatibility metadata and add a changelog entry.
           "@
           $existing = (gh issue list --state open --search "$title in:title" --json number,title --jq "[.[] | select(.title == `"$title`")] | .[0].number // empty" | Out-String).Trim()
           if ($existing) {

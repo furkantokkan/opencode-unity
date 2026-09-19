@@ -23,6 +23,10 @@ npm run lint
   doctor check; CI fails when they differ.
 - The package round trip (`test/install/package-roundtrip.test.mjs`) packs and installs the package, so
   it runs only when `OPENCODE_UNITY_TEST_PACKAGE_ROUNDTRIP=1` is set, as in the CI package job.
+- `npm run test:contract` runs the shipped profile and plugin inside the real OpenCode binary, against
+  a mock Ollama server. Set `OPENCODE_UNITY_TEST_OPENCODE` to the executable path first; an unset path
+  fails explicitly. `OPENCODE_UNITY_TEST_ARTIFACTS` optionally saves the probe output for inspection.
+  This verifies startup and refusal paths; it does not measure real-model quality or GPU behavior.
 
 ## Conventions
 
@@ -41,6 +45,18 @@ npm run lint
   line, or an official documentation page.
 - Prompts, skills and templates are original text. Do not copy text or code from GPL projects or from
   Unity Companion License material; credit an idea in `NOTICE.md` instead.
+
+## Release verification
+
+Before tagging, run the checks above, `npm run check:release`, the real OpenCode contract suite and the
+package round trip. Keep the package version, lockfile, README install commands, host files, security
+support table and changelog in sync. Do not relabel experimental hardware or model results without
+new evidence.
+
+A version tag runs CI, validates the release metadata, then builds one tarball and `SHA256SUMS`.
+Preview tags publish those files as a GitHub prerelease without contacting npm. Stable tags first
+publish the same tarball to npm using trusted publishing; a failed npm publish blocks the GitHub
+release. Downloaded artifacts are checked against their checksum before either publication.
 
 ## No personal data
 
