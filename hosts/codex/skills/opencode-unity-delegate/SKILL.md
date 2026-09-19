@@ -5,7 +5,7 @@ description: Preview. Hand token-heavy, low-ambiguity Unity and C# work (multi-f
 
 # opencode-unity delegate (preview)
 
-This is a preview host file for opencode-unity 0.1.0-preview.3. It tells you, the host agent, when and
+This is a preview host file for opencode-unity 0.1.0-preview.4. It tells you, the host agent, when and
 how to hand work to a local model through `opencode-unity delegate`, and how to read what comes back.
 opencode-unity is MIT licensed and runs on this machine. It is unofficial and not affiliated with
 OpenCode, Ollama or Unity Technologies.

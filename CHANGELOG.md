@@ -5,10 +5,15 @@ All notable changes to this project are documented here. The format follows
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html). While the version is `0.y.z`, a minor release
 may change the CLI or the config schema, with automatic migrations and a Breaking section.
 
-## [0.1.0-preview.3] - 2026-09-19
+## [0.1.0-preview.4] - 2026-09-19
+
+The preview.3 tag was not published: its Windows CI run exposed the log-rotation issue fixed here.
 
 ### Fixed
 
+- Ollama log rotation preserves native file identifiers as big integers. Large Windows file IDs
+  could round to the same JavaScript number, causing the follower to skip old lines and start partway
+  through the replacement file. A deterministic regression test reproduces the collision.
 - Startup now requires the guard plugin and its local provider/model in OpenCode's resolved config.
   A successful agent probe alone could previously accept a missing plugin. Plugin origins now use
   OpenCode's actual record format, and foreign plugins are refused before the interactive session.
@@ -36,7 +41,7 @@ published for this preview.
 Install:
 
 ```sh
-npm install -g "github:furkantokkan/opencode-unity#v0.1.0-preview.3"
+npm install -g "github:furkantokkan/opencode-unity#v0.1.0-preview.4"
 ```
 
 For an existing installation, run `opencode-unity upgrade`, then `opencode-unity doctor`.
@@ -120,6 +125,6 @@ release-gate series is not in this preview.
 - opencode-unity is not a sandbox. The permission rules and the shell guard stop the actions they name;
   a compile check runs the project's own MSBuild logic.
 
-[0.1.0-preview.3]: https://github.com/furkantokkan/opencode-unity/releases/tag/v0.1.0-preview.3
+[0.1.0-preview.4]: https://github.com/furkantokkan/opencode-unity/releases/tag/v0.1.0-preview.4
 [0.1.0-preview.2]: https://github.com/furkantokkan/opencode-unity/releases/tag/v0.1.0-preview.2
 [0.1.0-preview.1]: https://github.com/furkantokkan/opencode-unity/releases/tag/v0.1.0-preview.1

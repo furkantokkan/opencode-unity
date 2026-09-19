@@ -200,6 +200,30 @@ describe('createLogFollower', () => {
     assert.deepEqual(await follower.poll(), ['fresh']);
   });
 
+  it('distinguishes rotated files whose native identifiers collide as JavaScript numbers', async (t) => {
+    const sandbox = await useSandbox(t, 'server-log-wide-identity');
+    const file = sandbox.path('server.log');
+    const rotated = sandbox.path('server-1.log');
+    const originalStat = fs.stat.bind(fs);
+    let replaced = false;
+    t.mock.method(fs, 'stat', async (target, options) => {
+      const stat = await originalStat(target, options);
+      if (target !== file && target !== rotated) return stat;
+      const ino = replaced && target === file ? 9007199254740993n : 9007199254740992n;
+      return options?.bigint
+        ? { ...stat, ino, birthtimeNs: 1n }
+        : { ...stat, ino: Number(ino), birthtimeMs: 1 };
+    });
+    await fs.writeFile(file, 'before\n');
+    const follower = createLogFollower(file);
+    await follower.poll();
+    await fs.appendFile(file, 'last of the old file\n');
+    await fs.rename(file, rotated);
+    await fs.writeFile(file, 'first of the new file\n');
+    replaced = true;
+    assert.deepEqual(await follower.poll(), ['last of the old file', 'first of the new file']);
+  });
+
   it('is quiet while the file does not exist yet', async (t) => {
     const sandbox = await useSandbox(t, 'server-log-missing');
     const file = sandbox.path('server.log');

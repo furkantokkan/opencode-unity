@@ -278,14 +278,14 @@ export function createLogFollower(filePath, { startAtEnd = true, rotatedPath = p
       if (!started) {
         started = true;
         if (stat && startAtEnd) {
-          position = { identity: getIdentity(stat), offset: stat.size };
+          position = { identity: getIdentity(stat), offset: Number(stat.size) };
           return [];
         }
       }
       let text = '';
       if (position && (!stat || getIdentity(stat) !== position.identity)) {
         const rotated = await statOrNull(rotatedPath);
-        if (rotated && getIdentity(rotated) === position.identity) text += await readRange(rotatedPath, position.offset, rotated.size);
+        if (rotated && getIdentity(rotated) === position.identity) text += await readRange(rotatedPath, position.offset, Number(rotated.size));
         if (!stat) {
           position = null;
           return takeLines(text);
@@ -294,9 +294,10 @@ export function createLogFollower(filePath, { startAtEnd = true, rotatedPath = p
       }
       if (!stat) return takeLines(text);
       const identity = getIdentity(stat);
-      const offset = position && stat.size >= position.offset ? position.offset : 0;
-      text += await readRange(filePath, offset, stat.size);
-      position = { identity, offset: stat.size };
+      const size = Number(stat.size);
+      const offset = position && size >= position.offset ? position.offset : 0;
+      text += await readRange(filePath, offset, size);
+      position = { identity, offset: size };
       return takeLines(text);
     },
   };
@@ -346,11 +347,11 @@ async function readRange(filePath, start, end) {
 
 /**
  * @param {string} filePath
- * @returns {Promise<import('node:fs').Stats | null>}
+ * @returns {Promise<import('node:fs').BigIntStats | null>}
  */
 async function statOrNull(filePath) {
   try {
-    return await fsp.stat(filePath);
+    return await fsp.stat(filePath, { bigint: true });
   } catch (error) {
     if (/** @type {{ code?: string }} */ (error)?.code === 'ENOENT') return null;
     throw error;
@@ -359,11 +360,13 @@ async function statOrNull(filePath) {
 
 /**
  * A renamed file keeps its identity; a newly created file at the same path gets a new one.
- * @param {import('node:fs').Stats} stat
+ * Native file IDs can exceed Number.MAX_SAFE_INTEGER on Windows. Preserve all their bits so a
+ * replacement file is never mistaken for the previous file at its old byte offset.
+ * @param {import('node:fs').BigIntStats} stat
  * @returns {string}
  */
 function getIdentity(stat) {
-  return `${stat.dev}:${stat.ino}:${stat.birthtimeMs}`;
+  return `${stat.dev}:${stat.ino}:${stat.birthtimeNs}`;
 }
 
 /**
