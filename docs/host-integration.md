@@ -36,6 +36,27 @@ A new session is ready to use these instructions after `host verify` passes for 
 Whether the host actually follows them is evidenced by its handoff message and a matching job ID in
 `delegate status --json`. The switch alone proves permission, not that a model job ran.
 
+### Check whether a new session used labor
+
+Check `opencode-unity delegate status --json` for active jobs and recent results, and
+`opencode-unity delegate ledger --since 1d --json` for recent usage. Match each job's working
+directory and timestamp to the host session. Read-only `plan` and `health` calls are not model jobs.
+
+Inspect the host's visible messages and command history to distinguish these cases:
+
+- No delegation call: the host has not started a job. Without an explanation, the reason is unknown;
+  do not attribute every unused session to a GPU block. This skill is guidance, not a mandatory host hook.
+- `plan` returns `host`: the task stays with the main agent; no inference was requested.
+- `health` refuses: report the returned reason. An `ollama_unreachable` result can mean the Ollama
+  app/server is stopped; RAM offload cannot fix that. Do not retry automatically or relax other guards.
+- `health` passes: the worker is available at that moment. Only a subsequent model job proves use.
+
+When explaining a decision, distinguish unsuitable work from unavailable resources. Keep small,
+already-read or tool-solvable work with the host; do not start a demonstration job just to add history.
+For an explicit RAM-offload opt-in, use the [configuration steps](../README.md#opt-into-system-ram-offload).
+
+## Update or remove a host skill
+
 After upgrading the CLI package:
 
 ```sh

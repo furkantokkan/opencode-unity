@@ -558,6 +558,38 @@ When the card is a little short of video memory, `guard.allowOffload` changes th
 load: the part of the model that does not fit runs from system RAM, replies are slower, and the
 free-memory minimum still applies. It is off by default.
 
+### Opt into system RAM offload
+
+On a supported Windows installation, edit `%LOCALAPPDATA%\opencode-unity\config.json` (or the config
+inside your custom `OPENCODE_UNITY_HOME`). Merge this field into the existing `guard` object; keep
+your other settings:
+
+```json
+{
+  "guard": {
+    "allowOffload": true
+  }
+}
+```
+
+Refresh the generated profile, then check readiness without loading the model:
+
+```powershell
+opencode-unity setup --dry-run
+opencode-unity setup
+opencode-unity delegate health --json
+```
+
+Restart an already-open OpenCode session to use the refreshed profile. This is a per-machine opt-in;
+it does not change the default for other users. To undo it, set the field to `false` and run `setup`
+again. GPU activity, Unity activity, editor-count and probe-failure checks remain enabled.
+
+The default 1,500 MiB threshold is a video-memory reserve, **not a system-RAM usage limit**. <!-- claim-ok: guard.minFreeVramAfterLoadMiB is a schema default, not a performance measurement. -->
+The
+guard permits offload; Ollama controls the actual placement. RAM use can exceed that amount and
+generation can slow down. A passing health check means a job may start; it does not start one or
+prove that a host delegated work. See [checking a new session](docs/host-integration.md#check-whether-a-new-session-used-labor).
+
 Settings are in [docs/configuration.md](docs/configuration.md#guard).
 
 ## Safety model
