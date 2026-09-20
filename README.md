@@ -439,7 +439,14 @@ how a host chooses its tools. Start a new host session after changing its instru
 
 ```text
 When opencode-unity is on PATH, use the opencode-unity-delegate skill by default for token-heavy,
-low-ambiguity labor: multi-file digests, inventories, exact mechanical edits and drafts. Keep small,
+low-ambiguity labor. At the start of each substantive task or meaningful scope change, include one
+short Labor: decision in the first progress update, before bulk reads. State host with a concrete
+reason, or candidate with a named subtask and files. Keep this checkpoint even before loading the
+skill; skip repeated checks for simple chat/status requests and unchanged progress.
+Look for independent labor inside larger tasks while keeping their design/debugging decisions
+with the host. Candidate means run plan, then health and the selected job in the same turn when
+allowed; report an actual refusal reason or the returned job ID/status. Readiness is not usage.
+Suitable work includes multi-file digests, inventories, exact mechanical edits and drafts. Keep small,
 already-read, tool-solvable or expensive-to-verify work with the host. For candidates, use delegate
 plan, follow its route, then check delegate health before a job. Review file coverage and evidence;
 ok does not prove completeness. Announce the handoff and report its job id.

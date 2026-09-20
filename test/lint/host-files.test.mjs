@@ -88,6 +88,31 @@ describe('preview host files (hosts/)', () => {
     assert.match(body, /gpu_guard_blocked/);
   });
 
+  it('require a visible decision without mistaking readiness for actual delegation', () => {
+    const body = files.claude.body;
+    assert.match(body, /At the start of each substantive task or a materially changed scope/);
+    assert.match(body, /first progress update/);
+    assert.match(body, /Decide before bulk source reads/);
+    assert.match(body, /Labor: host/);
+    assert.match(body, /Labor: candidate/);
+    assert.match(body, /Labor: blocked/);
+    assert.match(body, /Candidate is not a started job/);
+    assert.match(body, /run the selected lane in the same turn/);
+    assert.match(body, /Report the returned job ID and status/);
+    assert.match(body, /Never infer a resource block/);
+    assert.match(body, /not a runtime hook/);
+  });
+
+  it('preserve cheap host work and consider bounded labor inside mixed tasks', () => {
+    const body = files.claude.body;
+    assert.match(body, /Proceed without plan\/health calls/);
+    assert.match(body, /Do not repeat the checkpoint for greetings, simple/);
+    assert.match(body, /For mixed tasks, keep design\/debugging decisions with the host/);
+    assert.match(body, /Do not reject a useful labor subtask solely/);
+    assert.match(body, /Do not invent work, split tiny tasks or run a demonstration job/);
+    assert.match(body, /Mark a result partial when review finds missing coverage/);
+  });
+
   it('contain no permission-bypass flag and no personal path', () => {
     for (const [host, file] of Object.entries(files)) {
       for (const flag of BYPASS_FLAGS) assert.ok(!file.text.includes(flag), `${host} contains ${flag}`);

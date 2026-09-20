@@ -36,6 +36,24 @@ A new session is ready to use these instructions after `host verify` passes for 
 Whether the host actually follows them is evidenced by its handoff message and a matching job ID in
 `delegate status --json`. The switch alone proves permission, not that a model job ran.
 
+### Visible decision at task start
+
+Add the [standing rule](../README.md#automatic-handoff-and-user-controls) to the host's instructions.
+For each substantive task or meaningful scope change, the first progress update should include a
+short `Labor:` decision before bulk source reads. The host translates the explanation for the user.
+
+| Decision | Required next action |
+| --- | --- |
+| `host` with a concrete reason | Continue with the host; skip unnecessary plan/health calls. |
+| `candidate` with named files and output | Run plan, then health and the selected job in the same turn when permitted. |
+| `blocked` with the returned reason | Follow the refusal; do not infer a GPU block from missing job history. |
+| Job ID and status | Review coverage and report the actual result, including partial results. |
+
+Consider independent inventory/digest work within a larger design or debugging task without
+delegating its decisions. Small tasks, simple chat/status requests and unchanged progress do not
+need repeated checkpoints. This instruction does not add a mandatory CLI hook or guarantee host
+compliance; the command history and job ledger remain the evidence of actual use.
+
 ### Check whether a new session used labor
 
 Check `opencode-unity delegate status --json` for active jobs and recent results, and

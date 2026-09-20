@@ -10,6 +10,35 @@ how to hand work to a local model through `opencode-unity delegate`, and how to 
 opencode-unity is MIT licensed and runs on this machine. It is unofficial and not affiliated with
 OpenCode, Ollama or Unity Technologies.
 
+## Report the routing decision
+
+At the start of each substantive task or a materially changed scope, include one short `Labor:`
+line in the first progress update, in the user's language. Decide before bulk source reads; use
+known intent and bounded file metadata. Do not repeat the checkpoint for greetings, simple
+questions, status-only requests or unchanged progress.
+
+Use these states and supply a concrete reason or evidence:
+
+- `Labor: host — <reason>.` The work is small, already read, tool-solvable, ambiguous, protected or
+  expensive to verify. Proceed without plan/health calls just to justify the decision.
+- `Labor: candidate — <bounded subtask>; next: plan.` Name the files and output, then run
+  `delegate plan` in the same turn. Candidate is not a started job.
+- If plan chooses host, report its reason and continue with the host. If health refuses, report
+  `Labor: blocked — <returned code/reason>; continuing with host.` Never infer a resource block
+  from an old health result or from an empty job history.
+- If plan and health permit the authorized subtask, run the selected lane in the same turn.
+  Report the returned job ID and status. Mark a result partial when review finds missing coverage;
+  a successful command or health check alone never proves completed, useful work.
+
+For mixed tasks, keep design/debugging decisions with the host, but consider an independent
+inventory or digest if the named unread files and targeted verification make it worthwhile.
+Do not reject a useful labor subtask solely because the overall task includes design or debugging.
+Do not invent work, split tiny tasks or run a demonstration job to satisfy this checkpoint.
+
+This is a host instruction, not a runtime hook: CLI installation cannot force a host to follow it.
+A standing host rule must request the checkpoint even when this skill is not loaded. In the final
+task result, briefly state the actual labor outcome when delegation was considered or attempted.
+
 ## Select work before calling tools
 
 `delegate on` permits new jobs across sessions; it does not send every user message to the worker.
